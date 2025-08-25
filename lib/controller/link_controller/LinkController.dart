@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:swopband/view/widgets/custom_snackbar.dart';
@@ -32,8 +33,8 @@ class LinkController extends GetxController {
     }
   }
 
-  Future<void> createLink({required String name, required String type, required String url,}) async {
-    print("api start");
+  Future<void> createLink({required String name, required String type, required String url,required VoidCallback call}) async {
+    log("api start");
     isLoading.value = true;
     try {
       final userId = await SharedPrefService.getString('backend_user_id');
@@ -49,30 +50,73 @@ class LinkController extends GetxController {
         "url": url,
       };
 
-      print("body---->$body");
+      log("body---->$body");
 
       final response = await ApiService.post(ApiUrls.createLink, body);
-      print("response---->${response?.body}");
+      log("create link response---->${response?.body}");
       if (response == null) {
         SnackbarUtil.showError("No response from server");
         return;
       }
 
       final data = jsonDecode(response.body);
-      print("status code----->1${response.statusCode}");
+      log("status code----->1${response.statusCode}");
       if (response.statusCode == 200) {
-        print("status code----->2${response.statusCode}");
-        print("response body${response.body}");
+        log("status code----->2${response.statusCode}");
+        log("response body${response.body}");
         final message = data['message'] ?? 'Link created';
+        call();
+
+        SnackbarUtil.showSuccess(message);
       } else {
+        // Check for field-specific errors first
+        if (data['errors'] != null && data['errors']['fieldErrors'] != null) {
+          final fieldErrors = data['errors']['fieldErrors'] as Map<String, dynamic>;
+          
+          // Check for URL field error
+          if (fieldErrors['url'] != null && fieldErrors['url'] is List && fieldErrors['url'].isNotEmpty) {
+            final urlError = fieldErrors['url'][0];
+            log("URL field error: $urlError");
+            SnackbarUtil.showError(urlError);
+            return;
+          }
+          
+          // Check for other field errors
+          for (String field in fieldErrors.keys) {
+            if (fieldErrors[field] is List && fieldErrors[field].isNotEmpty) {
+              final fieldError = fieldErrors[field][0];
+              log("Field error for $field: $fieldError");
+              SnackbarUtil.showError(fieldError);
+              return;
+            }
+          }
+        }
+        
+        // Check for specific error messages and provide better user feedback
         final error = data['error'] ?? data['message'] ?? "Something went wrong";
-        print("error-->$error");
-        SnackbarUtil.showError(error);
+        log("error-->$error");
+        
+        // Handle specific error cases with better user guidance
+        final errorString = error.toString().toLowerCase();
+        if (errorString.contains('duplicate')) {
+          SnackbarUtil.showError("This link already exists. Please try a different URL or check your existing links.");
+        } else if (errorString.contains('invalid') || errorString.contains('url')) {
+          SnackbarUtil.showError("Please enter a valid URL for this link type.");
+        } else if (errorString.contains('required') || errorString.contains('missing')) {
+          SnackbarUtil.showError("Please fill in all required fields.");
+        } else if (response.statusCode == 409) {
+          SnackbarUtil.showError("This link already exists in your profile. Please use a different URL.");
+        } else {
+          SnackbarUtil.showError(error);
+        }
       }
     } finally {
       isLoading.value = false;
     }
   }
+
+
+
 
   Future<void> writeNfcTagAndSaveLink({
     required BuildContext context,
@@ -103,7 +147,7 @@ class LinkController extends GetxController {
           nfcWriteInProgress.value = false;
           SnackbarUtil.showSuccess('NFC write successful!');
           // Call backend API to save link
-          await createLink(name: name, type: type, url: url);
+          await createLink(name: name, type: type, url: url, call: () {  });
         } catch (e) {
           NfcManager.instance.stopSession(errorMessage: e.toString());
           nfcWriteStatus.value = 'Write failed: $e';

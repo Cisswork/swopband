@@ -1,8 +1,15 @@
+import 'dart:developer';
+import 'dart:io' show Platform;
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swopband/view/network/ApiService.dart';
+import 'package:swopband/view/screens/PrivacyPolicyScreen.dart';
+import 'package:swopband/view/screens/UpdateProfileScreen.dart';
+import 'package:swopband/view/screens/nfc_test_screen.dart';
 import 'package:swopband/view/widgets/custom_button.dart';
 import 'package:swopband/view/widgets/custom_textfield.dart';
+import 'package:swopband/view/widgets/feedback_modal.dart';
 
 import '../utils/app_colors.dart';
 import '../utils/app_text_styles.dart';
@@ -24,8 +31,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,134 +58,90 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   text: "FAQ and Troubleshooting",
                   onPressed: () {
                     Get.to(()=>FAQScreen());
-
                   },
                 ),
               ),
-             /* const SizedBox(height: 15),
-              Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.black,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle('Notifications'),
-                      _buildNotificationOption('New connections'),
-                      _buildNotificationOption('Updates'),
-                      _buildNotificationOption('News'),
-                    ],
-                  )),*/
 
               const SizedBox(height: 24),
 
               // Account Information section
               Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.black,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionTitle('Account Information'),
-                      //_buildAccountOption('Update SWOPHANDLE'),
-                      SizedBox(height: 5,),
-                      /*GestureDetector(
-                          onTap: () {
-                            Get.to(()=>UpdateEmailScreen());
-                          },
-                          child: _buildAccountOption('Update Email')),
-                      SizedBox(height: 5,),
-                      GestureDetector(
-                          onTap: () {
-                            Get.to(()=>UpdatePhoneNumberScreen());
-
-                          },
-                          child: _buildAccountOption('Update Phone Number')),
-                      SizedBox(height: 5,),
-                      GestureDetector(
-                          onTap: () {
-                            Get.to(()=>UpdatePasswordScreen());
-
-                          },
-                          child: _buildAccountOption('Update Password')),*/
-                      SizedBox(height: 5,),
-                      GestureDetector(
-                          onTap: () {
-                            Get.to(()=>FAQScreen());
-                          },
-                          child: _buildAccountOption('FAQ')),
-                      SizedBox(height: 20),
-                      // Sign Out Option
-                      GestureDetector(
-                          onTap: () async {
-                            final confirmed = await showDialog<bool>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text('Sign Out'),
-                                content: Text('Are you sure you want to sign out?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
-                                    child: Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, true),
-                                    child: Text('Sign Out'),
-                                  ),
-                                ],
-                              ),
-                            );
-                            if (confirmed == true) {
-                              await _signOutUser();
-                            }
-                          },
-                      child: _buildAccountOption('Sign Out')),
-                      SizedBox(height: 5),
-                      // Delete Account Option
-                      GestureDetector(
-                          onTap: () async {
-                            final confirmed = await showDialog<bool>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: Text('Delete Account'),
-                                content: Text('Are you sure you want to delete your account? This action cannot be undone.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
-                                    child: Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, true),
-                                    child: Text('Delete'),
-                                  ),
-                                ],
-                              ),
-                            );
-                            if (confirmed == true) {
-                             await reauthenticateAndDeleteUser();
-                             await deleteAndSignOutUser();
-                              // await _deleteAndSignOutUser();
-                              // await _deleteAndSignOutUser1();
-                            }
-                          },
-                          child: _buildAccountOption('Delete Account')),
-                    ],
-                  )),
-              /*const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CustomButton(
-                  buttonColor: MyColors.textDisabledColor,
-                  textColor: MyColors.textBlack,
-                  text: "Contact SWOPBAND",
-                  onPressed: () {},
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.black,
                 ),
-              ),*/
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSectionTitle('Account Information'),
+                    SizedBox(height: 5),
+
+                    _buildTappableAccountOption(
+                      title: 'Edit Profile',
+                      icon: Icons.person,
+                      onTap: () => Get.to(()=>UpdateProfileScreen()),
+                    ),
+
+                    _buildTappableAccountOption(
+                      title: 'FAQ',
+                      icon: Icons.help_outline,
+                      onTap: () => Get.to(()=>FAQScreen()),
+                    ),
+
+                    // Feedback option
+                    _buildTappableAccountOption(
+                      title: 'Send Feedback',
+                      icon: Icons.feedback,
+                      onTap: () => FeedbackModalHelper.showFeedbackModal(context),
+                    ),
+
+                   /* // NFC Test option (for development/testing)
+                    _buildTappableAccountOption(
+                      title: 'NFC Test',
+                      icon: Icons.nfc,
+                      iconColor: Colors.blue,
+                      onTap: () => Get.to(()=>NfcTestScreen()),
+                    ),*/
+
+                    // Privacy Policy option
+                    _buildTappableAccountOption(
+                      title: 'Privacy Policy',
+                      icon: Icons.privacy_tip_outlined,
+                      onTap: () => Get.to(()=>PrivacyPolicyScreen(url: "https://srirangasai.dev/privacy_policy.html",
+                        type: 'Privacy Policy',)),
+                    ),
+
+                    // Terms & Conditions option
+                    _buildTappableAccountOption(
+                      title: 'Term & Condition',
+                      icon: Icons.description_outlined,
+                      onTap: () => Get.to(()=>PrivacyPolicyScreen(url: "https://srirangasai.dev/terms_and_conditions.html",
+                        type: 'Term & Condition',)),
+                    ),
+
+                    SizedBox(height: 20),
+
+                    // Sign Out Option
+                    _buildTappableAccountOption(
+                      title: 'Sign Out',
+                      icon: Icons.logout,
+                      onTap: () => _showSignOutDialog(),
+                    ),
+
+                    SizedBox(height: 5),
+
+                    // Delete Account Option
+                    _buildTappableAccountOption(
+                      title: 'Delete Account',
+                      icon: Icons.delete_forever,
+                      iconColor: Colors.red,
+                      onTap: () => _showDeleteAccountDialog(),
+                    ),
+                  ],
+                ),
+              ),
+
               const SizedBox(height: 80),
             ],
           ),
@@ -195,159 +156,237 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Text(
         title,
         style: AppTextStyles.medium.copyWith(
-          color: MyColors.textWhite,
-          fontWeight: FontWeight.w500,
-          fontSize: 24
+            color: MyColors.textWhite,
+            fontWeight: FontWeight.w500,
+            fontSize: 24
         ),
       ),
     );
   }
 
-  Widget _buildNotificationOption(String option) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Text(
-            option,
-            style: AppTextStyles.medium.copyWith(
-              color: MyColors.textWhite, // Dummy secondary color
-              fontWeight: FontWeight.w500,
+  Widget _buildTappableAccountOption({required String title, required IconData icon, required VoidCallback onTap, Color iconColor = Colors.white,}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+        child: Row(
+          children: [
+            Icon(icon, color: iconColor, size: 24),
+            SizedBox(width: 12),
+            Text(
+              title,
+              style: AppTextStyles.medium.copyWith(
+                color: MyColors.textWhite,
+                fontWeight: FontWeight.w500,
+              ),
             ),
+            Spacer(),
+            Icon(Icons.arrow_forward, color: Colors.white, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showSignOutDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+        title: Text(
+          'Sign Out',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text('Are you sure you want to sign out?'),
+        actions: [
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.grey[600],
+            ),
+            onPressed: () => Navigator.pop(context),
+            child: Text('CANCEL'),
           ),
-          const Spacer(),
-          Switch(
-              activeTrackColor: Colors.white,
-              inactiveThumbColor: MyColors.textDisabledColor,
-              activeColor: Colors.black,
-              value: true, onChanged: (bool value) {}),
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              _signOutUser();
+            },
+            child: Text('SIGN OUT'),
+          ),
         ],
       ),
     );
   }
 
-  Future<void> _deleteAndSignOutUser1() async {
+  Future<void> _showDeleteAccountDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+        title: Text(
+          'Delete Account',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('This will permanently:'),
+            SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('• Delete all your data'),
+                  Text('• Remove your profile'),
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
+            Text('This action cannot be undone.'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.grey[600],
+            ),
+            onPressed: () => Navigator.pop(context),
+            child: Text('CANCEL'),
+          ),
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            onPressed: () async {
+              Navigator.pop(context);
+              await _deleteAndSignOutUser1();
+            },
+            child: Text('DELETE ACCOUNT'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteAndSignOutUser() async {
     try {
+      // Step 0: Get backend user ID
       final backendUserId = await SharedPrefService.getString('backend_user_id');
+
+      // Step 1: Delete account from backend
       if (backendUserId != null && backendUserId.isNotEmpty) {
-        // Call backend delete API
         final response = await ApiService.delete(
           'https://srirangasai.dev/users/$backendUserId',
         );
+
         if (response == null || (response.statusCode != 200 && response.statusCode != 204)) {
           SnackbarUtil.showError('Failed to delete account on server.');
           return;
         }
-      } else {
-        print('No backend_user_id found, skipping backend delete.');
       }
-      // Delete Firebase user
+
+      // Step 2: Delete Firebase user
       final user = FirebaseAuth.instance.currentUser;
+      bool deleted = false;
+
       if (user != null) {
         try {
+          // Try direct deletion first
           await user.delete();
+          deleted = true;
         } catch (e) {
-          // Re-authenticate if needed
-          final googleUser = await GoogleSignIn().signIn();
-          if (googleUser == null) {
-            SnackbarUtil.showError('Google sign-in canceled.');
-            return;
+          log("⚠️ Direct deletion failed: $e");
+
+          // Re-auth required
+          try {
+            if (Platform.isIOS) {
+              // Fresh Apple sign-in
+              final appleCredential = await SignInWithApple.getAppleIDCredential(
+                scopes: [
+                  AppleIDAuthorizationScopes.email,
+                  AppleIDAuthorizationScopes.fullName
+                ],
+              );
+
+              final oauthCredential = OAuthProvider("apple.com").credential(
+                idToken: appleCredential.identityToken,
+              );
+
+              await user.reauthenticateWithCredential(oauthCredential);
+              await user.delete();
+              deleted = true;
+            } else if (Platform.isAndroid) {
+              // Google re-auth
+              final googleUser = await GoogleSignIn().signIn();
+              if (googleUser == null) {
+                SnackbarUtil.showError('Google sign-in canceled.');
+                return;
+              }
+
+              final googleAuth = await googleUser.authentication;
+              final credential = GoogleAuthProvider.credential(
+                accessToken: googleAuth.accessToken,
+                idToken: googleAuth.idToken,
+              );
+
+              await user.reauthenticateWithCredential(credential);
+              await user.delete();
+              deleted = true;
+              await GoogleSignIn().disconnect();
+            }
+          } catch (reauthError) {
+            log("❌ Re-auth or deletion failed: $reauthError");
+
+            // Reload user and check if already deleted
+            await user.reload();
+            if (FirebaseAuth.instance.currentUser == null) {
+              deleted = true;
+            } else {
+              SnackbarUtil.showError("Account deletion failed after re-authentication.");
+              return;
+            }
           }
-          final googleAuth = await googleUser.authentication;
-          final credential = GoogleAuthProvider.credential(
-            accessToken: googleAuth.accessToken,
-            idToken: googleAuth.idToken,
-          );
-          await user.reauthenticateWithCredential(credential);
-          await user.delete();
         }
       }
+
+      if (!deleted) {
+        SnackbarUtil.showError("Account deletion failed.");
+        return;
+      }
+
+      // Step 3: Sign out & clear local storage
       await FirebaseAuth.instance.signOut();
-      await GoogleSignIn().signOut();
+      if (Platform.isAndroid) await GoogleSignIn().signOut();
       await SharedPrefService.clear();
+
+      // Navigate to WelcomeScreen
       Get.offAll(() => WelcomeScreen());
       SnackbarUtil.showSuccess('Account Deleted: Your account has been deleted.');
     } catch (e) {
-      print('❌ Error deleting/signing out: $e');
+      log('❌ Error deleting/signing out: $e');
       SnackbarUtil.showError('Failed to delete account.');
     }
-  }
-
-  Widget _buildAccountOption(String option) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Text(
-            option,
-            style: AppTextStyles.medium.copyWith(
-              color: MyColors.textWhite,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const Spacer(),
-          Icon(Icons.arrow_forward,color: Colors.white,)
-        ],
-      ),
-    );
   }
 
   Future<void> _signOutUser() async {
     try {
       await FirebaseAuth.instance.signOut();
-      await GoogleSignIn().signOut();
+      if (Platform.isAndroid) await GoogleSignIn().signOut();
       await SharedPrefService.clear();
       Get.offAll(() => WelcomeScreen());
     } catch (e) {
       print('❌ Error signing out: $e');
       SnackbarUtil.showError('Failed to sign out.');
-    }
-  }
-
-  Future<void> _deleteAndSignOutUser() async {
-    try {
-      final backendUserId = await SharedPrefService.getString('backend_user_id');
-      if (backendUserId == null || backendUserId.isEmpty) {
-        SnackbarUtil.showError('No backend user ID found.');
-        return;
-      }
-      // Call backend delete API
-      final response = await ApiService.delete(
-        'https://srirangasai.dev/users/$backendUserId',
-      );
-      if (response == null || (response.statusCode != 200 && response.statusCode != 204)) {
-        SnackbarUtil.showError('Failed to delete account on server.');
-        return;
-      }
-      // Delete Firebase user
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        try {
-          await user.delete();
-        } catch (e) {
-          // If requires recent login, reauthenticate with Google
-          final googleUser = await GoogleSignIn().signIn();
-          if (googleUser == null) {
-            SnackbarUtil.showError('Google sign-in canceled.');
-            return;
-          }
-          final googleAuth = await googleUser.authentication;
-          final credential = GoogleAuthProvider.credential(
-            accessToken: googleAuth.accessToken,
-            idToken: googleAuth.idToken,
-          );
-          await user.reauthenticateWithCredential(credential);
-          await user.delete();
-        }
-      }
-      await FirebaseAuth.instance.signOut();
-      await GoogleSignIn().signOut();
-      await SharedPrefService.clear();
-      Get.offAll(() => WelcomeScreen());
-      SnackbarUtil.showSuccess('Account Deleted: Your account has been deleted.');
-    } catch (e) {
-      print('❌ Error deleting/signing out: $e');
-      SnackbarUtil.showError('Failed to delete account.');
     }
   }
 
@@ -386,28 +425,75 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> deleteAndSignOutUser() async {
-    try {
-      final FirebaseAuth auth = FirebaseAuth.instance;
-      final user = auth.currentUser;
 
-      if (user != null) {
-        // 🔥 Delete Firebase account
-        await user.delete();
-        print("✅ Firebase user account deleted.");
+  Future<void> _deleteAndSignOutUser1() async {
+    try {
+      // Show loading indicator
+      Get.dialog(
+        const Center(child: CircularProgressIndicator()),
+        barrierDismissible: false,
+      );
+
+      // Step 1: Delete account from backend
+      final backendUserId = await SharedPrefService.getString('backend_user_id');
+      if (backendUserId != null && backendUserId.isNotEmpty) {
+        final response = await ApiService.delete(
+          'https://srirangasai.dev/users/$backendUserId',
+        );
+
+        if (response == null || (response.statusCode != 200 && response.statusCode != 204)) {
+          Get.back(); // Close loading dialog
+          SnackbarUtil.showError('Failed to delete account on server.');
+          return;
+        }
       }
 
-      // 🔌 Sign out from Firebase and Google
-      await auth.signOut();
-      await GoogleSignIn().signOut();
+      // Step 2: Attempt direct Firebase user deletion
+      await _attemptFirebaseAccountDeletion();
 
-      print("✅ Signed out successfully.");
+      // Step 3: Force sign out and clear data
+      await _forceSignOutAndClearData();
 
-      // 🧼 Clear SharedPrefs if needed
-      // await SharedPrefService.clearAll();  // Optional if using shared prefs
+      // Navigate to WelcomeScreen
+      Get.offAll(() => const WelcomeScreen());
+      SnackbarUtil.showSuccess('Account deleted successfully');
     } catch (e) {
-      print("❌ Error deleting/signing out: $e");
+      log('❌ Error during account deletion: $e');
+      SnackbarUtil.showError('An error occurred during account deletion');
+    } finally {
+      if (Get.isDialogOpen!) Get.back(); // Close loading dialog
     }
   }
 
-}
+  Future<void> _attemptFirebaseAccountDeletion() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    try {
+      await user.delete();
+      log('✅ Firebase account deleted successfully');
+    } catch (e) {
+      log('⚠️ Firebase account deletion failed: $e');
+      // Even if deletion fails, we'll proceed with sign out
+      // You might want to add analytics here to track failure rates
+    }
+  }
+
+  Future<void> _forceSignOutAndClearData() async {
+    try {
+      // Common sign out for all platforms
+      await FirebaseAuth.instance.signOut();
+
+      // Platform-specific sign out
+      if (Platform.isAndroid) {
+        await GoogleSignIn().signOut();
+        await GoogleSignIn().disconnect();
+      }
+
+      // Clear all local data
+      await SharedPrefService.clear();
+      log('✅ All sessions and data cleared');
+    } catch (e) {
+      log('❌ Error during signout: $e');
+    }
+  }}

@@ -12,4 +12,5 @@ class MyColors {
   static const Color textDisabledColor = Color(0xFFBDBDBD);
   static const Color textLinkColor = Color(0xFF1976D2);
   static const Color textErrorColor = Color(0xFFD32F2F);
+
 }

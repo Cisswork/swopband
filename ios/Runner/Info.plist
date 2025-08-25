@@ -49,15 +49,45 @@
 	  <key>CFBundleURLTypes</key>
       <array>
         <dict>
+          <key>CFBundleURLName</key>
+          <string>com.swopband.nfc</string>
           <key>CFBundleURLSchemes</key>
           <array>
-            <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>com.googleusercontent.apps.172436055817-oel4945sodpj1c0fr4ecqdvsskc0h8pi</string>
+          </array>
+        </dict>
+        <dict>
+          <key>CFBundleURLName</key>
+          <string>com.swopband.universal</string>
+          <key>CFBundleURLSchemes</key>
+          <array>
+            <string>swopband</string>
+            <string>swopband-nfc</string>
           </array>
         </dict>
       </array>
+<key>NSUserTrackingUsageDescription</key>
+<string>Used for Apple Sign-In authentication.</string>
 
       <key>NSFaceIDUsageDescription</key>
       <string>Sign in with Apple requires Face ID permission.</string>
+      <key>NSCameraUsageDescription</key>
+      <string>This app needs camera access to take photos.</string>
+      <key>NSPhotoLibraryUsageDescription</key>
+      <string>This app needs photo library access to select photos.</string>
+      <key>NFCReaderUsageDescription</key>
+      <string>This app uses NFC to scan tags.</string>
+      <key>NSPhotoLibraryAddUsageDescription</key>
+      <string>This app needs access to save photos to your photo library.</string>
+
+
+<key>GIDClientID</key>
+<string>172436055817-oel4945sodpj1c0fr4ecqdvsskc0h8pi.apps.googleusercontent.com</string>
+<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+<array/>
+<key>com.apple.developer.nfc.readersession.felica.systemcodes</key>
+<array/>
+
 
 </dict>
 </plist>

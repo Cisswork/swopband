@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swopband/controller/nav_controller/NavController.dart';
-import '../EditLinksScreen.dart';
 import '../FeedbackScreen.dart';
+import '../EditLinksScreen.dart';
 import '../HubScreen.dart';
 import '../RecentSwoppersScreen.dart';
 import '../SettingScreen.dart';
+import '../swopband_webview_screen.dart';
 
 class BottomNavScreen extends StatelessWidget {
   BottomNavScreen({super.key});
@@ -15,8 +16,9 @@ class BottomNavScreen extends StatelessWidget {
   final List<Widget> screens = [
     const EditLinksScreen(),
     const RecentSwoppersScreen(),
-    HubScreen(),
-    FeedbackPopup(),
+    // HubScreen(),
+    SwopbandWebViewScreen(url: '',),
+    Container(), // Placeholder for feedback - will be handled by navigation
     SettingsScreen(),
   ];
 
@@ -25,15 +27,28 @@ class BottomNavScreen extends StatelessWidget {
     return Scaffold(
         backgroundColor: Colors.black,
         body: Obx(() => screens[navController.selectedIndex.value]),
-        bottomNavigationBar: Obx(
-          () => Container(
-            decoration: BoxDecoration(
-              border:
-                  Border(top: BorderSide(color: Colors.grey.withOpacity(0.2))),
+      bottomNavigationBar: Obx(
+            () => Container(
+          decoration: BoxDecoration(
+            border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.2))),
+          ),
+          child: Theme(
+            data: Theme.of(context).copyWith(
+              splashFactory: NoSplash.splashFactory, // Ripple effect disable
+              highlightColor: Colors.transparent,   // Press highlight disable
             ),
             child: BottomNavigationBar(
               currentIndex: navController.selectedIndex.value,
-              onTap: (index) => navController.changeIndex(index),
+              onTap: (index) {
+                if (index == 3) { // Feedback tab
+                  showDialog(
+                    context: context,
+                    builder: (context) => FeedbackPopup(),
+                  );
+                } else {
+                  navController.changeIndex(index);
+                }
+              },
               type: BottomNavigationBarType.fixed,
               backgroundColor: Colors.black,
               selectedItemColor: Colors.white,
@@ -41,7 +56,7 @@ class BottomNavScreen extends StatelessWidget {
               showSelectedLabels: false,
               showUnselectedLabels: false,
               elevation: 0,
-              items: [
+              items: const [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.link),
                   label: '',
@@ -65,7 +80,9 @@ class BottomNavScreen extends StatelessWidget {
               ],
             ),
           ),
-        )
+        ),
+      ),
+
     );
   }
 }

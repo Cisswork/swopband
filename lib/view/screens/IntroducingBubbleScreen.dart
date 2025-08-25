@@ -134,20 +134,5 @@ class _IntroducingBubbleScreenState extends State<IntroducingBubbleScreen> {
       },
     );
   }
-  Widget _buildInstructionItem(String text,String image) {
-    return ListTile(
-      visualDensity: VisualDensity.comfortable,
-      contentPadding: EdgeInsets.all(0),
-      leading:   Image(image: AssetImage(image),height: 55,alignment: Alignment.center,),
-      title: Text(
-        text,
-        style: AppTextStyles.medium.copyWith(
-          fontSize: 14,
-        ),
-        textAlign: TextAlign.left,
-      ),
-    );
-
-  }
 
 }

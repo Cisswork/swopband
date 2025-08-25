@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -25,7 +26,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final TextEditingController passwordController = TextEditingController();
   final String _error = '';
   bool _loading = false;
+  bool _loadingApple = false;
   User? _user;
+
+
 
   Future<void> signInWithGoogle() async {
     setState(() {
@@ -71,11 +75,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       final userData = await userController.fetchUserByFirebaseId(firebaseId!);
 
       if (userData != null) {
-        // User exists, save backend_user_id and go to main app
         await SharedPrefService.saveString('backend_user_id', userData['id']);
         Get.off(() => BottomNavScreen());
       } else {
-        // User does not exist, go to onboarding
         Get.to(() => CreateProfileScreen(
           email: user?.email.toString(),
           name: user?.displayName,
@@ -104,15 +106,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 children: [
                   Image.asset(
                     MyImages.welcomeLogo,
-                    height: 350,
+                    height: 450,
                     width: double.infinity,
                   ),
-                  SizedBox(height: 8,),
-                  CustomButton(
+                  _loadingApple
+                      ?  CupertinoActivityIndicator(color: Colors.black,)
+                      : CustomButton(
                       border: Colors.black,
-                      widget: Icon(Icons.apple,color: Colors.black,size: 28,),
+                      widget: Icon(Icons.apple,color: Colors.white,size: 28,),
                       text: 'Sign up with Apple',
-                      onPressed: signInWithApple
+                      onPressed: () {
+                        signInWithApple();
+                      },
                   ),
                   SizedBox(height: 16),
                   _loading
@@ -137,24 +142,74 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   Future<void> signInWithApple() async {
-    final appleCredential = await SignInWithApple.getAppleIDCredential(
-      scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ],
-    );
+    print("🚀 Starting Apple sign-in...");
+    setState(() {
+      _loadingApple = true;
+    });
 
-    final oauthCredential = OAuthProvider("apple.com").credential(
-      idToken: appleCredential.identityToken,
-      accessToken: appleCredential.authorizationCode,
-    );
+    try {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
 
-    // Sign in with Firebase
-    await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+      // Save email and name locally if returned (only available on first login)
+      if (appleCredential.email != null) {
+        await SharedPrefService.saveString("apple_email", appleCredential.email!);
+      }
 
-    print("✅ Signed in with Apple successfully");
+      if (appleCredential.givenName != null || appleCredential.familyName != null) {
+        final fullName = "${appleCredential.givenName ?? ''} ${appleCredential.familyName ?? ''}".trim();
+        await SharedPrefService.saveString("apple_name", fullName);
+      }
+
+      // Create Firebase credential
+      final oauthCredential = OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      // Sign in to Firebase
+      final userCred = await FirebaseAuth.instance.signInWithCredential(oauthCredential);
+      final user = userCred.user;
+
+      if (user != null) {
+        print("✅ Firebase sign-in successful");
+        print("👤 UID: ${user.uid}");
+        print("📧 Email: ${user.email}");
+        print("🧑‍💼 Display Name: ${user.displayName}");
+
+        await SharedPrefService.saveString("firebase_id", user.uid);
+
+        final userController = Get.put(UserController());
+        final userData = await userController.fetchUserByFirebaseId(user.uid);
+
+        if (userData != null) {
+          print("userData['id']${userData['id']}");
+          await SharedPrefService.saveString('backend_user_id', userData['id']);
+          Get.off(() => BottomNavScreen());
+        } else {
+
+          final savedEmail = await SharedPrefService.getString("apple_email");
+          final savedName = await SharedPrefService.getString("apple_name");
+
+          Get.to(() => CreateProfileScreen(
+            email: user.email ?? savedEmail ?? "",
+            name: user.displayName ?? savedName ?? "",
+            userImage: user.photoURL??"",
+          ));
+        }
+      }
+    } catch (e) {
+      print("❌ Apple Sign-In failed: $e");
+    } finally {
+      setState(() {
+        _loadingApple = false;
+      });
+    }
   }
-
   Future<void> signOut() async {
     await GoogleSignIn().signOut();
     await FirebaseAuth.instance.signOut();
@@ -164,7 +219,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     super.initState();
-    _checkLogin();
+    //_checkLogin();
   }
 
   void _checkLogin() async {

@@ -93,7 +93,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     textInputAction: TextInputAction.next,
                     onChanged: (phone) {
                       print(phone
-                          .completeNumber); // Get complete number with country code
+                          ?.completeNumber); // Get complete number with country code
                     },
                     onCountryChanged: (country) {
                       print('Country changed to: ${country.code}');

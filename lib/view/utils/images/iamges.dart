@@ -22,4 +22,8 @@ class MyImages {
   static const github = "assets/images/github.png";
   static const facebook = "assets/images/facebook.png";
   static const profileImage = "assets/images/profileImage.png";
+  static const website = "assets/images/web.png";
+  static const dribble = "assets/images/dribble.png";
+  static const discord = "assets/images/discord.png";
+  static const tiktok = "assets/images/tiktok.png";
 }

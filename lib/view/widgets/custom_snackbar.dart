@@ -27,4 +27,30 @@ class SnackbarUtil {
       duration: const Duration(seconds: 3),
     );
   }
+
+  static void showInfo(String message) {
+    Get.snackbar(
+      "ℹ️ Info",
+      message,
+      backgroundColor: Colors.blue,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      borderRadius: 12,
+      duration: const Duration(seconds: 3),
+    );
+  }
+
+  static void showWarning(String message) {
+    Get.snackbar(
+      "⚠️ Warning",
+      message,
+      backgroundColor: Colors.orange,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      borderRadius: 12,
+      duration: const Duration(seconds: 3),
+    );
+  }
 }

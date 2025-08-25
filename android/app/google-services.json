@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "172436055817-rpot1skptcrpugpd5coc44o9a2aha42b.apps.googleusercontent.com",
+          "client_id": "172436055817-s0lnmpjgv6j1bl80marduhac8ov3oukj.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.swopband.nfc.swopband",
-            "certificate_hash": "0995bd77fa9d9c0766555803ec06f82f81fb76f9"
+            "certificate_hash": "1a0d8b6e5792dae99fedbe563829423f00b1be54"
           }
         },
         {
@@ -37,6 +37,13 @@
             {
               "client_id": "172436055817-8j25plsvsec6cjcvnl4me687fp65730p.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "172436055817-oel4945sodpj1c0fr4ecqdvsskc0h8pi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.swopband.nfc.swopband"
+              }
             }
           ]
         }

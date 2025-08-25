@@ -1,10 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-
-
 
   static Future<Map<String, String>> _buildHeaders() async {
     final prefs = await SharedPreferences.getInstance();
@@ -27,6 +26,128 @@ class ApiService {
       return response;
     } catch (e) {
       print("❌ POST Error: $e");
+      return null;
+    }
+  }
+
+  /// Multipart POST request (for file uploads)
+  static Future<http.Response?> multipartPost(
+    String url, {
+    required Map<String, String> fields,
+    File? file,
+    String fileFieldName = 'profile',
+    String? filename,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final firebaseId = prefs.getString("firebase_id") ?? "";
+
+      final uri = Uri.parse(url);
+      final request = http.MultipartRequest('POST', uri);
+
+      // Headers: do NOT set Content-Type; MultipartRequest sets it
+      request.headers.addAll({
+        'firebase_id': firebaseId,
+      });
+
+      request.fields.addAll(fields);
+
+      if (file != null) {
+        final multipartFile = await http.MultipartFile.fromPath(
+          fileFieldName,
+          file.path,
+          filename: filename,
+        );
+        request.files.add(multipartFile);
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      return response;
+    } catch (e) {
+      print("❌ MULTIPART POST Error: $e");
+      return null;
+    }
+  }
+
+  /// Multipart PUT request (for file uploads during updates)
+  static Future<http.Response?> multipartPut(
+    String url, {
+    required Map<String, String> fields,
+    File? file,
+    String fileFieldName = 'profile',
+    String? filename,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final firebaseId = prefs.getString("firebase_id") ?? "";
+
+      final uri = Uri.parse(url);
+      final request = http.MultipartRequest('PUT', uri);
+
+      // Headers: do NOT set Content-Type; MultipartRequest sets it
+      request.headers.addAll({
+        'firebase_id': firebaseId,
+      });
+
+      request.fields.addAll(fields);
+
+      if (file != null) {
+        final multipartFile = await http.MultipartFile.fromPath(
+          fileFieldName,
+          file.path,
+          filename: filename,
+        );
+        request.files.add(multipartFile);
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      return response;
+    } catch (e) {
+      print("❌ MULTIPART PUT Error: $e");
+      return null;
+    }
+  }
+
+  /// Multipart POST with update header (fallback for PUT issues)
+  static Future<http.Response?> multipartPostWithUpdate(
+    String url, {
+    required Map<String, String> fields,
+    File? file,
+    String fileFieldName = 'profile',
+    String? filename,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final firebaseId = prefs.getString("firebase_id") ?? "";
+
+      final uri = Uri.parse(url);
+      final request = http.MultipartRequest('POST', uri);
+
+      // Headers: do NOT set Content-Type; MultipartRequest sets it
+      request.headers.addAll({
+        'firebase_id': firebaseId,
+        'X-HTTP-Method-Override': 'PUT', // Some backends use this
+        'X-Requested-With': 'XMLHttpRequest',
+      });
+
+      request.fields.addAll(fields);
+
+      if (file != null) {
+        final multipartFile = await http.MultipartFile.fromPath(
+          fileFieldName,
+          file.path,
+          filename: filename,
+        );
+        request.files.add(multipartFile);
+      }
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      return response;
+    } catch (e) {
+      print("❌ MULTIPART POST WITH UPDATE Error: $e");
       return null;
     }
   }

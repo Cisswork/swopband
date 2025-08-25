@@ -1,7 +1,13 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:swopband/controller/user_controller/UserController.dart';
 import 'package:swopband/view/network/ApiService.dart';
+import 'package:swopband/view/utils/app_constants.dart';
+import 'package:swopband/view/utils/shared_pref/SharedPrefHelper.dart';
 import 'package:swopband/view/widgets/custom_button.dart';
 import 'package:swopband/view/widgets/custom_textfield.dart';
 import 'package:swopband/view/widgets/custom_snackbar.dart';
@@ -23,40 +29,68 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
   final List<String> _linkTypes = [];
   int _linkCount = 0;
   final controller = Get.put(LinkController());
+  final userController = Get.put(UserController());
 
   late Worker _linksWorker;
+  String imageUrl = "";
+
+  // Method to launch URLs
+  Future<void> _launchUrl(String url) async {
+    try {
+      // Ensure URL has proper scheme
+      String finalUrl = url;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        finalUrl = 'https://$url';
+      }
+      
+      final Uri uri = Uri.parse(finalUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        SnackbarUtil.showError('Could not launch $finalUrl');
+      }
+    } catch (e) {
+      SnackbarUtil.showError('Error launching URL: $e');
+    }
+  }
 
   final Map<String, String> _platformImages = {
     'instagram': MyImages.insta,
-    'music': MyImages.music,
+    'custom': MyImages.music, // Changed from 'music' to 'custom'
     'reddit': MyImages.reddit,
     'linkedin': MyImages.linkedId,
-    'twitter': MyImages.xmaster,
+    'x': MyImages.xmaster, // Changed from 'twitter' to 'x'
     'spotify': MyImages.spotify,
     'facebook': MyImages.facebook,
     'github': MyImages.github,
     'youtube': MyImages.youtube,
-    'tinder': MyImages.tindi,
+    'tiktok': MyImages.insta, // Added TikTok
+    'discord': MyImages.insta, // Added Discord
+    'dribble': MyImages.insta, // Added Dribbble
+    'website': MyImages.music, // Added Website
   };
 
   final Map<String, Map<String, dynamic>> _supportedLinks = {
     'instagram': {'name': 'Instagram', 'icon': MyImages.insta},
-    'music': {'name': 'Music', 'icon': MyImages.music},
+    'custom': {'name': 'Music', 'icon': MyImages.music}, // Changed from 'music' to 'custom'
     'reddit': {'name': 'Reddit', 'icon': MyImages.reddit},
     'linkedin': {'name': 'LinkedIn', 'icon': MyImages.linkedId},
-    'twitter': {'name': 'Twitter', 'icon': MyImages.xmaster},
+    'x': {'name': 'Twitter', 'icon': MyImages.xmaster}, // Changed from 'twitter' to 'x'
     'spotify': {'name': 'Spotify', 'icon': MyImages.spotify},
     'facebook': {'name': 'Facebook', 'icon': MyImages.facebook},
     'github': {'name': 'GitHub', 'icon': MyImages.github},
     'youtube': {'name': 'YouTube', 'icon': MyImages.youtube},
-    'tinder': {'name': 'Tinder', 'icon': MyImages.tindi},
+    'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok}, // Added TikTok
+    'discord': {'name': 'Discord', 'icon': MyImages.discord}, // Added Discord
+    'dribble': {'name': 'Dribbble', 'icon': MyImages.dribble}, // Added Dribbble
+    'website': {'name': 'Website', 'icon': MyImages.website}, // Added Website
   };
 
 
   @override
   void initState() {
     super.initState();
-
+    _checkAuth();
     // Register 'ever' immediately
     _linksWorker = ever(controller.links, (_) {
       if (!mounted) return;
@@ -71,7 +105,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
 
       if (_linkControllers.isEmpty) {
         _linkControllers.add(TextEditingController());
-        _linkTypes.add('spotify');
+        _linkTypes.add('custom'); // Changed from 'spotify' to 'custom'
       }
 
       setState(() {
@@ -83,6 +117,28 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     controller.fetchLinks();
   }
 
+  Future<void> _checkAuth()async {
+    final firebaseId = await SharedPrefService.getString('firebase_id');
+    final backendUserId = await SharedPrefService.getString('backend_user_id');
+
+    log("firebaseId  : $firebaseId");
+
+    if (firebaseId != null && firebaseId.isNotEmpty) {
+       await userController.fetchUserByFirebaseId(firebaseId);
+       imageUrl =  sanitizeProfileUrl(AppConst.USER_PROFILE as String?);
+
+    }
+  }
+
+
+  String sanitizeProfileUrl(String? url) {
+    if (url == null || url.isEmpty) return '';
+    if (kIsWeb && url.startsWith('http://srirangasai.dev')) {
+      return url.replaceFirst('http://', 'https://');
+    }
+    return url;
+  }
+
   @override
   void dispose() {
     _linksWorker.dispose();
@@ -92,41 +148,6 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     super.dispose();
   }
 
-  Future<void> _submitLinks() async {
-    // Validation: no empty, no duplicate type, no duplicate url
-    final urls = <String>{};
-    final types = <String>{};
-    for (int i = 0; i < _linkControllers.length; i++) {
-      final url = _linkControllers[i].text.trim();
-      final type = _linkTypes[i];
-      if (url.isEmpty || type.isEmpty) {
-        SnackbarUtil.showError('Link type and URL cannot be empty.');
-        return;
-      }
-      /*if (types.contains(type)) {
-        SnackbarUtil.showError('Duplicate link type "$type" not allowed.');
-        return;
-      }
-      if (urls.contains(url)) {
-        SnackbarUtil.showError('Duplicate link URL "$url" not allowed.');
-        return;
-      }*/
-      types.add(type);
-      urls.add(url);
-    }
-    try {
-      for (int i = 0; i < _linkControllers.length; i++) {
-        await controller.createLink(
-          name: _linkTypes[i],
-          type: _linkTypes[i],
-          url: _linkControllers[i].text.trim(),
-        );
-      }
-      controller.fetchLinks(); // Refresh links after update
-    } catch (e) {
-      SnackbarUtil.showError('Failed to update links: ${e.toString()}');
-    }
-  }
 
   void _showEditDialog(int index) {
     final link = controller.links[index];
@@ -201,18 +222,10 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
   Widget _buildPlatformImage(String platform, bool isActive) {
     return Column(
       children: [
-        ColorFiltered(
-          colorFilter: isActive
-              ? const ColorFilter.mode(Colors.transparent, BlendMode.multiply)
-              : ColorFilter.mode(
-            Colors.grey.withOpacity(0.5),
-            BlendMode.saturation,
-          ),
-          child: Image.asset(
-            _platformImages[platform] ?? MyImages.insta,
-            width: 40,
-            height: 40,
-          ),
+        Image.asset(
+          _platformImages[platform] ?? MyImages.insta,
+          width: 40,
+          height: 40,
         ),
         if (isActive)
           Container(
@@ -273,19 +286,21 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                           ),
                           child: Column(
                             children: [
+
+
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   _buildPlatformImage('instagram',
                                       controller.links.any((link) => link.type == 'instagram')),
-                                  _buildPlatformImage('music',
-                                      controller.links.any((link) => link.type == 'music')),
+                                  _buildPlatformImage('custom',
+                                      controller.links.any((link) => link.type == 'custom')),
                                   _buildPlatformImage('reddit',
                                       controller.links.any((link) => link.type == 'reddit')),
                                   _buildPlatformImage('linkedin',
                                       controller.links.any((link) => link.type == 'linkedin')),
-                                  _buildPlatformImage('twitter',
-                                      controller.links.any((link) => link.type == 'twitter')),
+                                  _buildPlatformImage('x',
+                                      controller.links.any((link) => link.type == 'x')),
                                 ],
                               ),
                               const SizedBox(height: 8),
@@ -300,7 +315,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                       controller.links.any((link) => link.type == 'github')),
                                   _buildPlatformImage('youtube',
                                       controller.links.any((link) => link.type == 'youtube')),
-                                  _buildPlatformImage('tinder',controller.links.any((link) => link.type == 'tinder')),
+                                  _buildPlatformImage('tiktok',controller.links.any((link) => link.type == 'tiktok')),
                                 ],
                               ),
                               const SizedBox(height: 15),
@@ -366,20 +381,28 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                 const SizedBox(width: 10),
                                 Expanded(
                                   flex: 7,
-                                  child: TextField(
-                                    controller: TextEditingController(text: controller.links[index].url),
-                                    readOnly: true,
-                                    decoration: InputDecoration(
-                                      hintText: 'Enter ${_supportedLinks[controller.links[index].type]!['name']} URL or ID',
-                                      filled: true,
-                                      fillColor: Colors.transparent,
-                                      border: OutlineInputBorder(
+                                  child: GestureDetector(
+                                    onTap: () => _launchUrl(controller.links[index].url),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey),
                                         borderRadius: BorderRadius.circular(10),
-                                        borderSide: const BorderSide(color: Colors.grey),
                                       ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: const BorderSide(color: Colors.grey),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              controller.links[index].url,
+                                              style: TextStyle(
+                                                color: Colors.blue,
+                                                decoration: TextDecoration.underline,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          Icon(Icons.open_in_new, color: Colors.blue, size: 16),
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -424,9 +447,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                           ],
                         )),
                         // Editable fields for new links
-                        ...List.generate(
-                          (_linkCount - controller.links.length).clamp(0, _linkCount),
-                          (i) {
+                        ...List.generate((_linkCount - controller.links.length).clamp(0, _linkCount), (i) {
                             final index = controller.links.length + i;
                             return Column(
                               children: [
@@ -520,7 +541,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                             onPressed: () {
                               setState(() {
                                 _linkControllers.add(TextEditingController());
-                                _linkTypes.add('spotify');
+                                _linkTypes.add('custom'); // Changed from 'spotify' to 'custom'
                                 _linkCount++;
                               });
                             },
@@ -528,26 +549,38 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                         ),
                         if (_linkCount > controller.links.length)
                           Obx(() => controller.isLoading.value?
-                            Center(child: CircularProgressIndicator(color: Colors.black,)):
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: CustomButton(
-                                buttonColor: MyColors.textBlack,
-                                textColor: MyColors.textWhite,
-                                text: AppStrings.apply.tr,
-                                onPressed: () async {
-                                  // Only submit new (editable) links
-                                  for (int i = controller.links.length; i < _linkCount; i++) {
+                          Center(child: CircularProgressIndicator(color: Colors.black,)):
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: CustomButton(
+                              buttonColor: MyColors.textBlack,
+                              textColor: MyColors.textWhite,
+                              text: AppStrings.apply.tr,
+                              onPressed: () async {
+                                bool hasEmpty = false;
+
+                                // Loop backwards to safely remove empty links while iterating
+                                for (int i = _linkCount - 1; i >= controller.links.length; i--) {
+                                  final url = _linkControllers[i].text.trim();
+
+                                  if (url.isEmpty) {
+                                    _linkControllers.removeAt(i);
+                                    _linkTypes.removeAt(i);
+                                    _linkCount--;
+                                    hasEmpty = true;
+                                  } else {
+                                    // Create the link if not empty
                                     await controller.createLink(
                                       name: _linkTypes[i],
                                       type: _linkTypes[i],
-                                      url: _linkControllers[i].text.trim(),
+                                      url: url, call: () {  },
                                     );
                                   }
-                                  controller.fetchLinks();
-                                },
-                              ),
+                                }
+                                controller.fetchLinks();
+                              },
                             ),
+                          ),
                           ),
                       ],
                     ),
@@ -558,6 +591,4 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
       ),
     );
   }
-
-
 }

@@ -24,8 +24,7 @@ Widget myFieldAdvance({
 }) {
   final FocusNode internalFocusNode = FocusNode();
   final readOnlyMain = false;
-  bool obscureText =
-      showPasswordToggle; // Initially obscure if it's a password field
+  bool obscureText = showPasswordToggle; // Initially obscure if it's a password field
 
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +49,7 @@ Widget myFieldAdvance({
                 if (nextFocusNode != null) {
                   FocusScope.of(context).requestFocus(nextFocusNode);
                 } else {
-                  FocusScope.of(context).unfocus();
+                  FocusScope.of(context).unfocus(); // This dismisses the keyboard
                 }
               },
               decoration: InputDecoration(
@@ -58,12 +57,12 @@ Widget myFieldAdvance({
                   hintText,
                   style: TextStyle(
                     backgroundColor: textBack,
-                    color: MyColors.textBlack.withOpacity(0.8),
+                    color: Colors.black.withOpacity(0.8),
                     fontSize: 14,
                   ),
                 ),
                 contentPadding:
-                    const EdgeInsets.only(top: 3, left: 20, right: 12),
+                const EdgeInsets.only(top: 3, left: 20, right: 12),
                 hintText: hintText,
                 hintStyle: const TextStyle(
                   fontSize: 12,
@@ -78,27 +77,26 @@ Widget myFieldAdvance({
                     borderSide: BorderSide(color: Colors.black, width: 1.2),
                     borderRadius: BorderRadius.all(Radius.circular(28))),
                 border: const OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius
-                      .circular(28)),
+                  borderRadius: BorderRadius.all(Radius.circular(28)),
                 ),
                 suffixIcon: showPasswordToggle
                     ? Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: IconButton(
-                          icon: Icon(
-                            obscureText
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.grey,
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              obscureText = !obscureText;
-                            });
-                          },
-                        ),
-                      )
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: IconButton(
+                    icon: Icon(
+                      obscureText
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      color: Colors.grey,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        obscureText = !obscureText;
+                      });
+                    },
+                  ),
+                )
                     : null,
               ),
             );

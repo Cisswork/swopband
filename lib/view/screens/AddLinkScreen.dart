@@ -9,7 +9,6 @@ import '../utils/images/iamges.dart';
 import '../utils/app_text_styles.dart';
 import '../utils/app_colors.dart';
 import 'bottom_nav/BottomNavScreen.dart';
-import 'package:nfc_manager/nfc_manager.dart';
 
 class AddLinkScreen extends StatefulWidget {
   const AddLinkScreen({super.key});
@@ -22,28 +21,35 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
 
   final controller = Get.put(LinkController());
 
+  @override
+  void initState() {
+    super.initState();
+    // Load existing links when screen initializes
+    controller.fetchLinks();
+  }
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final List<TextEditingController> _linkControllers = [TextEditingController()];
-  final List<String> _linkTypes = ['spotify']; // Default first link type
+  final List<String> _linkTypes = ['custom']; // Default first link type - changed from 'spotify' to 'custom'
   int _linkCount = 1;
 
   // Supported link types with their display names and icons
   final Map<String, Map<String, dynamic>> _supportedLinks = {
     'instagram': {'name': 'Instagram', 'icon': MyImages.insta},
-    'music': {'name': 'Music', 'icon': MyImages.music},
+    'custom': {'name': 'Music', 'icon': MyImages.music}, // Changed from 'music' to 'custom'
     'reddit': {'name': 'Reddit', 'icon': MyImages.reddit},
     'linkedin': {'name': 'LinkedIn', 'icon': MyImages.linkedId},
-    'twitter': {'name': 'Twitter', 'icon': MyImages.xmaster},
+    'x': {'name': 'Twitter', 'icon': MyImages.xmaster}, // Changed from 'twitter' to 'x'
     'spotify': {'name': 'Spotify', 'icon': MyImages.spotify},
     'facebook': {'name': 'Facebook', 'icon': MyImages.facebook},
     'github': {'name': 'GitHub', 'icon': MyImages.github},
     'youtube': {'name': 'YouTube', 'icon': MyImages.youtube},
-    'tinder': {'name': 'Tinder', 'icon': MyImages.tindi},
+    'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok}, // Added TikTok
+    'discord': {'name': 'Discord', 'icon': MyImages.discord}, // Added Discord
+    'dribble': {'name': 'Dribbble', 'icon': MyImages.dribble}, // Added Dribbble
+    'website': {'name': 'Website', 'icon': MyImages.website}, // Added Website
   };
-
-  bool _nfcInProgress = false;
-  String _nfcStatus = '';
 
   @override
   void dispose() {
@@ -64,71 +70,33 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
       }
     }
 
-    setState(() {
-      _nfcInProgress = true;
-      _nfcStatus = 'Waiting for NFC tag...';
-    });
+    try {
+      for (int i = 0; i < _linkControllers.length; i++) {
+        await controller.createLink(
+          name: _linkTypes[i],
+          type: _linkTypes[i],
+          url: _linkControllers[i].text, call: () {
 
-    // Prepare NDEF records for all links
-    List<NdefRecord> records = [];
-    for (int i = 0; i < _linkControllers.length; i++) {
-      final url = _linkControllers[i].text;
-      if (url.isNotEmpty) {
-        records.add(NdefRecord.createUri(Uri.parse(url)));
+        },
+        );
       }
-    }
+      // Clear form
+      _emailController.clear();
+      _phoneController.clear();
+      _linkControllers.forEach((c) => c.clear());
+      setState(() {
+        _linkTypes.clear();
+        _linkTypes.add('custom'); // Changed from 'spotify' to 'custom'
+        _linkControllers.clear();
+        _linkControllers.add(TextEditingController());
+      });
 
-    // Start NFC write session
-    NfcManager.instance.startSession(
-      onDiscovered: (NfcTag tag) async {
-        var ndef = Ndef.from(tag);
-        if (ndef == null || !ndef.isWritable) {
-          NfcManager.instance.stopSession(errorMessage: 'Tag not writable');
-          setState(() {
-            _nfcStatus = 'This tag is not writable';
-            _nfcInProgress = false;
-          });
-          SnackbarUtil.showError('This tag is not writable');
-          return;
-        }
-        try {
-          await ndef.write(NdefMessage(records));
-          NfcManager.instance.stopSession();
-          setState(() {
-            _nfcStatus = 'Write successful!';
-            _nfcInProgress = false;
-          });
-          SnackbarUtil.showSuccess('NFC write successful!');
-          // Now save links to backend
-          for (int i = 0; i < _linkControllers.length; i++) {
-            await controller.createLink(
-              name: _linkTypes[i],
-              type: _linkTypes[i],
-              url: _linkControllers[i].text,
-            );
-          }
-          // Clear form
-          _emailController.clear();
-          _phoneController.clear();
-          _linkControllers.forEach((c) => c.clear());
-          setState(() {
-            _linkTypes.clear();
-            _linkTypes.add('spotify');
-            _linkControllers.clear();
-            _linkControllers.add(TextEditingController());
-          });
-          SnackbarUtil.showSuccess("Links submitted successfully!");
-          Get.off(() =>  BottomNavScreen());
-        } catch (e) {
-          NfcManager.instance.stopSession(errorMessage: e.toString());
-          setState(() {
-            _nfcStatus = 'Write failed: $e';
-            _nfcInProgress = false;
-          });
-          SnackbarUtil.showError('Write failed: $e');
-        }
-      },
-    );
+      SnackbarUtil.showSuccess("Links submitted successfully!");
+      Get.off(() =>  BottomNavScreen());
+
+    } catch (e) {
+      SnackbarUtil.showError("Failed to submit links: ${e.toString()}");
+    }
   }
 
   @override
@@ -234,7 +202,48 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                         textBack: Colors.transparent,
                       ),
                       const SizedBox(height: 20),
-                      ..._linkControllers.asMap().entries.map((entry) {
+                      
+                      // Show existing links section
+                      if (controller.links.isNotEmpty) ...[
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.link, color: Colors.green, size: 20),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Your Existing Links',
+                                    style: AppTextStyles.extraLarge.copyWith(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'These links are already saved to your profile:',
+                                style: AppTextStyles.extraLarge.copyWith(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                      ],
+                      
+                      /*..._linkControllers.asMap().entries.map((entry) {
                         final index = entry.key;
                         final controller = entry.value;
 
@@ -324,21 +333,324 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                           },
                         ),
                       ),
-                      _nfcInProgress
-                          ? Center(child: Column(children: [
-                              CircularProgressIndicator(color: Colors.black),
-                              SizedBox(height: 8),
-                              Text(_nfcStatus, style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
-                            ]))
-                          : Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: CustomButton(
-                                buttonColor: MyColors.textBlack,
-                                textColor: MyColors.textWhite,
-                                text: AppStrings.goToHub.tr,
-                                onPressed: _submitLinks,
+                     controller.isLoading.value?
+                     Center(child: CircularProgressIndicator(color: Colors.black,)):
+                     Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CustomButton(
+                          buttonColor: MyColors.textBlack,
+                          textColor: MyColors.textWhite,
+                          text: AppStrings.goToHub.tr,
+                          onPressed: _submitLinks,
+                        ),
+                      ),*/
+
+                      ...List.generate(controller.links.length, (index) => Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 4,
+                                child: DropdownButtonFormField<String>(
+                                  value: controller.links[index].type,
+                                  isExpanded: true,
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: Colors.transparent,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(color: Colors.grey),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(color: Colors.grey),
+                                    ),
+                                  ),
+                                  items: _supportedLinks.entries.map((entry) {
+                                    return DropdownMenuItem<String>(
+                                      value: entry.key,
+                                      child: Row(
+                                        children: [
+                                          Image.asset(
+                                            entry.value['icon'],
+                                            width: 24,
+                                            height: 24,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Flexible(
+                                            child: Text(
+                                              entry.value['name'],
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: null, // readonly
+                                ),
                               ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                flex: 7,
+                                child: TextField(
+                                  controller: TextEditingController(text: controller.links[index].url),
+                                  readOnly: true,
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter ${_supportedLinks[controller.links[index].type]!['name']} URL or ID',
+                                    filled: true,
+                                    fillColor: Colors.transparent,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(color: Colors.grey),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: const BorderSide(color: Colors.grey),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              PopupMenuButton<String>(
+                                  color: Colors.white,
+                                  icon: Icon(Icons.more_vert, color: Colors.black,size: 17),
+                                  onSelected: (String value) async {
+                                    final link = controller.links[index];
+                                    if (value == 'edit') {
+                                      //_showEditDialog(index);
+                                    } else if (value == 'delete') {
+                                      await controller.deleteLink(link.id);
+                                    }
+                                  },
+                                  itemBuilder: (BuildContext context) => [
+                                    PopupMenuItem<String>(
+                                      value: 'edit',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.edit, color: Colors.black,size: 17,),
+                                          SizedBox(width: 8),
+                                          Text('Edit'),
+                                        ],
+                                      ),
+                                    ),
+                                    PopupMenuItem<String>(
+                                      value: 'delete',
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.delete, color: Colors.black),
+                                          SizedBox(width: 8),
+                                          Text('Delete'),
+                                        ],
+                                      ),
+                                    ),
+                                  ]
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      )),
+                      
+                      // New links section
+                      if (_linkCount > controller.links.length) ...[
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.add_circle, color: Colors.blue, size: 20),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Add New Links',
+                                    style: AppTextStyles.extraLarge.copyWith(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Add new social media links to your profile. Make sure the URL is unique and not already added.',
+                                style: AppTextStyles.extraLarge.copyWith(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                      ],
+                      
+                      // Editable fields for new links
+                      ...List.generate((_linkCount - controller.links.length).clamp(0, _linkCount), (i) {
+                        final index = controller.links.length + i;
+                        return Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 4,
+                                  child: DropdownButtonFormField<String>(
+                                    value: _linkTypes[index],
+                                    isExpanded: true,
+                                    decoration: InputDecoration(
+                                      filled: true,
+                                      fillColor: Colors.transparent,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: const BorderSide(color: Colors.grey),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: const BorderSide(color: Colors.grey),
+                                      ),
+                                    ),
+                                    items: _supportedLinks.entries.map((entry) {
+                                      return DropdownMenuItem<String>(
+                                        value: entry.key,
+                                        child: Row(
+                                          children: [
+                                            Image.asset(
+                                              entry.value['icon'],
+                                              width: 24,
+                                              height: 24,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Flexible(
+                                              child: Text(
+                                                entry.value['name'],
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        _linkTypes[index] = newValue!;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  flex: 7,
+                                  child: myFieldAdvance(
+                                    context: context,
+                                    controller: _linkControllers[index],
+                                    hintText: 'Enter ${_supportedLinks[_linkTypes[index]]!['name']} URL or ID',
+                                    inputType: TextInputType.text,
+                                    textInputAction: index < _linkControllers.length - 1
+                                        ? TextInputAction.next
+                                        : TextInputAction.done,
+                                    fillColor: Colors.transparent,
+                                    textBack: Colors.transparent,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () {
+                                    setState(() {
+                                      if (_linkCount > controller.links.length) {
+                                        _linkControllers.removeAt(index);
+                                        _linkTypes.removeAt(index);
+                                        _linkCount--;
+                                      }
+                                    });
+                                  },
+                                ),
+                              ],
                             ),
+                            const SizedBox(height: 20),
+                          ],
+                        );
+                      },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CustomButton(
+                          buttonColor: MyColors.textBlack,
+                          textColor: MyColors.textWhite,
+                          text: AppStrings.addAnotherLink.tr,
+                          onPressed: () {
+                            setState(() {
+                              _linkControllers.add(TextEditingController());
+                              _linkTypes.add('spotify');
+                              _linkCount++;
+                            });
+                          },
+                        ),
+                      ),
+                      if (_linkCount > controller.links.length)
+                        Obx(() => controller.isLoading.value?
+                        Center(child: CircularProgressIndicator(color: Colors.black,)):
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CustomButton(
+                            buttonColor: MyColors.textBlack,
+                            textColor: MyColors.textWhite,
+                            text: AppStrings.apply.tr,
+                            onPressed: () async {
+                              bool hasEmpty = false;
+                              bool hasDuplicate = false;
+
+                              // Check for duplicates first
+                              for (int i = controller.links.length; i < _linkCount; i++) {
+                                final url = _linkControllers[i].text.trim();
+                                if (url.isNotEmpty) {
+                                  // Check if this URL already exists in the user's links
+                                  final existingLink = controller.links.any((link) => 
+                                    link.url.toLowerCase() == url.toLowerCase() || 
+                                    link.url.toLowerCase().contains(url.toLowerCase()) ||
+                                    url.toLowerCase().contains(link.url.toLowerCase())
+                                  );
+                                  
+                                  if (existingLink) {
+                                    hasDuplicate = true;
+                                    SnackbarUtil.showError("Link '${_linkTypes[i]}' with URL '$url' already exists in your profile.");
+                                    break;
+                                  }
+                                }
+                              }
+
+                              if (hasDuplicate) return;
+
+                              // Loop backwards to safely remove empty links while iterating
+                              for (int i = _linkCount - 1; i >= controller.links.length; i--) {
+                                final url = _linkControllers[i].text.trim();
+
+                                if (url.isEmpty) {
+                                  // Remove empty link
+                                  _linkControllers.removeAt(i);
+                                  _linkTypes.removeAt(i);
+                                  _linkCount--;
+                                  hasEmpty = true;
+                                } else {
+                                  // Create the link if not empty
+                                  await controller.createLink(
+                                    name: _linkTypes[i],
+                                    type: _linkTypes[i],
+                                    url: url, call: () {
+                                    Get.offAll(() =>  BottomNavScreen());
+                                  },);
+                                }
+                              }
+
+                            },
+                          ),
+                        ),
+                        ),
                     ],
                   ),
                 ),

@@ -88,6 +88,9 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Purchase Swopband"),
+      ),
       body: SafeArea(
         child: WebViewWidget(
           controller: _controller,

@@ -9,8 +9,6 @@ import '../utils/app_colors.dart';
 import '../translations/app_strings.dart';
 import 'FaqScreen.dart';
 import 'AddLinkScreen.dart';
-import 'package:nfc_manager/nfc_manager.dart';
-import 'package:swopband/controller/link_controller/LinkController.dart';
 
 class ConnectSwopbandScreen extends StatefulWidget {
   const ConnectSwopbandScreen({Key? key}) : super(key: key);
@@ -20,122 +18,6 @@ class ConnectSwopbandScreen extends StatefulWidget {
 }
 
 class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
-  bool _isScanning = false;
-  bool _connectionSuccess = false;
-  String _error = '';
-
-  void _startNfcConnection() async {
-    setState(() {
-      _isScanning = true;
-      _connectionSuccess = false;
-      _error = '';
-    });
-    showNfcScanDialog(context);
-    try {
-      await NfcManager.instance.startSession(
-        onDiscovered: (NfcTag tag) async {
-          NfcManager.instance.stopSession();
-          Navigator.of(context).pop(); // Close dialog
-          setState(() {
-            _isScanning = false;
-            _connectionSuccess = true;
-            _error = '';
-          });
-          // Show success screen for a moment, then navigate
-          await Future.delayed(Duration(seconds: 1));
-          Get.off(() => AddLinkScreen());
-        },
-      );
-    } catch (e) {
-      setState(() {
-        _isScanning = false;
-        _connectionSuccess = false;
-        _error = 'Could not connect. Please try again.';
-      });
-      Navigator.of(context).pop();
-      _showConnectionFailedDialog();
-    }
-  }
-
-  void _showConnectionFailedDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('SWOPBAND could not connect.'),
-        content: Text(_error),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _startNfcConnection();
-            },
-            child: Text('Retry'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void showNfcScanDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          contentPadding: EdgeInsets.fromLTRB(24.0, 28.0, 24.0, 16.0),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                'Ready to Scan',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 24),
-              Icon(
-                Icons.nfc,
-                size: 48,
-                color: Colors.blue,
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Hold your device near the NFC tag.',
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 24),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 16,
-                ),
-              ),
-              onPressed: () {
-                NfcManager.instance.stopSession();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +94,9 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                                     padding: const EdgeInsets.all(12.0),
                                     child: CustomButton(
                                       text: AppStrings.connectYourSwopbandButton.tr,
-                                      onPressed: _startNfcConnection,
+                                      onPressed: () {
+                                        Get.to(() => AddLinkScreen());
+                                      },
                                     ),
                                   ),
                                 ],
