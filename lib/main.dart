@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swopband/view/screens/splash_screen/SplashScreen.dart';
 import 'package:swopband/view/screens/nfc_test_screen.dart';
+import 'package:swopband/view/screens/swopband_webview_screen.dart';
 import 'package:swopband/view/translations/app_strings.dart';
 import 'package:swopband/view/utils/app_text_styles.dart';
 import 'package:app_links/app_links.dart';
@@ -33,7 +34,7 @@ Future<void> main() async {
 
 class MyApp extends StatefulWidget {
   final String? initialNfcUrl;
-  const MyApp({Key? key, this.initialNfcUrl}) : super(key: key);
+  const MyApp({super.key, this.initialNfcUrl});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -44,6 +45,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   final RecentSwoppersController recentSwoppersController = Get.put(RecentSwoppersController());
   final NfcBackgroundService _nfcService = NfcBackgroundService();
   final AppLinks _appLinks = AppLinks();
+  bool _hasProcessedInitialLink = false;
+  bool _isNavigatingToProfile = false;
 
   @override
   void initState() {
@@ -61,7 +64,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       // App became active - start iOS NFC scanning
       if (Platform.isIOS) {
         log('📱 iOS: App resumed, starting NFC scanning...');
-        Future.delayed(Duration(milliseconds: 500), () {
+        Future.delayed(const Duration(milliseconds: 500), () {
           _nfcService.startIosForegroundNfcScanning();
         });
       }
@@ -82,13 +85,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   void _initializeApp() {
     // Start NFC background service after a short delay
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       _nfcService.startListening();
       
       // For iPhone 13, also start foreground NFC scanning
       if (Platform.isIOS) {
         log('📱 iOS: Starting initial NFC scanning for iPhone 13...');
-        Future.delayed(Duration(seconds: 3), () {
+        Future.delayed(const Duration(seconds: 3), () {
           _nfcService.startIosForegroundNfcScanning();
         });
       }
@@ -115,7 +118,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       final initialUri = await _appLinks.getInitialLink();
       if (initialUri != null) {
         log('📱 iOS: Initial app link found: $initialUri');
-        _handleAppLink(initialUri);
+        // Don't automatically process initial link to prevent profile page opening on restart
+        log('📱 Skipping automatic initial link processing to prevent restart issues');
+        log('📱 App will start normally to SplashScreen instead of opening profile page');
       }
     } catch (e) {
       log('❌ Error checking initial app link: $e');
@@ -129,23 +134,15 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     if (uri.host == 'srirangasai.dev' || 
         uri.host == 'localhost' || 
         uri.host == '192.168.0.28') {
-      // Extract username from URL and create connection
+      // Extract username from URL and show profile page first
       final username = _extractUsernameFromUri(uri);
       if (username != null) {
         log('✅ Username extracted from NFC URL: $username');
-        log('🔄 Creating connection for username: $username');
+        log('🔄 Navigating to profile page for username: $username');
         
-        // Call the connection creation method
-        recentSwoppersController.handleNfcConnection(username);
+        // Navigate to profile page instead of directly creating connection
+        _navigateToProfilePage(username, uri.toString());
         
-        // Show success message
-        Get.snackbar(
-          'NFC Connection Detected',
-          'Connecting with @$username...',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          duration: Duration(seconds: 3),
-        );
       } else {
         log('❌ Could not extract username from URI: $uri');
         Get.snackbar(
@@ -175,22 +172,87 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return null;
   }
 
-  Widget _handleInitialNfcUrl(String url) {
-    // Extract username and handle the NFC connection
-    try {
-      final uri = Uri.parse(url);
-      final username = _extractUsernameFromUri(uri);
-      if (username != null) {
-        print('Initial NFC URL detected for username: $username');
-        // Navigate to splash screen but trigger connection creation
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          recentSwoppersController.handleNfcConnection(username);
-        });
-      }
-    } catch (e) {
-      print('Error parsing initial NFC URL: $e');
+
+
+  void _navigateToProfilePage(String username, String url) {
+    if (_isNavigatingToProfile) {
+      log('⚠️ Already navigating to profile page, skipping duplicate navigation');
+      return;
     }
-    return SplashScreen();
+    
+    _isNavigatingToProfile = true;
+    log('🔄 Navigating to profile page for @$username');
+    log('🔄 Profile URL: $url');
+    
+    // Add a small delay to ensure proper navigation
+    Future.delayed(const Duration(milliseconds: 500), () {
+      // Navigate to SwopbandWebViewScreen with proper parameters
+      Get.to(
+        () => SwopbandWebViewScreen(
+          username: username,
+          url: url,
+        ),
+        arguments: {
+          'username': username,
+          'url': url,
+        },
+      );
+      
+      log('✅ Navigation command sent for @$username');
+      
+      // Reset flag after navigation
+      Future.delayed(const Duration(seconds: 2), () {
+        _isNavigatingToProfile = false;
+      });
+    });
+    
+    // Show info message
+    Get.snackbar(
+      'NFC Profile Detected',
+      'Viewing @$username\'s profile',
+      backgroundColor: Colors.blue,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 2),
+    );
+  }
+
+  void _navigateToProfilePageDirectly(String username, String url) {
+    if (_isNavigatingToProfile) {
+      log('⚠️ Already navigating to profile page, skipping duplicate direct navigation');
+      return;
+    }
+    
+    _isNavigatingToProfile = true;
+    log('🔄 Navigating directly to profile page for @$username');
+    log('🔄 Profile URL: $url');
+    
+    // Navigate directly without delay to avoid splash screen interference
+    Get.offAll(
+      () => SwopbandWebViewScreen(
+        username: username,
+        url: url,
+      ),
+      arguments: {
+        'username': username,
+        'url': url,
+      },
+    );
+    
+    log('✅ Direct navigation completed for @$username');
+    
+    // Reset flag after navigation
+    Future.delayed(const Duration(seconds: 2), () {
+      _isNavigatingToProfile = false;
+    });
+    
+    // Show info message
+    Get.snackbar(
+      'NFC Profile Detected',
+      'Viewing @$username\'s profile',
+      backgroundColor: Colors.blue,
+      colorText: Colors.white,
+      duration: const Duration(seconds: 2),
+    );
   }
 
   @override
@@ -214,14 +276,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         primaryColor: Colors.orange,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: widget.initialNfcUrl != null && (widget.initialNfcUrl!.contains('srirangasai.dev') || 
-                                             widget.initialNfcUrl!.contains('localhost') ||
-                                             widget.initialNfcUrl!.contains('192.168.0.28'))
-          ? _handleInitialNfcUrl(widget.initialNfcUrl!)
-          : SplashScreen(),
+      home: const SplashScreen(), // Always start with SplashScreen, never auto-open profile page
       getPages: [
-        GetPage(name: '/', page: () => SplashScreen()),
-        GetPage(name: '/nfc-test', page: () => NfcTestScreen()),
+        GetPage(name: '/', page: () => const SplashScreen()),
+        GetPage(name: '/nfc-test', page: () => const NfcTestScreen()),
         // GetPage(name: '/webview', page: () => SwopbandWebViewScreen(url: '')),
       ],
     );

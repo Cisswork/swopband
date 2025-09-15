@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'dart:convert';
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,8 @@ import 'bottom_nav/PurchaseScreen.dart';
 import 'package:swopband/view/widgets/custom_snackbar.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:swopband/services/nfc_background_service.dart';
+
+import 'connect_swopband_screen.dart';
 
 class CreateProfileScreen extends StatefulWidget {
   final userImage,name,email;
@@ -47,13 +50,24 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   File? _profileImage;
   bool _nfcInProgress = false;
   String _nfcStatus = '';
+  Timer? _nfcTimeoutTimer;
 
 
   @override
   void dispose() {
+    // Cancel timeout timer if running
+    _nfcTimeoutTimer?.cancel();
+    _nfcTimeoutTimer = null;
+    
     // Ensure background NFC operations are resumed if screen is disposed during NFC operation
     if (_nfcInProgress) {
+      try {
+        NfcManager.instance.stopSession();
+      } catch (e) {
+        log("[NFC] Error stopping session in dispose: $e");
+      }
       _nfcBackgroundService.resumeBackgroundOperations();
+      log("[NFC] Background NFC operations resumed in dispose");
     }
     super.dispose();
   }
@@ -73,381 +87,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     }
   }
 
-  // Method to check if NFC is available on the device
-  Future<bool> _isNfcAvailable() async {
-    try {
-      bool isAvailable = await NfcManager.instance.isAvailable();
-      log("[NFC] NFC available: $isAvailable");
-      return isAvailable;
-    } catch (e) {
-      log("[NFC] Error checking NFC availability: $e");
-      return false;
-    }
-  }
 
-  // Enhanced NFC connection method with availability check
-  Future<void> _connectAndWriteToNfc() async {
-    if(controller.usernameMessage.value != "Username is available") {
-      SnackbarUtil.showError("Please enter a valid username");
-      return;
-    }
 
-    // Check NFC availability first
-    bool nfcAvailable = await _isNfcAvailable();
-    if (!nfcAvailable) {
-      SnackbarUtil.showError("NFC is not available on this device. Please enable NFC in your device settings.");
-      return;
-    }
-
-    setState(() {
-      _nfcInProgress = true;
-      _nfcStatus = 'Creating profile...';
-    });
-
-    // First create user profile
-    try {
-      _writeSwopHandleToNfc();
-    } catch (e) {
-      setState(() {
-        _nfcInProgress = false;
-        _nfcStatus = 'Failed to create profile';
-      });
-      SnackbarUtil.showError('Failed to create profile: $e');
-    }
-  }
-
-  Future<void> _writeSwopHandleToNfc() async {
-    setState(() {
-      _nfcStatus = 'Ready to connect to Swopband...';
-    });
-
-    log("[NFC] Starting manual NFC write operation...");
-    
-    // Pause background NFC operations to avoid conflicts
-    _nfcBackgroundService.pauseBackgroundOperations();
-    log("[NFC] Background NFC operations paused");
-
-    // Show NFC connection dialog
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text('Connect to Swopband'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.nfc, size: 48, color: Colors.blue),
-            SizedBox(height: 16),
-            Text('Hold your device near the Swopband ring.'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              log("[NFC] User cancelled NFC operation");
-              NfcManager.instance.stopSession();
-              Navigator.of(context).pop();
-              setState(() {
-                _nfcInProgress = false;
-                _nfcStatus = '';
-              });
-              // Resume background operations when cancelled
-              _nfcBackgroundService.resumeBackgroundOperations();
-              log("[NFC] Background NFC operations resumed after cancellation");
-            },
-            child: Text('Cancel'),
-          ),
-        ],
-      ),
-    );
-    
-    try {
-      log("[NFC] Starting NFC session for writing...");
-      await NfcManager.instance.startSession(
-        onDiscovered: (NfcTag tag) async {
-          log("[NFC] Tag discovered during write operation: $tag");
-          var ndef = Ndef.from(tag);
-          if (ndef == null) {
-            log("[NFC] Tag is not NDEF compatible");
-            NfcManager.instance.stopSession(errorMessage: 'Tag not NDEF compatible');
-            Navigator.of(context).pop();
-            setState(() {
-              _nfcStatus = 'This tag is not NDEF compatible. Use a blank NFC tag.';
-              _nfcInProgress = false;
-            });
-            SnackbarUtil.showError('This tag is not NDEF compatible. Use a blank NFC tag.');
-            // Resume background operations on error
-            _nfcBackgroundService.resumeBackgroundOperations();
-            log("[NFC] Background NFC operations resumed after NDEF error");
-            return;
-          }
-          if (!ndef.isWritable) {
-            log("[NFC] Tag is not writable");
-            NfcManager.instance.stopSession(errorMessage: 'Tag not writable');
-            Navigator.of(context).pop();
-            setState(() {
-              _nfcStatus = 'This tag is not writable. Use a blank NFC tag.';
-              _nfcInProgress = false;
-            });
-            SnackbarUtil.showError('This tag is not writable. Use a blank NFC tag.');
-            // Resume background operations on error
-            _nfcBackgroundService.resumeBackgroundOperations();
-            log("[NFC] Background NFC operations resumed after writable error");
-            return;
-          }
-          try {
-            String swopHandleUrl = "https://srirangasai.dev/${swopUserNameController.text}";
-            log("[NFC] Writing URL to tag: $swopHandleUrl");
-            await ndef.write(NdefMessage([
-              NdefRecord.createUri(Uri.parse(swopHandleUrl))
-            ]));
-            log("[NFC] Successfully wrote to NFC tag");
-            NfcManager.instance.stopSession();
-            Navigator.of(context).pop();
-            setState(() {
-              _nfcStatus = 'Successfully connected!';
-              _nfcInProgress = false;
-            });
-            SnackbarUtil.showSuccess('Swopband connected successfully!');
-            await Future.delayed(Duration(seconds: 1));
-            // Prefer file upload via multipart when available
-            File? selectedFile = _imagePickerKey.currentState?.getSelectedImageFile();
-            String profileImage = await _getCurrentProfileImage();
-            await controller.createUser(
-              username: swopUserNameController.text,
-              name: nameController.text,
-              email: emailController.text,
-              bio: bioController.text,
-              profileFile: selectedFile,
-              profileUrl: selectedFile == null ? profileImage : null,
-              onSuccess: () {
-                log("[NFC] User profile created successfully");
-                // Resume background operations after successful operation
-                _nfcBackgroundService.resumeBackgroundOperations();
-                log("[NFC] Background NFC operations resumed after successful operation");
-                Get.to(() => AddLinkScreen());
-              },
-            );
-          } catch (e) {
-            log("[NFC] Error writing to tag: $e");
-            NfcManager.instance.stopSession(errorMessage: e.toString());
-            Navigator.of(context).pop();
-            setState(() {
-              _nfcStatus = 'Failed to write: $e';
-              _nfcInProgress = false;
-            });
-            String errorMsg = e.toString();
-            if (errorMsg.contains('capacity')) {
-              SnackbarUtil.showError('Tag memory too small. Use a bigger NFC tag.');
-            } else {
-              SnackbarUtil.showError('Failed to write to tag: $e');
-            }
-            print('NFC write error: $e');
-            // Resume background operations on error
-            _nfcBackgroundService.resumeBackgroundOperations();
-            log("[NFC] Background NFC operations resumed after write error");
-          }
-        },
-        onError: (error) async {
-          log("[NFC] NFC session error: $error");
-          Navigator.of(context).pop();
-          setState(() {
-            _nfcStatus = 'NFC session error: $error';
-            _nfcInProgress = false;
-          });
-          SnackbarUtil.showError('NFC session error: $error');
-          // Resume background operations on error
-          _nfcBackgroundService.resumeBackgroundOperations();
-          log("[NFC] Background NFC operations resumed after session error");
-        },
-      );
-    } catch (e) {
-      log("[NFC] Failed to start NFC session: $e");
-      Navigator.of(context).pop();
-      setState(() {
-        _nfcStatus = 'Failed to connect: $e';
-        _nfcInProgress = false;
-      });
-      SnackbarUtil.showError('Failed to connect: $e');
-      print('NFC session error: $e');
-      // Resume background operations on error
-      _nfcBackgroundService.resumeBackgroundOperations();
-      log("[NFC] Background NFC operations resumed after start session error");
-    }
-  }
-
-  Future<void> _readFromNfc() async {
-    setState(() {
-      _nfcStatus = 'Reading from Swopband...';
-    });
-
-    // Pause background NFC operations to avoid conflicts
-    _nfcBackgroundService.pauseBackgroundOperations();
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text('Read from Swopband'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.nfc, size: 48, color: Colors.blue),
-            SizedBox(height: 16),
-            Text('Hold your device near the Swopband ring.'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              NfcManager.instance.stopSession();
-              Navigator.of(context).pop();
-              setState(() {
-                _nfcStatus = '';
-              });
-              // Resume background operations when cancelled
-              _nfcBackgroundService.resumeBackgroundOperations();
-            },
-            child: Text('Cancel'),
-          ),
-        ],
-      ),
-    );
-
-    try {
-      await NfcManager.instance.startSession(
-        onDiscovered: (NfcTag tag) async {
-          Ndef? ndef = Ndef.from(tag);
-          if (ndef == null || ndef.cachedMessage == null) {
-            NfcManager.instance.stopSession(errorMessage: 'No data found');
-            Navigator.of(context).pop();
-            setState(() {
-              _nfcStatus = 'No data found on this tag.';
-            });
-            SnackbarUtil.showError('No data found on this tag.');
-            // Resume background operations on error
-            _nfcBackgroundService.resumeBackgroundOperations();
-            return;
-          }
-          
-          NfcManager.instance.stopSession();
-          Navigator.of(context).pop();
-          
-          final records = ndef.cachedMessage!.records;
-          if (records.isNotEmpty) {
-            String data = '';
-            String extractedUsername = '';
-            
-            for (var record in records) {
-              if (record.typeNameFormat == NdefTypeNameFormat.nfcWellknown) {
-                String uriData = NdefRecord.URI_PREFIX_LIST[record.payload[0]] + String.fromCharCodes(record.payload.sublist(1));
-                data += '$uriData\n';
-                
-                // Extract username from srirangasai.dev URLs for display only
-                if (uriData.contains('srirangasai.dev')) {
-                  try {
-                    final uri = Uri.parse(uriData);
-                    if (uri.host == 'srirangasai.dev' && uri.pathSegments.isNotEmpty) {
-                      extractedUsername = uri.pathSegments.first;
-                    }
-                  } catch (e) {
-                    print('Error parsing URI: $e');
-                  }
-                }
-              } else {
-                data += '${String.fromCharCodes(record.payload)}\n';
-              }
-            }
-            
-            setState(() {
-              if (extractedUsername.isNotEmpty) {
-                _nfcStatus = 'Read: @$extractedUsername (Profile Preview)';
-              } else {
-                _nfcStatus = 'Data read: ${data.trim()}';
-              }
-            });
-            
-            // Resume background operations after successful read
-            _nfcBackgroundService.resumeBackgroundOperations();
-            
-            // Show enhanced data dialog with username info
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: Text('Swopband Data Read'),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (extractedUsername.isNotEmpty) ...[
-                      Text(
-                        'Username: @$extractedUsername',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'This is a profile preview. No connection will be created.',
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 12,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Divider(),
-                    ],
-                    Text(
-                      'Raw Data:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        data.trim(),
-                        style: TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('OK'),
-                  ),
-                ],
-              ),
-            );
-          } else {
-            setState(() {
-              _nfcStatus = 'No records found on this tag.';
-            });
-            SnackbarUtil.showError('No records found on this tag.');
-            // Resume background operations on error
-            _nfcBackgroundService.resumeBackgroundOperations();
-          }
-        },
-      );
-    } catch (e) {
-      Navigator.of(context).pop();
-      setState(() {
-        _nfcStatus = 'Failed to read: $e';
-      });
-      SnackbarUtil.showError('Failed to read: $e');
-      // Resume background operations on error
-      _nfcBackgroundService.resumeBackgroundOperations();
-    }
-  }
 
   bool _validateForm() {
     if (swopUserNameController.text.trim().isEmpty) {
@@ -491,7 +132,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     return true;
   }
 
-  Future<void> _startNfcSessionAndWrite() async {
+  // COMMENTED: This function moved to ConnectSwopbandScreen
+  /*Future<void> _startNfcSessionAndWrite() async {
     // Validate form first
     if (!_validateForm()) {
       return;
@@ -505,6 +147,29 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
     // Pause background NFC operations to avoid conflicts
     _nfcBackgroundService.pauseBackgroundOperations();
+    
+    // Set a timeout to automatically stop loading if NFC session doesn't start
+    _nfcTimeoutTimer = Timer(const Duration(seconds: 30), () {
+      if (_nfcInProgress) {
+        log("[NFC] Timeout reached, stopping NFC session");
+        setState(() {
+          _nfcStatus = "NFC connection timeout. Please try again.";
+          _nfcInProgress = false;
+        });
+        try {
+          NfcManager.instance.stopSession();
+        } catch (e) {
+          log("[NFC] Error stopping session on timeout: $e");
+        }
+        // Close custom dialog if open
+        if (Platform.isAndroid && Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+        // Resume background operations
+        _nfcBackgroundService.resumeBackgroundOperations();
+        log("[NFC] Background NFC operations resumed after timeout");
+      }
+    });
 
     // Show beautiful dialog with Cancel button while waiting for NFC connection
    Platform.isAndroid? showDialog(
@@ -513,7 +178,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
       builder: (context) {
         return Dialog(
           backgroundColor: Colors.transparent,
-          insetPadding: EdgeInsets.all(20),
+          insetPadding: const EdgeInsets.all(20),
           child: Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -526,14 +191,14 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                 )
               ],
             ),
-            padding: EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Animated NFC icon with gradient
                 Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       colors: [Colors.orange, Colors.deepOrange],
                       begin: Alignment.topLeft,
@@ -541,13 +206,13 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     ),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.nfc, size: 48, color: Colors.white),
+                  child: const Icon(Icons.nfc, size: 48, color: Colors.white),
                 ),
 
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
 
                 // Title with custom styling
-                Text(
+                const Text(
                   "Connect to Swopband",
                   style: TextStyle(
                     fontSize: 20,
@@ -556,10 +221,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   ),
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
 
                 // Description text
-                Text(
+                const Text(
                   "Hold your device near the Swopband ring to connect...",
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -568,10 +233,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   ),
                 ),
 
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
 
                 // Custom animated progress indicator
-                SizedBox(
+                const SizedBox(
                   width: 50,
                   height: 50,
                   child: CupertinoActivityIndicator(
@@ -579,13 +244,17 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   ),
                 ),
 
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
 
                 // Cancel button with nice styling
                 OutlinedButton(
                   onPressed: () {
                     log("[NFC] User cancelled NFC session.");
-                    NfcManager.instance.stopSession();
+                    try {
+                      NfcManager.instance.stopSession();
+                    } catch (e) {
+                      log("[NFC] Error stopping session: $e");
+                    }
                     Navigator.of(context).pop();  // Close dialog
                     setState(() {
                       _nfcStatus = "";
@@ -593,15 +262,16 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     });
                     // Resume background operations when cancelled
                     _nfcBackgroundService.resumeBackgroundOperations();
+                    log("[NFC] Background NFC operations resumed after user cancellation");
                   },
                   style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                     side: BorderSide(color: Colors.grey.shade300),
                   ),
-                  child: Text(
+                  child: const Text(
                     "Cancel",
                     style: TextStyle(
                       color: Colors.black54,
@@ -614,7 +284,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
           ),
         );
       },
-    ):SizedBox();
+    ):const SizedBox();
 
     try {
       log("[NFC] Calling NfcManager.instance.startSession()");
@@ -663,6 +333,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
               NdefRecord.createUri(Uri.parse(swopHandleUrl))
             ]));
             log("[NFC] Write successful, stopping NFC session.");
+            // Cancel timeout timer
+            _nfcTimeoutTimer?.cancel();
+            _nfcTimeoutTimer = null;
+            
             NfcManager.instance.stopSession();
             setState(() {
               _nfcStatus = "Successfully connected and written!";
@@ -688,11 +362,15 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                 log("[NFC] User created successfully, navigating to AddLinkScreen.");
                 // Resume background operations after successful operation
                 _nfcBackgroundService.resumeBackgroundOperations();
-                Get.offAll(() => AddLinkScreen());
+                Get.offAll(() => const AddLinkScreen());
               },
             );
           } catch (e) {
             log("[NFC] Error during write: $e");
+            // Cancel timeout timer
+            _nfcTimeoutTimer?.cancel();
+            _nfcTimeoutTimer = null;
+            
             NfcManager.instance.stopSession(errorMessage: e.toString());
             setState(() {
               _nfcStatus = "Write failed: $e";
@@ -704,6 +382,46 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
             _nfcBackgroundService.resumeBackgroundOperations();
           }
         },
+        onError: (error) async {
+          log("[NFC] NFC session error: $error");
+          
+          // Handle user cancellation of default NFC popup
+          if (error.toString().contains('cancelled') || 
+              error.toString().contains('canceled') ||
+              error.toString().contains('user') ||
+              error.toString().contains('User')) {
+            log("[NFC] User cancelled default NFC popup");
+            setState(() {
+              _nfcStatus = "NFC connection cancelled by user";
+              _nfcInProgress = false;
+            });
+            // Close custom dialog if open
+            if (Platform.isAndroid && Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+            // Resume background operations
+            _nfcBackgroundService.resumeBackgroundOperations();
+            log("[NFC] Background NFC operations resumed after user cancellation");
+            return;
+          }
+          
+          // Handle other NFC errors
+          log("[NFC] Other NFC error: $error");
+          setState(() {
+            _nfcStatus = "NFC error: $error";
+            _nfcInProgress = false;
+          });
+          SnackbarUtil.showError("NFC error: $error");
+          
+          // Close custom dialog if open
+          if (Platform.isAndroid && Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+          
+          // Resume background operations on error
+          _nfcBackgroundService.resumeBackgroundOperations();
+          log("[NFC] Background NFC operations resumed after NFC error");
+        },
       );
     } catch (e) {
       log("[NFC] Failed to start NFC session: $e");
@@ -712,11 +430,15 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
         _nfcInProgress = false;
       });
       SnackbarUtil.showError("Failed to start NFC session: $e");
-      Platform.isAndroid?  Navigator.of(context).pop():null; // close dialog
+      // Close dialog if it's open
+      if (Platform.isAndroid && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
       // Resume background operations on error
       _nfcBackgroundService.resumeBackgroundOperations();
+      log("[NFC] Background NFC operations resumed after session start error");
     }
-  }
+  }*/
 
   // Method to get current profile image (selected file or auth image)
   Future<String> _getCurrentProfileImage() async {
@@ -765,39 +487,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     return "";
   }
 
-  // Method to test NFC functionality
-  Future<void> _testNfcFunctionality() async {
-    log("[NFC] Testing NFC functionality...");
-    
-    try {
-      // Check NFC availability
-      bool nfcAvailable = await _isNfcAvailable();
-      if (!nfcAvailable) {
-        SnackbarUtil.showError("NFC is not available on this device");
-        return;
-      }
-      
-      // Check background service health
-      bool serviceHealthy = _nfcBackgroundService.isHealthy;
-      log("[NFC] Background service health: $serviceHealthy");
-      
-      // Test pause/resume functionality
-      _nfcBackgroundService.pauseBackgroundOperations();
-      log("[NFC] Background operations paused for testing");
-      
-      await Future.delayed(Duration(seconds: 2));
-      
-      _nfcBackgroundService.resumeBackgroundOperations();
-      log("[NFC] Background operations resumed after testing");
-      
-      SnackbarUtil.showSuccess("NFC test completed successfully!");
-      log("[NFC] NFC test completed successfully");
-      
-    } catch (e) {
-      log("[NFC] NFC test failed: $e");
-      SnackbarUtil.showError("NFC test failed: $e");
-    }
-  }
+
 
   @override
   void initState() {
@@ -839,7 +529,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Image.asset(MyImages.nameLogo, height: 40),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
                         AppStrings.createProfile.tr,
                         style: AppTextStyles.large.copyWith(fontSize: 20),
@@ -849,13 +539,13 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         key: _imagePickerKey,
                         profileImage: widget.userImage ?? "",
                       ),
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
                       Text(
                         AppStrings.createSwopHandle.tr,
                         style: AppTextStyles.large.copyWith(fontSize: 13,fontWeight: FontWeight.w600),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 5),
+                      const SizedBox(height: 5),
                       myFieldAdvance(
                         onChanged: (username) {
                           controller.checkUsernameAvailability(username.trim());
@@ -869,7 +559,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         textBack: MyColors.textWhite,
                       ),
 
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Obx(() {
                         final username = controller.swopUsername.value.trim();
                         if (username.isEmpty) return const SizedBox(); // Hide when empty
@@ -877,8 +567,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         return Column(
                           children: [
                             Container(
-                              padding: EdgeInsets.all(3),
-                              decoration: BoxDecoration(
+                              padding: const EdgeInsets.all(3),
+                              decoration: const BoxDecoration(
                                 color: MyColors.textBlack,
                                 borderRadius: BorderRadius.all(Radius.circular(20)),
                               ),
@@ -906,7 +596,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           ],
                         );
                       }),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       myFieldAdvance(
                         context: context,
                         controller: nameController,
@@ -914,7 +604,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         inputType: TextInputType.text,
                         textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       myFieldAdvance(
                         context: context,
                         controller: emailController,
@@ -922,7 +612,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         inputType: TextInputType.text,
                         textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       myFieldAdvance(
                         context: context,
                         controller: ageController,
@@ -930,7 +620,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         inputType: TextInputType.number,
                         textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       myFieldAdvance(
                         context: context,
                         controller: phoneController,
@@ -938,7 +628,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         inputType: TextInputType.phone,
                         textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
                       Text(
                         AppStrings.addYourBio.tr,
@@ -947,7 +637,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           fontWeight: FontWeight.bold
                         ),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
                       TextFormField(
                         maxLength: 100,
@@ -958,14 +648,14 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
                         controller: bioController,
                         textInputAction: TextInputAction.done,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           counterText: '',
-                          contentPadding: const EdgeInsets.only(
+                          contentPadding: EdgeInsets.only(
                             top: 40,
                             left: 20,
                           ),
                           hintText: "Enter a bio",
-                          hintStyle: const TextStyle(
+                          hintStyle: TextStyle(
                             fontSize: 12,
                             fontFamily: "Chromatica",
                             color: MyColors.textBlack,
@@ -974,33 +664,33 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           ),
                           filled: true,
                           fillColor: Colors.transparent,
-                          enabledBorder: const OutlineInputBorder(
+                          enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                               color: Colors.black,
                               width: 1.2,
                             ),
                             borderRadius: BorderRadius.all(Radius.circular(28)),
                           ),
-                          border: const OutlineInputBorder(
+                          border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(28)),
                           ),
                         ),
                       ),
 
-                      SizedBox(height: 24),
+                      const SizedBox(height: 24),
                       
                       // NFC Status display
                       if (_nfcStatus.isNotEmpty)
                         Container(
-                          padding: EdgeInsets.all(8),
-                          margin: EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.only(bottom: 16),
                           decoration: BoxDecoration(
                             color: Colors.blue.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             _nfcStatus,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.blue,
                               fontWeight: FontWeight.bold,
                             ),
@@ -1008,43 +698,37 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           ),
                         ),
                       _nfcInProgress
-                          ? Center(child: CircularProgressIndicator(color: Colors.black))
+                          ? const Center(child: CircularProgressIndicator(color: Colors.black))
                           : CustomButton(
                           text: AppStrings.connectSwopband.tr,
-                          onPressed:_startNfcSessionAndWrite// _connectAndWriteToNfc,
+                          //onPressed:_startNfcSessionAndWrite// _connectAndWriteToNfc,
+                        onPressed: () {
+                          // Pass all create profile data to ConnectSwopbandScreen
+                          Get.to(() => ConnectSwopbandScreen(
+                            username: swopUserNameController.text,
+                            name: nameController.text,
+                            email: emailController.text,
+                            bio: bioController.text,
+                            age: ageController.text.trim().isNotEmpty ? int.tryParse(ageController.text.trim()) : null,
+                            phone: phoneController.text.trim().isNotEmpty ? phoneController.text.trim() : null,
+                            userImage: widget.userImage,
+                            imagePickerKey: _imagePickerKey,
+                          ));
+                        },
                       ),
 
-                      SizedBox(height:10),
-                      
-                      // NFC Read Button for testing
-                      CustomButton(
-                        buttonColor: MyColors.textWhite,
-                        textColor: MyColors.textBlack,
-                        text: "Read NFC Tag",
-                        onPressed: _readFromNfc,
-                      ),
-
-                      SizedBox(height:10),
-                      
-                      // NFC Test Button for debugging
-                      CustomButton(
-                        buttonColor: Colors.orange,
-                        textColor: Colors.white,
-                        text: "Test NFC",
-                        onPressed: _testNfcFunctionality,
-                      ),
-
-                      SizedBox(height:10),
+                      const SizedBox(height:10),
                       CustomButton(
                         buttonColor: MyColors.textWhite,
                         textColor: MyColors.textBlack,
                         text: AppStrings.purchaseSwopband.tr,
                         onPressed: ()async{
-                          Get.to(()=>PurchaseScreen());
+                          Get.to(()=>const PurchaseScreen());
                         },
                       ),
 
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
+
                     ],
                   ),
                 ),
@@ -1103,7 +787,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
               });
             },
             child: _isLoadingImage
-                ? CircularProgressIndicator(
+                ? const CircularProgressIndicator(
                     color: MyColors.primaryColor,
                     strokeWidth: 3,
                   )
@@ -1115,13 +799,13 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
               bottom: 0,
               right: 0,
               child: Container(
-                padding: EdgeInsets.all(4),
+                padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
                   color: MyColors.primaryColor,
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.camera_alt,
                   size: 20,
                   color: Colors.white,
@@ -1140,7 +824,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
     } else if (_selectedImageUrl != null && _selectedImageUrl!.isNotEmpty) {
       return NetworkImage(_selectedImageUrl!);
     } else {
-      return AssetImage("assets/images/img.png") as ImageProvider;
+      return const AssetImage("assets/images/img.png") as ImageProvider;
     }
   }
 
@@ -1174,11 +858,11 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
         ),
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1191,15 +875,15 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 16),
+            const Text(
               'Change Profile Photo',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
 
               _buildOptionButton(
                 context,
@@ -1210,7 +894,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
                   _pickImage1(ImageSource.camera);
                 },
               ),
-              Divider(height: 1, indent: 20, endIndent: 20),
+              const Divider(height: 1, indent: 20, endIndent: 20),
               _buildOptionButton(
                 context,
                 icon: Icons.photo_library,
@@ -1220,12 +904,12 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
                   _pickImage1(ImageSource.gallery);
                 },
               ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             // Only show remove option if there's an image
             if (_selectedImageFile != null || (_selectedImageUrl != null && _selectedImageUrl!.isNotEmpty))
               Column(
                 children: [
-                  Divider(height: 1, indent: 20, endIndent: 20),
+                  const Divider(height: 1, indent: 20, endIndent: 20),
                   _buildOptionButton(
                     context,
                     icon: Icons.delete,
@@ -1234,10 +918,10 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
                   ),
                 ],
               ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(
+              child: const Text(
                 'Cancel',
                 style: TextStyle(
                   fontSize: 16,
@@ -1368,4 +1052,3 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
     SnackbarUtil.showSuccess(message);
   }
 }
-

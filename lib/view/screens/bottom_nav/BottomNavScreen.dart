@@ -17,72 +17,164 @@ class BottomNavScreen extends StatelessWidget {
     const EditLinksScreen(),
     const RecentSwoppersScreen(),
     // HubScreen(),
-    SwopbandWebViewScreen(url: '',),
+    const SwopbandWebViewScreen(url: '',),
     Container(), // Placeholder for feedback - will be handled by navigation
-    SettingsScreen(),
+    const SettingsScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.black,
-        body: Obx(() => screens[navController.selectedIndex.value]),
-      bottomNavigationBar: Obx(
-            () => Container(
-          decoration: BoxDecoration(
-            border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.2))),
-          ),
-          child: Theme(
-            data: Theme.of(context).copyWith(
-              splashFactory: NoSplash.splashFactory, // Ripple effect disable
-              highlightColor: Colors.transparent,   // Press highlight disable
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // Main content
+          Obx(() => screens[navController.selectedIndex.value]),
+          
+          // Floating bottom navigation bar with gradient background
+          Positioned(
+            left: MediaQuery.of(context).size.width * 0.01, // 5% of screen width
+            right: MediaQuery.of(context).size.width * 0.01, // 5% of screen width
+            bottom: MediaQuery.of(context).padding.bottom , // Safe area + 10px
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.08, // 8% of screen height
+              constraints: const BoxConstraints(
+                minHeight: 60,
+                maxHeight: 80,
+              ),
+              decoration: BoxDecoration(
+                gradient:  LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white,
+                    Colors.white.withOpacity(0.9),
+                    Colors.white.withOpacity(0.7),
+                    Colors.white.withOpacity(0.3),
+                    Colors.transparent,
+                  ],
+                  stops: const [0.0, 0.3, 0.6, 0.8, 1.0],
+                ),
+                borderRadius: BorderRadius.circular(25),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    spreadRadius: 0,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Container(
+                margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02), // 2% of screen width
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.95),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildNavItem(0, Icons.link, 'Links',context),
+                    _buildNavItem(1, Icons.account_circle_outlined, 'Profile',context),
+                    _buildNavItem(2, Icons.group_outlined, 'Groups',context),
+                    _buildNavItem(3, Icons.star_border, 'Feedback',context),
+                    _buildNavItem(4, Icons.settings, 'Settings',context),
+                  ],
+                ),
+              ),
             ),
-            child: BottomNavigationBar(
-              currentIndex: navController.selectedIndex.value,
-              onTap: (index) {
-                if (index == 3) { // Feedback tab
-                  showDialog(
-                    context: context,
-                    builder: (context) => FeedbackPopup(),
-                  );
-                } else {
-                  navController.changeIndex(index);
-                }
-              },
-              type: BottomNavigationBarType.fixed,
-              backgroundColor: Colors.black,
-              selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.grey,
-              showSelectedLabels: false,
-              showUnselectedLabels: false,
-              elevation: 0,
-              items: const [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.link),
-                  label: '',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.account_circle_outlined),
-                  label: '',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.group_outlined),
-                  label: '',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.star_border),
-                  label: '',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.settings),
-                  label: '',
-                ),
-              ],
-            ),
           ),
-        ),
+        ],
       ),
-
     );
   }
+
+  Widget _buildNavItem(int index, IconData icon, String label,BuildContext context) {
+    return Obx(() {
+      final isSelected = navController.selectedIndex.value == index;
+      final screenWidth = MediaQuery.of(context).size.width;
+      final screenHeight = MediaQuery.of(context).size.height;
+      
+      // Show labels only on larger screens
+      final shouldShowLabels = screenWidth > 400 && screenHeight > 600;
+      
+      return GestureDetector(
+        onTap: () {
+          if (index == 3) { // Feedback tab
+            showFeedbackPopup(context);
+
+          } else {
+            navController.changeIndex(index);
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: EdgeInsets.symmetric(
+            horizontal: screenWidth * 0.015, // 1.5% of screen width
+            vertical: screenHeight * 0.01, // 1% of screen height
+          ),
+          constraints: BoxConstraints(
+            minWidth: screenWidth * 0.12, // 12% of screen width
+            maxWidth: screenWidth * 0.18, // 18% of screen width
+          ),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.white.withOpacity(0.2) : Colors.transparent,
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: isSelected ? Colors.white : Colors.grey,
+                size: screenWidth * 0.06, // 6% of screen width
+              ),
+              if (isSelected && shouldShowLabels) ...[
+                SizedBox(height: screenHeight * 0.005), // 0.5% of screen height
+                Flexible(
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: screenWidth * 0.025, // 2.5% of screen width
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
+    });
+  }
+  void showFeedbackPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black54,
+      builder: (context) {
+        return Stack(
+          children: [
+            // Align bottom with padding = nav bar height
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 60), // 👈 nav bar ki height
+                child: const FeedbackPopup(),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }

@@ -11,6 +11,7 @@ import 'package:swopband/view/widgets/custom_button.dart';
 import 'package:swopband/view/widgets/custom_textfield.dart';
 import 'package:swopband/view/widgets/feedback_modal.dart';
 
+import '../translations/app_strings.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_text_styles.dart';
 import 'ChangeEmailAddressScreen.dart';
@@ -22,6 +23,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../utils/shared_pref/SharedPrefHelper.dart';
 import 'package:swopband/view/screens/welcome_screen.dart';
 import 'package:swopband/view/widgets/custom_snackbar.dart';
+
+import 'bottom_nav/PurchaseScreen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -57,16 +60,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   textColor: MyColors.textWhite,
                   text: "FAQ and Troubleshooting",
                   onPressed: () {
-                    Get.to(()=>FAQScreen());
+                    Get.to(()=>const FAQScreen());
                   },
                 ),
               ),
+              const SizedBox(height: 10),
 
+              CustomButton(
+                buttonColor: MyColors.primaryColor,
+                textColor: MyColors.textBlack,
+                text: "Enter the SWOPSTORE",
+                onPressed: ()async{
+                  Get.to(()=>const PurchaseScreen());
+                },
+              ),
               const SizedBox(height: 24),
 
               // Account Information section
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   color: Colors.black,
@@ -75,18 +87,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildSectionTitle('Account Information'),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
 
                     _buildTappableAccountOption(
                       title: 'Edit Profile',
                       icon: Icons.person,
-                      onTap: () => Get.to(()=>UpdateProfileScreen()),
+                      onTap: () => Get.to(()=>const UpdateProfileScreen()),
                     ),
 
                     _buildTappableAccountOption(
                       title: 'FAQ',
                       icon: Icons.help_outline,
-                      onTap: () => Get.to(()=>FAQScreen()),
+                      onTap: () => Get.to(()=>const FAQScreen()),
                     ),
 
                     // Feedback option
@@ -120,7 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         type: 'Term & Condition',)),
                     ),
 
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
                     // Sign Out Option
                     _buildTappableAccountOption(
@@ -129,7 +141,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onTap: () => _showSignOutDialog(),
                     ),
 
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
 
                     // Delete Account Option
                     _buildTappableAccountOption(
@@ -173,7 +185,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Row(
           children: [
             Icon(icon, color: iconColor, size: 24),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Text(
               title,
               style: AppTextStyles.medium.copyWith(
@@ -181,8 +193,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            Spacer(),
-            Icon(Icons.arrow_forward, color: Colors.white, size: 20),
+            const Spacer(),
+            const Icon(Icons.arrow_forward, color: Colors.white, size: 20),
           ],
         ),
       ),
@@ -196,18 +208,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
         ),
-        title: Text(
+        title: const Text(
           'Sign Out',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: Text('Are you sure you want to sign out?'),
+        content: const Text('Are you sure you want to sign out?'),
         actions: [
           TextButton(
             style: TextButton.styleFrom(
               foregroundColor: Colors.grey[600],
             ),
             onPressed: () => Navigator.pop(context),
-            child: Text('CANCEL'),
+            child: const Text('CANCEL'),
           ),
           TextButton(
             style: TextButton.styleFrom(
@@ -217,7 +229,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Navigator.pop(context);
               _signOutUser();
             },
-            child: Text('SIGN OUT'),
+            child: const Text('SIGN OUT'),
           ),
         ],
       ),
@@ -231,18 +243,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
         ),
-        title: Text(
+        title: const Text(
           'Delete Account',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: Column(
+        content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('This will permanently:'),
             SizedBox(height: 8),
             Padding(
-              padding: const EdgeInsets.only(left: 8.0),
+              padding: EdgeInsets.only(left: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -261,7 +273,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               foregroundColor: Colors.grey[600],
             ),
             onPressed: () => Navigator.pop(context),
-            child: Text('CANCEL'),
+            child: const Text('CANCEL'),
           ),
           TextButton(
             style: TextButton.styleFrom(
@@ -271,7 +283,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Navigator.pop(context);
               await _deleteAndSignOutUser1();
             },
-            child: Text('DELETE ACCOUNT'),
+            child: const Text('DELETE ACCOUNT'),
           ),
         ],
       ),
@@ -370,7 +382,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await SharedPrefService.clear();
 
       // Navigate to WelcomeScreen
-      Get.offAll(() => WelcomeScreen());
+      Get.offAll(() => const WelcomeScreen());
       SnackbarUtil.showSuccess('Account Deleted: Your account has been deleted.');
     } catch (e) {
       log('❌ Error deleting/signing out: $e');
@@ -383,7 +395,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await FirebaseAuth.instance.signOut();
       if (Platform.isAndroid) await GoogleSignIn().signOut();
       await SharedPrefService.clear();
-      Get.offAll(() => WelcomeScreen());
+      Get.offAll(() => const WelcomeScreen());
     } catch (e) {
       print('❌ Error signing out: $e');
       SnackbarUtil.showError('Failed to sign out.');
