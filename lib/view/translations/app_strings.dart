@@ -63,7 +63,8 @@ class AppStrings extends Translations {
   static const String newEmailAddress = 'newEmailAddress';
   static const String confirmEmailAddress = 'confirmEmailAddress';
   static const String comFacebook = 'comFacebook';
-  static const String comReddit = 'comReddit';
+  static const String comSnapchat = 'comSnapchat';
+  static const String comStrava = 'comStrava';
 
   static const String settings = 'settings';
   static const String notifications = 'notifications';
@@ -162,7 +163,8 @@ class AppStrings extends Translations {
       newEmailAddress: 'New Email Address',
       confirmEmailAddress: 'Confirm Email Address',
       comFacebook: 'com.facebook/pp',
-      comReddit: 'com.reddit/username',
+      comSnapchat: 'snapchat.com/add/username',
+      comStrava: 'strava.com/athletes/username',
       settings: 'Settings',
       notifications: 'Notifications',
       newConnections: 'New connections',
@@ -258,7 +260,8 @@ class AppStrings extends Translations {
       newEmailAddress: 'Nuevo correo electrónico',
       confirmEmailAddress: 'Confirmar correo electrónico',
       comFacebook: 'com.facebook/pp',
-      comReddit: 'com.reddit/usuario',
+      comSnapchat: 'snapchat.com/agregar/usuario',
+      comStrava: 'strava.com/atletas/usuario',
       settings: 'Configuración',
       notifications: 'Notificaciones',
       newConnections: 'Nuevas conexiones',

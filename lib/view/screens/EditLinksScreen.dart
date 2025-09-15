@@ -56,34 +56,30 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
 
   final Map<String, String> _platformImages = {
     'instagram': MyImages.insta,
-    'custom': MyImages.music, // Changed from 'music' to 'custom'
-    'reddit': MyImages.reddit,
+    'snapchat': MyImages.snapchat,
     'linkedin': MyImages.linkedId,
-    'x': MyImages.xmaster, // Changed from 'twitter' to 'x'
+    'x': MyImages.xmaster,
     'spotify': MyImages.spotify,
     'facebook': MyImages.facebook,
-    'github': MyImages.github,
+    'strava': MyImages.strava,
     'youtube': MyImages.youtube,
-    'tiktok': MyImages.insta, // Added TikTok
-    'discord': MyImages.insta, // Added Discord
-    'dribble': MyImages.insta, // Added Dribbble
-    'website': MyImages.music, // Added Website
+    'tiktok': MyImages.tiktok,
+    'discord': MyImages.discord,
+    'website': MyImages.website,
   };
 
   final Map<String, Map<String, dynamic>> _supportedLinks = {
     'instagram': {'name': 'Instagram', 'icon': MyImages.insta},
-    'custom': {'name': 'Music', 'icon': MyImages.music}, // Changed from 'music' to 'custom'
-    'reddit': {'name': 'Reddit', 'icon': MyImages.reddit},
+    'snapchat': {'name': 'Snapchat', 'icon': MyImages.snapchat},
     'linkedin': {'name': 'LinkedIn', 'icon': MyImages.linkedId},
     'x': {'name': 'Twitter', 'icon': MyImages.xmaster}, // Changed from 'twitter' to 'x'
     'spotify': {'name': 'Spotify', 'icon': MyImages.spotify},
     'facebook': {'name': 'Facebook', 'icon': MyImages.facebook},
-    'github': {'name': 'GitHub', 'icon': MyImages.github},
+    'strava': {'name': 'Strava', 'icon': MyImages.strava},
     'youtube': {'name': 'YouTube', 'icon': MyImages.youtube},
-    'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok}, // Added TikTok
-    'discord': {'name': 'Discord', 'icon': MyImages.discord}, // Added Discord
-    'dribble': {'name': 'Dribbble', 'icon': MyImages.dribble}, // Added Dribbble
-    'website': {'name': 'Website', 'icon': MyImages.website}, // Added Website
+    'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok},
+    'discord': {'name': 'Discord', 'icon': MyImages.discord},
+    'website': {'name': 'Website', 'icon': MyImages.website},
   };
 
 
@@ -103,9 +99,18 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
         _linkTypes.add(link.type);
       }
 
+      // Clean up any invalid link types for new additions
+      for (int i = 0; i < _linkTypes.length; i++) {
+        if (i >= controller.links.length) { // Only check new links, not existing ones
+          if (!_supportedLinks.containsKey(_linkTypes[i])) {
+            _linkTypes[i] = 'instagram';
+          }
+        }
+      }
+
       if (_linkControllers.isEmpty) {
         _linkControllers.add(TextEditingController());
-        _linkTypes.add('custom'); // Changed from 'spotify' to 'custom'
+        _linkTypes.add('instagram');
       }
 
       setState(() {
@@ -157,23 +162,36 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Link'),
+          title: const Text('Edit Link'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
                 value: selectedType,
                 isExpanded: true,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                 ),
+                // Show only icon in selected item
+                selectedItemBuilder: (BuildContext context) {
+                  return _supportedLinks.entries.map((entry) {
+                    return Container(
+                      alignment: Alignment.center,
+                      child: Image.asset(
+                        entry.value['icon'],
+                        width: 24,
+                        height: 24,
+                      ),
+                    );
+                  }).toList();
+                },
                 items: _supportedLinks.entries.map((entry) {
                   return DropdownMenuItem<String>(
                     value: entry.key,
                     child: Row(
                       children: [
                         Image.asset(entry.value['icon'], width: 24, height: 24),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(entry.value['name']),
                       ],
                     ),
@@ -185,10 +203,10 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                   }
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextField(
                 controller: urlController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'URL',
                   border: OutlineInputBorder(),
                 ),
@@ -198,10 +216,10 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             Obx(() => controller.isLoading.value
-                ? CircularProgressIndicator()
+                ? const CircularProgressIndicator()
                 : TextButton(
                     onPressed: () async {
                       await controller.updateLink(
@@ -211,7 +229,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                       );
                       Navigator.of(context).pop();
                     },
-                    child: Text('Save'),
+                    child: const Text('Save'),
                   )),
           ],
         );
@@ -220,24 +238,10 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
   }
 
   Widget _buildPlatformImage(String platform, bool isActive) {
-    return Column(
-      children: [
-        Image.asset(
-          _platformImages[platform] ?? MyImages.insta,
-          width: 40,
-          height: 40,
-        ),
-        if (isActive)
-          Container(
-            margin: const EdgeInsets.only(top: 4),
-            width: 9,
-            height: 9,
-            decoration: const BoxDecoration(
-              color: Colors.green,
-              shape: BoxShape.circle,
-            ),
-          ),
-      ],
+    return Image.asset(
+      _platformImages[platform] ?? MyImages.insta,
+      width: 40,
+      height: 40,
     );
   }
 
@@ -293,29 +297,29 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                 children: [
                                   _buildPlatformImage('instagram',
                                       controller.links.any((link) => link.type == 'instagram')),
-                                  _buildPlatformImage('custom',
-                                      controller.links.any((link) => link.type == 'custom')),
-                                  _buildPlatformImage('reddit',
-                                      controller.links.any((link) => link.type == 'reddit')),
+                                  _buildPlatformImage('snapchat',
+                                      controller.links.any((link) => link.type == 'snapchat')),
                                   _buildPlatformImage('linkedin',
                                       controller.links.any((link) => link.type == 'linkedin')),
                                   _buildPlatformImage('x',
                                       controller.links.any((link) => link.type == 'x')),
+                                  _buildPlatformImage('spotify',
+                                      controller.links.any((link) => link.type == 'spotify')),
                                 ],
                               ),
                               const SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  _buildPlatformImage('spotify',
-                                      controller.links.any((link) => link.type == 'spotify')),
                                   _buildPlatformImage('facebook',
                                       controller.links.any((link) => link.type == 'facebook')),
-                                  _buildPlatformImage('github',
-                                      controller.links.any((link) => link.type == 'github')),
+                                  _buildPlatformImage('strava',
+                                      controller.links.any((link) => link.type == 'strava')),
                                   _buildPlatformImage('youtube',
                                       controller.links.any((link) => link.type == 'youtube')),
                                   _buildPlatformImage('tiktok',controller.links.any((link) => link.type == 'tiktok')),
+                                  _buildPlatformImage('discord',
+                                      controller.links.any((link) => link.type == 'discord')),
                                 ],
                               ),
                               const SizedBox(height: 15),
@@ -354,6 +358,19 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                         borderSide: const BorderSide(color: Colors.grey),
                                       ),
                                     ),
+                                    // Show only icon in selected item
+                                    selectedItemBuilder: (BuildContext context) {
+                                      return _supportedLinks.entries.map((entry) {
+                                        return Container(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(
+                                            entry.value['icon'],
+                                            width: 24,
+                                            height: 24,
+                                          ),
+                                        );
+                                      }).toList();
+                                    },
                                     items: _supportedLinks.entries.map((entry) {
                                       return DropdownMenuItem<String>(
                                         value: entry.key,
@@ -384,7 +401,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                   child: GestureDetector(
                                     onTap: () => _launchUrl(controller.links[index].url),
                                     child: Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                                       decoration: BoxDecoration(
                                         border: Border.all(color: Colors.grey),
                                         borderRadius: BorderRadius.circular(10),
@@ -394,14 +411,14 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                           Expanded(
                                             child: Text(
                                               controller.links[index].url,
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 color: Colors.blue,
                                                 decoration: TextDecoration.underline,
                                               ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
-                                          Icon(Icons.open_in_new, color: Colors.blue, size: 16),
+                                          const Icon(Icons.open_in_new, color: Colors.blue, size: 16),
                                         ],
                                       ),
                                     ),
@@ -409,7 +426,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                 ),
                                 PopupMenuButton<String>(
                                   color: Colors.white,
-                                  icon: Icon(Icons.more_vert, color: Colors.black,size: 17),
+                                  icon: const Icon(Icons.more_vert, color: Colors.black,size: 17),
                                   onSelected: (String value) async {
                                     final link = controller.links[index];
                                     if (value == 'edit') {
@@ -419,7 +436,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                     }
                                   },
                                   itemBuilder: (BuildContext context) => [
-                                    PopupMenuItem<String>(
+                                    const PopupMenuItem<String>(
                                       value: 'edit',
                                       child: Row(
                                         children: [
@@ -429,7 +446,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                         ],
                                       ),
                                     ),
-                                    PopupMenuItem<String>(
+                                    const PopupMenuItem<String>(
                                       value: 'delete',
                                       child: Row(
                                         children: [
@@ -456,7 +473,9 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                     Expanded(
                                       flex: 4,
                                       child: DropdownButtonFormField<String>(
-                                        value: _linkTypes[index],
+                                        value: _supportedLinks.entries.any((entry) => entry.key == _linkTypes[index]) 
+                                            ? _linkTypes[index] 
+                                            : 'instagram', // Fallback to 'instagram' if current value is not available
                                         isExpanded: true,
                                         decoration: InputDecoration(
                                           filled: true,
@@ -470,6 +489,19 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                             borderSide: const BorderSide(color: Colors.grey),
                                           ),
                                         ),
+                                        // Show only icon in selected item
+                                        selectedItemBuilder: (BuildContext context) {
+                                          return _supportedLinks.entries.map((entry) {
+                                            return Container(
+                                              alignment: Alignment.center,
+                                              child: Image.asset(
+                                                entry.value['icon'],
+                                                width: 24,
+                                                height: 24,
+                                              ),
+                                            );
+                                          }).toList();
+                                        },
                                         items: _supportedLinks.entries.map((entry) {
                                           return DropdownMenuItem<String>(
                                             value: entry.key,
@@ -492,9 +524,11 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                           );
                                         }).toList(),
                                         onChanged: (String? newValue) {
-                                          setState(() {
-                                            _linkTypes[index] = newValue!;
-                                          });
+                                          if (newValue != null) {
+                                            setState(() {
+                                              _linkTypes[index] = newValue;
+                                            });
+                                          }
                                         },
                                       ),
                                     ),
@@ -514,7 +548,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                       ),
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.delete, color: Colors.red),
+                                      icon: const Icon(Icons.delete, color: Colors.red),
                                       onPressed: () {
                                         setState(() {
                                           if (_linkCount > controller.links.length) {
@@ -541,7 +575,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                             onPressed: () {
                               setState(() {
                                 _linkControllers.add(TextEditingController());
-                                _linkTypes.add('custom'); // Changed from 'spotify' to 'custom'
+                                _linkTypes.add('instagram');
                                 _linkCount++;
                               });
                             },
@@ -549,7 +583,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                         ),
                         if (_linkCount > controller.links.length)
                           Obx(() => controller.isLoading.value?
-                          Center(child: CircularProgressIndicator(color: Colors.black,)):
+                          const Center(child: CircularProgressIndicator(color: Colors.black,)):
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: CustomButton(
@@ -582,6 +616,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                             ),
                           ),
                           ),
+                        const SizedBox(height: 80)
                       ],
                     ),
                   ),

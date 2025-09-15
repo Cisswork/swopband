@@ -31,23 +31,23 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final List<TextEditingController> _linkControllers = [TextEditingController()];
-  final List<String> _linkTypes = ['custom']; // Default first link type - changed from 'spotify' to 'custom'
+  final List<String> _linkTypes = ['instagram']; // Default first link type; hide 'custom' from selection
   int _linkCount = 1;
-
+  final List<FocusNode> _linkFocusNodes = [FocusNode()];
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _phoneFocusNode = FocusNode();
   // Supported link types with their display names and icons
   final Map<String, Map<String, dynamic>> _supportedLinks = {
     'instagram': {'name': 'Instagram', 'icon': MyImages.insta},
-    'custom': {'name': 'Music', 'icon': MyImages.music}, // Changed from 'music' to 'custom'
-    'reddit': {'name': 'Reddit', 'icon': MyImages.reddit},
+    'snapchat': {'name': 'Snapchat', 'icon': MyImages.snapchat},
     'linkedin': {'name': 'LinkedIn', 'icon': MyImages.linkedId},
     'x': {'name': 'Twitter', 'icon': MyImages.xmaster}, // Changed from 'twitter' to 'x'
     'spotify': {'name': 'Spotify', 'icon': MyImages.spotify},
     'facebook': {'name': 'Facebook', 'icon': MyImages.facebook},
-    'github': {'name': 'GitHub', 'icon': MyImages.github},
+    'strava': {'name': 'Strava', 'icon': MyImages.strava},
     'youtube': {'name': 'YouTube', 'icon': MyImages.youtube},
     'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok}, // Added TikTok
     'discord': {'name': 'Discord', 'icon': MyImages.discord}, // Added Discord
-    'dribble': {'name': 'Dribbble', 'icon': MyImages.dribble}, // Added Dribbble
     'website': {'name': 'Website', 'icon': MyImages.website}, // Added Website
   };
 
@@ -55,8 +55,13 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
   void dispose() {
     _emailController.dispose();
     _phoneController.dispose();
+    _emailFocusNode.dispose();
+    _phoneFocusNode.dispose();
     for (var controller in _linkControllers) {
       controller.dispose();
+    }
+    for (var focusNode in _linkFocusNodes) {
+      focusNode.dispose();
     }
     super.dispose();
   }
@@ -86,9 +91,11 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
       _linkControllers.forEach((c) => c.clear());
       setState(() {
         _linkTypes.clear();
-        _linkTypes.add('custom'); // Changed from 'spotify' to 'custom'
+        _linkTypes.add('instagram'); // Default to instagram
         _linkControllers.clear();
         _linkControllers.add(TextEditingController());
+        _linkFocusNodes.clear();
+        _linkFocusNodes.add(FocusNode());
       });
 
       SnackbarUtil.showSuccess("Links submitted successfully!");
@@ -103,15 +110,27 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MyColors.backgroundColor,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(MyImages.background5, fit: BoxFit.cover),
-          ),
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: SingleChildScrollView(
+      // Add resizeToAvoidBottomInset to handle keyboard properly
+      resizeToAvoidBottomInset: true,
+      body: GestureDetector(
+        onTap: () {
+          // Hide keyboard when tapping anywhere on screen
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(MyImages.background5, fit: BoxFit.cover),
+            ),
+            SafeArea(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: SingleChildScrollView(
+                // Better keyboard padding handling
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 100,
+                ),
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -149,22 +168,22 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Image.asset(MyImages.insta),
-                                Image.asset(MyImages.music),
-                                Image.asset(MyImages.reddit),
-                                Image.asset(MyImages.linkedId),
-                                Image.asset(MyImages.xmaster),
+                                Image.asset(MyImages.insta, width: 30, height: 30),
+                                Image.asset(MyImages.snapchat, width: 30, height: 30),
+                                Image.asset(MyImages.linkedId, width: 30, height: 30),
+                                Image.asset(MyImages.xmaster, width: 30, height: 30),
+                                Image.asset(MyImages.spotify, width: 30, height: 30),
                               ],
                             ),
                             const SizedBox(height: 8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Image.asset(MyImages.spotify),
-                                Image.asset(MyImages.facebook),
-                                Image.asset(MyImages.github),
-                                Image.asset(MyImages.youtube),
-                                Image.asset(MyImages.tindi),
+                                Image.asset(MyImages.facebook, width: 30, height: 30),
+                                Image.asset(MyImages.strava, width: 30, height: 30),
+                                Image.asset(MyImages.youtube, width: 30, height: 30),
+                                Image.asset(MyImages.tiktok, width: 30, height: 30),
+                                Image.asset(MyImages.discord, width: 30, height: 30),
                               ],
                             ),
                             const SizedBox(height: 15),
@@ -180,28 +199,100 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                         ),
                       ),
                       const SizedBox(height: 30),
-                      myFieldAdvance(
-                        autofillHints: [AutofillHints.email],
-                        context: context,
-                        controller: _emailController,
-                        hintText: 'email'.tr,
-                        inputType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                        fillColor: Colors.transparent,
-                        textBack: Colors.transparent,
+                      // Email TextField
+                      SizedBox(
+                        height: 43,
+                        child: TextFormField(
+                          controller: _emailController,
+                          focusNode: _emailFocusNode,
+                          autofillHints: [AutofillHints.email],
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (value) {
+                            _phoneFocusNode.requestFocus();
+                          },
+                          decoration: InputDecoration(
+                            label: Text(
+                              'email'.tr,
+                              style: TextStyle(
+                                backgroundColor: Colors.transparent,
+                                color: Colors.black.withOpacity(0.8),
+                                fontSize: 14,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.only(top: 3, left: 20, right: 12),
+                            hintText: 'email'.tr,
+                            hintStyle: const TextStyle(
+                              fontSize: 12,
+                              fontFamily: "Chromatica",
+                              color: Colors.grey,
+                              decoration: TextDecoration.none,
+                              wordSpacing: 1.2,
+                            ),
+                            filled: true,
+                            fillColor: Colors.transparent,
+                            enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black, width: 1.2),
+                              borderRadius: BorderRadius.all(Radius.circular(28)),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black, width: 1.2),
+                              borderRadius: BorderRadius.all(Radius.circular(28)),
+                            ),
+                            border: const OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(28)),
+                            ),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 10),
-                      myFieldAdvance(
-                        autofillHints: [AutofillHints.telephoneNumber],
-                        context: context,
-                        controller: _phoneController,
-                        hintText: AppStrings.phoneNumber.tr,
-                        inputType: TextInputType.phone,
-                        textInputAction: TextInputAction.next,
-                        fillColor: Colors.transparent,
-                        textBack: Colors.transparent,
+                      // Phone TextField
+                      SizedBox(
+                        height: 43,
+                        child: TextFormField(
+                          controller: _phoneController,
+                          focusNode: _phoneFocusNode,
+                          autofillHints: [AutofillHints.telephoneNumber],
+                          keyboardType: TextInputType.phone,
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (value) {
+                            FocusManager.instance.primaryFocus?.unfocus();
+                          },
+                          decoration: InputDecoration(
+                            label: Text(
+                              AppStrings.phoneNumber.tr,
+                              style: TextStyle(
+                                backgroundColor: Colors.transparent,
+                                color: Colors.black.withOpacity(0.8),
+                                fontSize: 14,
+                              ),
+                            ),
+                            contentPadding: const EdgeInsets.only(top: 3, left: 20, right: 12),
+                            hintText: AppStrings.phoneNumber.tr,
+                            hintStyle: const TextStyle(
+                              fontSize: 12,
+                              fontFamily: "Chromatica",
+                              color: Colors.grey,
+                              decoration: TextDecoration.none,
+                              wordSpacing: 1.2,
+                            ),
+                            filled: true,
+                            fillColor: Colors.transparent,
+                            enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black, width: 1.2),
+                              borderRadius: BorderRadius.all(Radius.circular(28)),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.black, width: 1.2),
+                              borderRadius: BorderRadius.all(Radius.circular(28)),
+                            ),
+                            border: const OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(28)),
+                            ),
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 30),
                       
                       // Show existing links section
                       if (controller.links.isNotEmpty) ...[
@@ -217,8 +308,8 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.link, color: Colors.green, size: 20),
-                                  SizedBox(width: 8),
+                                  const Icon(Icons.link, color: Colors.green, size: 20),
+                                  const SizedBox(width: 8),
                                   Text(
                                     'Your Existing Links',
                                     style: AppTextStyles.extraLarge.copyWith(
@@ -229,7 +320,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
                                 'These links are already saved to your profile:',
                                 style: AppTextStyles.extraLarge.copyWith(
@@ -240,110 +331,8 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 20),
                       ],
-                      
-                      /*..._linkControllers.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final controller = entry.value;
-
-                        return Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  flex: 4,
-                                  child: DropdownButtonFormField<String>(
-                                    value: _linkTypes[index],
-                                    isExpanded: true,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.transparent,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: const BorderSide(color: Colors.grey),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: const BorderSide(color: Colors.grey),
-                                      ),
-                                    ),
-                                    items: _supportedLinks.entries.map((entry) {
-                                      return DropdownMenuItem<String>(
-                                        value: entry.key,
-                                        child: Row(
-                                          children: [
-                                            Image.asset(
-                                              entry.value['icon'],
-                                              width: 24,
-                                              height: 24,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Flexible(
-                                              child: Text(
-                                                entry.value['name'],
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList(),
-                                    onChanged: (String? newValue) {
-                                      setState(() {
-                                        _linkTypes[index] = newValue!;
-                                      });
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  flex: 7,
-                                  child: myFieldAdvance(
-                                    context: context,
-                                    controller: controller,
-                                    hintText: 'Enter ${_supportedLinks[_linkTypes[index]]!['name']} URL or ID',
-                                    inputType: TextInputType.text,
-                                    textInputAction: index < _linkControllers.length - 1
-                                        ? TextInputAction.next
-                                        : TextInputAction.done,
-                                    fillColor: Colors.transparent,
-                                    textBack: Colors.transparent,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                        );
-                      }),
-
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CustomButton(
-                          buttonColor: MyColors.textBlack,
-                          textColor: MyColors.textWhite,
-                          text: AppStrings.addAnotherLink.tr,
-                          onPressed: () {
-                            setState(() {
-                              _linkControllers.add(TextEditingController());
-                              _linkTypes.add('spotify'); // Default type for new link
-                              _linkCount++;
-                            });
-                          },
-                        ),
-                      ),
-                     controller.isLoading.value?
-                     Center(child: CircularProgressIndicator(color: Colors.black,)):
-                     Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CustomButton(
-                          buttonColor: MyColors.textBlack,
-                          textColor: MyColors.textWhite,
-                          text: AppStrings.goToHub.tr,
-                          onPressed: _submitLinks,
-                        ),
-                      ),*/
 
                       ...List.generate(controller.links.length, (index) => Column(
                         children: [
@@ -351,9 +340,23 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                             children: [
                               Expanded(
                                 flex: 4,
-                                child: DropdownButtonFormField<String>(
-                                  value: controller.links[index].type,
-                                  isExpanded: true,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    // Hide keyboard when dropdown area is tapped
+                                    _emailFocusNode.unfocus();
+                                    _phoneFocusNode.unfocus();
+                                    FocusManager.instance.primaryFocus?.unfocus();
+                                  },
+                                  onTapDown: (details) {
+                                    // Hide keyboard when dropdown is pressed
+                                    _emailFocusNode.unfocus();
+                                    _phoneFocusNode.unfocus();
+                                    FocusManager.instance.primaryFocus?.unfocus();
+                                  },
+                                  child: DropdownButtonFormField<String>(
+                                    value: controller.links[index].type,
+                                    isExpanded: true,
+                                    menuMaxHeight: MediaQuery.of(context).size.height * 0.4,
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: Colors.transparent,
@@ -366,6 +369,19 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                       borderSide: const BorderSide(color: Colors.grey),
                                     ),
                                   ),
+                                  // Show only icon in selected item
+                                  selectedItemBuilder: (BuildContext context) {
+                                    return _supportedLinks.entries.map((entry) {
+                                      return Container(
+                                        alignment: Alignment.center,
+                                        child: Image.asset(
+                                          entry.value['icon'],
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                      );
+                                    }).toList();
+                                  },
                                   items: _supportedLinks.entries.map((entry) {
                                     return DropdownMenuItem<String>(
                                       value: entry.key,
@@ -388,32 +404,33 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                     );
                                   }).toList(),
                                   onChanged: null, // readonly
+                                  onTap: () {
+                                    // Hide keyboard when dropdown is tapped
+                                    _emailFocusNode.unfocus();
+                                    _phoneFocusNode.unfocus();
+                                    FocusManager.instance.primaryFocus?.unfocus();
+                                  },
+
+                                ),
                                 ),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
                                 flex: 7,
-                                child: TextField(
+                                child: myFieldAdvance(
+                                  context: context,
                                   controller: TextEditingController(text: controller.links[index].url),
+                                  hintText: 'Enter ${_supportedLinks[controller.links[index].type]!['name']} URL or ID',
+                                  inputType: TextInputType.text,
+                                  textInputAction: TextInputAction.done,
+                                  fillColor: Colors.transparent,
+                                  textBack: Colors.transparent,
                                   readOnly: true,
-                                  decoration: InputDecoration(
-                                    hintText: 'Enter ${_supportedLinks[controller.links[index].type]!['name']} URL or ID',
-                                    filled: true,
-                                    fillColor: Colors.transparent,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: const BorderSide(color: Colors.grey),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      borderSide: const BorderSide(color: Colors.grey),
-                                    ),
-                                  ),
                                 ),
                               ),
                               PopupMenuButton<String>(
                                   color: Colors.white,
-                                  icon: Icon(Icons.more_vert, color: Colors.black,size: 17),
+                                  icon: const Icon(Icons.more_vert, color: Colors.black,size: 17),
                                   onSelected: (String value) async {
                                     final link = controller.links[index];
                                     if (value == 'edit') {
@@ -423,7 +440,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                     }
                                   },
                                   itemBuilder: (BuildContext context) => [
-                                    PopupMenuItem<String>(
+                                    const PopupMenuItem<String>(
                                       value: 'edit',
                                       child: Row(
                                         children: [
@@ -433,7 +450,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                         ],
                                       ),
                                     ),
-                                    PopupMenuItem<String>(
+                                    const PopupMenuItem<String>(
                                       value: 'delete',
                                       child: Row(
                                         children: [
@@ -447,7 +464,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 15),
                         ],
                       )),
                       
@@ -465,8 +482,8 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.add_circle, color: Colors.blue, size: 20),
-                                  SizedBox(width: 8),
+                                  const Icon(Icons.add_circle, color: Colors.blue, size: 20),
+                                  const SizedBox(width: 8),
                                   Text(
                                     'Add New Links',
                                     style: AppTextStyles.extraLarge.copyWith(
@@ -477,7 +494,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
                                 'Add new social media links to your profile. Make sure the URL is unique and not already added.',
                                 style: AppTextStyles.extraLarge.copyWith(
@@ -488,7 +505,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 20),
                       ],
                       
                       // Editable fields for new links
@@ -500,9 +517,23 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                               children: [
                                 Expanded(
                                   flex: 4,
-                                  child: DropdownButtonFormField<String>(
-                                    value: _linkTypes[index],
-                                    isExpanded: true,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // Hide keyboard when dropdown area is tapped
+                                      _emailFocusNode.unfocus();
+                                      _phoneFocusNode.unfocus();
+                                      FocusManager.instance.primaryFocus?.unfocus();
+                                    },
+                                    onTapDown: (details) {
+                                      // Hide keyboard when dropdown is pressed
+                                      _emailFocusNode.unfocus();
+                                      _phoneFocusNode.unfocus();
+                                      FocusManager.instance.primaryFocus?.unfocus();
+                                    },
+                                    child: DropdownButtonFormField<String>(
+                                      value: _linkTypes[index],
+                                      isExpanded: true,
+                                      menuMaxHeight: MediaQuery.of(context).size.height * 0.4,
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: Colors.transparent,
@@ -515,6 +546,20 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                         borderSide: const BorderSide(color: Colors.grey),
                                       ),
                                     ),
+                                    // Show only icon in the selected field (no text)
+                                    selectedItemBuilder: (BuildContext context) {
+                                      return _supportedLinks.entries.map((entry) {
+                                        return Container(
+                                          alignment: Alignment.center,
+                                          child: Image.asset(
+                                            entry.value['icon'],
+                                            width: 24,
+                                            height: 24,
+                                          ),
+                                        );
+                                      }).toList();
+                                    },
+                                    // All supported links are available for selection
                                     items: _supportedLinks.entries.map((entry) {
                                       return DropdownMenuItem<String>(
                                         value: entry.key,
@@ -537,33 +582,45 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                       );
                                     }).toList(),
                                     onChanged: (String? newValue) {
+                                      // Hide keyboard when dropdown value changes
+                                      _emailFocusNode.unfocus();
+                                      _phoneFocusNode.unfocus();
+                                      FocusManager.instance.primaryFocus?.unfocus();
                                       setState(() {
                                         _linkTypes[index] = newValue!;
                                       });
                                     },
+                                    onTap: () {
+                                      // Hide keyboard when dropdown is tapped
+                                      _emailFocusNode.unfocus();
+                                      _phoneFocusNode.unfocus();
+                                      FocusManager.instance.primaryFocus?.unfocus();
+                                    },
+
+                                  ),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   flex: 7,
                                   child: myFieldAdvance(
+                                    focusNode: _linkFocusNodes[index],
                                     context: context,
                                     controller: _linkControllers[index],
                                     hintText: 'Enter ${_supportedLinks[_linkTypes[index]]!['name']} URL or ID',
                                     inputType: TextInputType.text,
-                                    textInputAction: index < _linkControllers.length - 1
-                                        ? TextInputAction.next
-                                        : TextInputAction.done,
+                                    textInputAction: TextInputAction.done,
                                     fillColor: Colors.transparent,
                                     textBack: Colors.transparent,
                                   ),
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  icon: const Icon(Icons.delete, color: Colors.red),
                                   onPressed: () {
                                     setState(() {
                                       if (_linkCount > controller.links.length) {
                                         _linkControllers.removeAt(index);
+                                        _linkFocusNodes.removeAt(index);
                                         _linkTypes.removeAt(index);
                                         _linkCount--;
                                       }
@@ -572,13 +629,14 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 15),
                           ],
                         );
                       },
                       ),
+                      const SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: CustomButton(
                           buttonColor: MyColors.textBlack,
                           textColor: MyColors.textWhite,
@@ -586,7 +644,8 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                           onPressed: () {
                             setState(() {
                               _linkControllers.add(TextEditingController());
-                              _linkTypes.add('spotify');
+                              _linkFocusNodes.add(FocusNode());
+                              _linkTypes.add('instagram');
                               _linkCount++;
                             });
                           },
@@ -594,9 +653,9 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                       ),
                       if (_linkCount > controller.links.length)
                         Obx(() => controller.isLoading.value?
-                        Center(child: CircularProgressIndicator(color: Colors.black,)):
+                        const Center(child: CircularProgressIndicator(color: Colors.black,)):
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
                           child: CustomButton(
                             buttonColor: MyColors.textBlack,
                             textColor: MyColors.textWhite,
@@ -658,6 +717,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
             ),
           ),
         ],
+        ),
       ),
     );
   }

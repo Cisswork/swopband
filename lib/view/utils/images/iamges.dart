@@ -16,14 +16,13 @@ class MyImages {
   static const xmaster = "assets/images/xmaster.png";
   static const tindi = "assets/images/tindi.png";
   static const spotify = "assets/images/spotify.png";
-  static const reddit = "assets/images/reddit.png";
+  static const snapchat = "assets/images/snapchat.png";
   static const music = "assets/images/music.png";
   static const insta = "assets/images/insta.png";
-  static const github = "assets/images/github.png";
+  static const strava = "assets/images/strava.png";
   static const facebook = "assets/images/facebook.png";
   static const profileImage = "assets/images/profileImage.png";
   static const website = "assets/images/web.png";
-  static const dribble = "assets/images/dribble.png";
   static const discord = "assets/images/discord.png";
   static const tiktok = "assets/images/tiktok.png";
 }

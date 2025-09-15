@@ -27,8 +27,7 @@ class UserController extends GetxController {
     int? age,
     String? phone,
     String? profileUrl,
-    File? profileFile,
-    VoidCallback? onSuccess,
+    File? profileFile, VoidCallback? onSuccess,
   }) async {
     isLoading.value = true;
 
@@ -169,14 +168,14 @@ class UserController extends GetxController {
     required String email,
     required String bio,
     String? profileUrl,
-    File? profileFile,
+    File? profileFile, // Keep for backward compatibility but won't be used
     VoidCallback? onSuccess,
   }) async {
     isLoading.value = true;
 
     // Get backend user ID for update
     final backendUserId = await SharedPrefService.getString('backend_user_id');
-    log("backend id",error: backendUserId);
+    log("🔗 Backend user ID: $backendUserId");
     if (backendUserId == null || backendUserId.isEmpty) {
       SnackbarUtil.showError("User ID not found. Please login again.");
       isLoading.value = false;
@@ -190,69 +189,23 @@ class UserController extends GetxController {
       "bio": bio,
     };
 
-    // Step 1: If profileFile is provided, upload it to webview endpoint to get imageUrl
-    String? finalProfileUrl = profileUrl;
-    if (profileFile != null) {
-      log("🔗 STEP 1: Uploading image file to webview endpoint to get imageUrl");
-      log("🔗 FILE PATH: ${profileFile.path}");
-      log("🔗 FILE SIZE: ${await profileFile.length()} bytes");
-      
-      try {
-        // Upload image to the webview endpoint
-        final uploadResponse = await ApiService.multipartPost(
-          ApiUrls.baseUrl, // Upload to main domain
-          fields: {},
-          file: profileFile,
-          fileFieldName: 'image', // Use 'image' field name
-          filename: profileFile.path.split('/').last,
-        );
-        
-        if (uploadResponse?.statusCode == 200 || uploadResponse?.statusCode == 201) {
-          final uploadBody = jsonDecode(uploadResponse!.body);
-          // Extract imageUrl from the webview response format
-          finalProfileUrl = uploadBody['imageUrl'];
-          log("🔗 Image uploaded successfully, got imageUrl: $finalProfileUrl");
-          log("🔗 Full upload response: $uploadBody");
-          
-          if (finalProfileUrl == null || finalProfileUrl.isEmpty) {
-            log("❌ imageUrl not found in response");
-            SnackbarUtil.showError("Failed to get image URL from upload response");
-            isLoading.value = false;
-            return;
-          }
-        } else {
-          log("❌ Image upload failed: ${uploadResponse?.statusCode}");
-          log("❌ Upload response: ${uploadResponse?.body}");
-          SnackbarUtil.showError("Failed to upload image");
-          isLoading.value = false;
-          return;
-        }
-      } catch (e) {
-        log("❌ Error uploading image: $e");
-        SnackbarUtil.showError("Error uploading image");
-        isLoading.value = false;
-        return;
-      }
+    // Add profile_url if provided (imageUrl from /uploads/ API)
+    if (profileUrl != null && profileUrl.isNotEmpty) {
+      fields["profile_url"] = profileUrl;
+      log("🔗 Using profile URL from /uploads/ API : $profileUrl");
     }
 
-    // Step 2: Use the final profile URL in the PUT request
-    if (finalProfileUrl != null && finalProfileUrl.isNotEmpty) {
-      fields["profile_url"] = finalProfileUrl; // Send imageUrl as profile_url parameter
-      log("🔗 Using profile URL: $finalProfileUrl");
-    }
-
-    log("UPDATE USER PARAMETER------>$fields");
+    log("🔗 UPDATE USER PARAMETERS: $fields");
     log("🔗 BACKEND USER ID: $backendUserId");
 
-    // Step 2: Update profile using PUT request with the imageUrl
+    // Update profile using PUT request
     final updateUrl = "${ApiUrls.updateUser}$backendUserId";
-    log("🔗 STEP 2: Updating profile with imageUrl");
     log("🔗 UPDATE URL: $updateUrl");
 
     final response = await ApiService.put(updateUrl, fields);
 
     isLoading.value = false;
-    _handleUpdateResponse(response, username, name, email, bio, finalProfileUrl, onSuccess);
+    _handleUpdateResponse(response, username, name, email, bio, profileUrl, onSuccess);
   }
 
   void _handleUpdateResponse(
@@ -470,11 +423,11 @@ class UserController extends GetxController {
           elevation: 0,
           backgroundColor: Colors.transparent,
           child: Container(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [
+              boxShadow: const [
               BoxShadow(
               color: Colors.black26,
               blurRadius: 10.0,
@@ -492,7 +445,7 @@ class UserController extends GetxController {
                   shape: BoxShape.circle,
                   color: Colors.green.shade100,
                 ),
-                child: Center(
+                child: const Center(
                   child: Icon(
                     Icons.check,
                     size: 60,
@@ -500,10 +453,10 @@ class UserController extends GetxController {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Success title
-              Text(
+              const Text(
                 "Thank You!",
                 style: TextStyle(
                   fontSize: 24,
@@ -511,7 +464,7 @@ class UserController extends GetxController {
                   color: Colors.green,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
 
               // Success message
               Text(
@@ -522,7 +475,7 @@ class UserController extends GetxController {
                   color: Colors.grey.shade700,
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Close button
               ElevatedButton(
@@ -531,12 +484,12 @@ class UserController extends GetxController {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text(
+                child: const Text(
                   "Close",
                   style: TextStyle(
                     fontSize: 16,
@@ -552,6 +505,5 @@ class UserController extends GetxController {
     );
 
   }
-
 
 }
