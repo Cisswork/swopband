@@ -48,7 +48,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
     'youtube': {'name': 'YouTube', 'icon': MyImages.youtube},
     'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok}, // Added TikTok
     'discord': {'name': 'Discord', 'icon': MyImages.discord}, // Added Discord
-    'website': {'name': 'Website', 'icon': MyImages.website}, // Added Website
+    'custom': {'name': 'Website', 'icon': MyImages.website}, // Added Website
   };
 
   @override

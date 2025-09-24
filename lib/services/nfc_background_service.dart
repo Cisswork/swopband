@@ -453,10 +453,10 @@ class NfcBackgroundService {
           log('📱 URL from NFC record $i: $url');
           
           // Extract username from URL if it's a swopband profile (support localhost, local IP, and production)
-          if (url.contains('srirangasai.dev/') || url.contains('localhost/') || url.contains('192.168.0.28/')) {
+          if (url.contains('profile.swopband.com/') || url.contains('localhost/') || url.contains('192.168.0.28/')) {
             // Extract username from all supported domains
-          if (url.contains('srirangasai.dev/')) {
-            username = url.split('srirangasai.dev/').last.split('/').first;
+          if (url.contains('profile.swopband.com/')) {
+            username = url.split('profile.swopband.com/').last.split('/').first;
             } else if (url.contains('localhost/')) {
               username = url.split('localhost/').last.split('/').first;
             } else if (url.contains('192.168.0.28/')) {
@@ -575,7 +575,7 @@ class NfcBackgroundService {
       log('🔄 Navigating to profile page for @$username');
       
       // Construct the profile URL
-      String profileUrl = "https://srirangasai.dev/$username";
+      String profileUrl = "https://profile.swopband.com/$username";
       
       // Navigate directly to profile page to avoid splash screen interference
       // Use Get.offAll to replace entire navigation stack

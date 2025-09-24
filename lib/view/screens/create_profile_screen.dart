@@ -327,7 +327,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
 
           log("[NFC] Tag is writable. Preparing to write...");
           try {
-            String swopHandleUrl = "https://srirangasai.dev/${swopUserNameController.text}";
+            String swopHandleUrl = "https://profile.swopband.com/${swopUserNameController.text}";
             log("[NFC] Writing URL to tag: $swopHandleUrl");
             await ndef.write(NdefMessage([
               NdefRecord.createUri(Uri.parse(swopHandleUrl))

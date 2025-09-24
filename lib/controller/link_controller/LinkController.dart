@@ -169,7 +169,7 @@ class LinkController extends GetxController {
       return;
     }
 
-    final response = await ApiService.get("https://srirangasai.dev/links/");
+    final response = await ApiService.get("https://profile.swopband.com/links/");
     print("Response Fetch Link--->${response?.body}");
 
     fetchLinkLoader.value = false;
@@ -195,7 +195,7 @@ class LinkController extends GetxController {
   Future<void> deleteLink(String id) async {
     isLoading.value = true;
     try {
-      final response = await ApiService.delete('https://srirangasai.dev/links/$id');
+      final response = await ApiService.delete('https://profile.swopband.com/links/$id');
       if (response != null && response.statusCode == 200) {
         SnackbarUtil.showSuccess('Link deleted successfully');
         await fetchLinks();
@@ -222,7 +222,7 @@ class LinkController extends GetxController {
         'type': type,
         'url': url,
       };
-      final response = await ApiService.put('https://srirangasai.dev/links/$id', body);
+      final response = await ApiService.put('https://profile.swopband.com/links/$id', body);
       if (response != null && response.statusCode == 200) {
         SnackbarUtil.showSuccess('Link updated successfully');
         await fetchLinks();

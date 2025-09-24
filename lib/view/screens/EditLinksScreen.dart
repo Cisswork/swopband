@@ -65,7 +65,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     'youtube': MyImages.youtube,
     'tiktok': MyImages.tiktok,
     'discord': MyImages.discord,
-    'website': MyImages.website,
+    'custom': MyImages.website,
   };
 
   final Map<String, Map<String, dynamic>> _supportedLinks = {
@@ -79,7 +79,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     'youtube': {'name': 'YouTube', 'icon': MyImages.youtube},
     'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok},
     'discord': {'name': 'Discord', 'icon': MyImages.discord},
-    'website': {'name': 'Website', 'icon': MyImages.website},
+    'custom': {'name': 'Website', 'icon': MyImages.website},
   };
 
 
@@ -138,7 +138,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
 
   String sanitizeProfileUrl(String? url) {
     if (url == null || url.isEmpty) return '';
-    if (kIsWeb && url.startsWith('http://srirangasai.dev')) {
+    if (kIsWeb && url.startsWith('http://profile.swopband.com')) {
       return url.replaceFirst('http://', 'https://');
     }
     return url;

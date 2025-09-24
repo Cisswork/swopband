@@ -348,7 +348,7 @@ class UserController extends GetxController {
 
   Future<Map<String, dynamic>?> fetchUserByFirebaseId(String firebaseId) async {
     fetchUserProfile.value = true;
-    final url = Uri.parse('https://srirangasai.dev/users/me');
+    final url = Uri.parse('https://profile.swopband.com/users/me');
     try {
       final response = await http.get(
         url,

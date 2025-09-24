@@ -26,7 +26,7 @@ class _ProfileImageUploadWebViewScreenState extends State<ProfileImageUploadWebV
   @override
   void initState() {
     super.initState();
-    log("Opening profile image upload webview: https://srirangasai.dev/");
+    log("Opening profile image upload webview: https://profile.swopband.com/");
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
@@ -48,7 +48,7 @@ class _ProfileImageUploadWebViewScreenState extends State<ProfileImageUploadWebV
           },
         ),
       )
-      ..loadRequest(Uri.parse("https://srirangasai.dev/"));
+      ..loadRequest(Uri.parse("https://profile.swopband.com/"));
   }
 
   // Check if the current page contains image upload response

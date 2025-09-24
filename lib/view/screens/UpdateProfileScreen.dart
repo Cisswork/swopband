@@ -153,7 +153,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
   String sanitizeProfileUrl(String? url) {
     if (url == null || url.isEmpty) return '';
-    if (kIsWeb && url.startsWith('http://srirangasai.dev')) {
+    if (kIsWeb && url.startsWith('http://profile.swopband.com')) {
       return url.replaceFirst('http://', 'https://');
     }
     return url;
@@ -346,7 +346,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       backgroundColor: MyColors.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const Text("Update Profile"),
+        title: const Text("Update your profile"),
       ),
       body: Stack(
         children: [
@@ -371,11 +371,11 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       children: [
                         Image.asset(MyImages.nameLogo, height: 40),
                         const SizedBox(height: 10),
-                        Text(
-                          "Update your profile",
-                          style: AppTextStyles.large.copyWith(fontSize: 20),
-                          textAlign: TextAlign.center,
-                        ),
+                        // Text(
+                        //   "Update your profile",
+                        //   style: AppTextStyles.large.copyWith(fontSize: 20),
+                        //   textAlign: TextAlign.center,
+                        // ),
 
                         _buildImagePicker(),
                         const SizedBox(height: 24),
@@ -666,7 +666,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       // Create multipart request to the correct endpoint
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse('https://srirangasai.dev/uploads/'),
+        Uri.parse('https://profile.swopband.com/uploads/'),
       );
 
       // Add image file with proper extension and content type
@@ -855,7 +855,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('https://srirangasai.dev/uploads/'),
+          Uri.parse('https://profile.swopband.com/uploads/'),
         );
 
         var stream = http.ByteStream(imageFile.openRead());

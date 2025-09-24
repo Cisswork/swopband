@@ -1,5 +1,5 @@
 class ApiUrls {
-  static const String baseUrl = 'https://srirangasai.dev';
+  static const String baseUrl = 'https://profile.swopband.com';
   static const String createUser = '$baseUrl/users/';
   static const String updateUser = '$baseUrl/users/';  // Will append user ID
   static const String updateUserAlt = '$baseUrl/users/update/';

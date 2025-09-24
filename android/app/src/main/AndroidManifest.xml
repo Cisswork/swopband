@@ -46,7 +46,7 @@
                 <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:scheme="https" 
-                      android:host="srirangasai.dev"/>
+                      android:host="profile.swopband.com"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

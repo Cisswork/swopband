@@ -131,7 +131,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     log('📱 iOS: Processing app link: $uri');
     
     // Support localhost, local IP, and production domain
-    if (uri.host == 'srirangasai.dev' || 
+    if (uri.host == 'profile.swopband.com' || 
         uri.host == 'localhost' || 
         uri.host == '192.168.0.28') {
       // Extract username from URL and show profile page first
@@ -154,14 +154,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       }
     } else {
       log('⚠️ App link not from supported domain: $uri');
-      log('⚠️ Supported domains: srirangasai.dev, localhost, 192.168.0.28');
+      log('⚠️ Supported domains: profile.swopband.com, localhost, 192.168.0.28');
     }
   }
 
   String? _extractUsernameFromUri(Uri uri) {
     try {
       // Support localhost, local IP, and production domains
-      if ((uri.host == 'srirangasai.dev' || 
+      if ((uri.host == 'profile.swopband.com' || 
            uri.host == 'localhost' || 
            uri.host == '192.168.0.28') && uri.pathSegments.isNotEmpty) {
         return uri.pathSegments.first;

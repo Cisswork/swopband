@@ -14,7 +14,7 @@ class SettingController extends GetxController{
   Future<void> fetchFaq() async {
     faqLoader.value = true;
 
-    final response = await ApiService.get("https://srirangasai.dev/faq/");
+    final response = await ApiService.get("https://profile.swopband.com/faq/");
     print("Response Fetch Faq--->${response?.body}");
 
     faqLoader.value = false;

@@ -120,7 +120,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildTappableAccountOption(
                       title: 'Privacy Policy',
                       icon: Icons.privacy_tip_outlined,
-                      onTap: () => Get.to(()=>PrivacyPolicyScreen(url: "https://srirangasai.dev/privacy_policy.html",
+                      onTap: () => Get.to(()=>PrivacyPolicyScreen(url: "https://profile.swopband.com/privacy_policy.html",
                         type: 'Privacy Policy',)),
                     ),
 
@@ -128,7 +128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildTappableAccountOption(
                       title: 'Term & Condition',
                       icon: Icons.description_outlined,
-                      onTap: () => Get.to(()=>PrivacyPolicyScreen(url: "https://srirangasai.dev/terms_and_conditions.html",
+                      onTap: () => Get.to(()=>PrivacyPolicyScreen(url: "https://profile.swopband.com/terms_and_conditions.html",
                         type: 'Term & Condition',)),
                     ),
 
@@ -298,7 +298,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // Step 1: Delete account from backend
       if (backendUserId != null && backendUserId.isNotEmpty) {
         final response = await ApiService.delete(
-          'https://srirangasai.dev/users/$backendUserId',
+          'https://profile.swopband.com/users/$backendUserId',
         );
 
         if (response == null || (response.statusCode != 200 && response.statusCode != 204)) {
@@ -450,7 +450,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final backendUserId = await SharedPrefService.getString('backend_user_id');
       if (backendUserId != null && backendUserId.isNotEmpty) {
         final response = await ApiService.delete(
-          'https://srirangasai.dev/users/$backendUserId',
+          'https://profile.swopband.com/users/$backendUserId',
         );
 
         if (response == null || (response.statusCode != 200 && response.statusCode != 204)) {

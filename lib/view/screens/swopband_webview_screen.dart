@@ -34,7 +34,7 @@ class _SwopbandWebViewScreenState extends State<SwopbandWebViewScreen> {
       finalUrl = widget.url;
     } else {
       final username = widget.username ?? AppConst.USER_NAME;
-      finalUrl = "https://srirangasai.dev/$username";
+      finalUrl = "https://profile.swopband.com/$username";
     }
 
     log("Loading profile: $finalUrl");
