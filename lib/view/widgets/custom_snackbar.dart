@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 class SnackbarUtil {
   static void showError(String message) {
     Get.snackbar(
-      "❌ Failed",
+      "Failed",
       message,
       backgroundColor: Colors.black,
       colorText: Colors.white,

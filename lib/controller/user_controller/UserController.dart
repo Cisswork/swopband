@@ -26,8 +26,10 @@ class UserController extends GetxController {
     required String bio,
     int? age,
     String? phone,
+    String? countryCode,
     String? profileUrl,
-    File? profileFile, VoidCallback? onSuccess,
+    File? profileFile,
+    VoidCallback? onSuccess,
   }) async {
     isLoading.value = true;
 
@@ -43,6 +45,9 @@ class UserController extends GetxController {
     if (phone != null && phone.isNotEmpty) {
       fields["phone"] = phone;
     }
+    if (countryCode != null && countryCode.isNotEmpty) {
+      fields["country_code"] = countryCode;
+    }
     if (profileUrl != null && profileUrl.isNotEmpty) {
       fields["profile"] = profileUrl;
     }
@@ -51,12 +56,15 @@ class UserController extends GetxController {
     if (profileUrl != null) {
       print("Profile URL/Base64 length: ${profileUrl.length}");
     }
-    
+
     if ((profileUrl ?? '').isNotEmpty) {
-      if (profileUrl!.startsWith('data:image') || profileUrl!.startsWith('/9j/') || profileUrl.startsWith('iVBOR')) {
+      if (profileUrl!.startsWith('data:image') ||
+          profileUrl!.startsWith('/9j/') ||
+          profileUrl.startsWith('iVBOR')) {
         print("Profile is base64 encoded image");
         print("Base64 starts with: ${profileUrl.substring(0, 50)}...");
-        print("Base64 ends with: ...${profileUrl.substring(profileUrl.length - 50)}");
+        print(
+            "Base64 ends with: ...${profileUrl.substring(profileUrl.length - 50)}");
       } else if (profileUrl.startsWith('http')) {
         print("Profile is URL: $profileUrl");
       } else {
@@ -103,32 +111,39 @@ class UserController extends GetxController {
       } else {
         // Check for field-specific validation errors first
         if (body['errors'] != null && body['errors']['fieldErrors'] != null) {
-          final fieldErrors = body['errors']['fieldErrors'] as Map<String, dynamic>;
-          
+          final fieldErrors =
+              body['errors']['fieldErrors'] as Map<String, dynamic>;
+
           // Check for name field error
-          if (fieldErrors['name'] != null && fieldErrors['name'] is List && fieldErrors['name'].isNotEmpty) {
+          if (fieldErrors['name'] != null &&
+              fieldErrors['name'] is List &&
+              fieldErrors['name'].isNotEmpty) {
             final nameError = fieldErrors['name'][0];
             log("Name field error: $nameError");
             SnackbarUtil.showError(nameError);
             return;
           }
-          
+
           // Check for username field error
-          if (fieldErrors['username'] != null && fieldErrors['username'] is List && fieldErrors['username'].isNotEmpty) {
+          if (fieldErrors['username'] != null &&
+              fieldErrors['username'] is List &&
+              fieldErrors['username'].isNotEmpty) {
             final usernameError = fieldErrors['username'][0];
             log("Username field error: $usernameError");
             SnackbarUtil.showError(usernameError);
             return;
           }
-          
+
           // Check for email field error
-          if (fieldErrors['email'] != null && fieldErrors['email'] is List && fieldErrors['email'].isNotEmpty) {
+          if (fieldErrors['email'] != null &&
+              fieldErrors['email'] is List &&
+              fieldErrors['email'].isNotEmpty) {
             final emailError = fieldErrors['email'][0];
             log("Email field error: $emailError");
             SnackbarUtil.showError(emailError);
             return;
           }
-          
+
           // Check for other field errors
           for (String field in fieldErrors.keys) {
             if (fieldErrors[field] is List && fieldErrors[field].isNotEmpty) {
@@ -139,13 +154,16 @@ class UserController extends GetxController {
             }
           }
         }
-        
+
         // Fallback to general error message
-        final error = body['error'] ?? body['message'] ?? "Something went wrong";
+        final error =
+            body['error'] ?? body['message'] ?? "Something went wrong";
         SnackbarUtil.showError(error);
         // If user already exists, navigate to BottomNavScreen
-        if (error.toString().toLowerCase().contains(
-            'firebase id or email id already exist')) {
+        if (error
+            .toString()
+            .toLowerCase()
+            .contains('firebase id or email id already exist')) {
           // Optionally save backend_user_id if present
           final userId = body['id']?['id'];
           if (userId != null) {
@@ -205,7 +223,8 @@ class UserController extends GetxController {
     final response = await ApiService.put(updateUrl, fields);
 
     isLoading.value = false;
-    _handleUpdateResponse(response, username, name, email, bio, profileUrl, onSuccess);
+    _handleUpdateResponse(
+        response, username, name, email, bio, profileUrl, onSuccess);
   }
 
   void _handleUpdateResponse(
@@ -231,7 +250,7 @@ class UserController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final message = body['message'] ?? "Profile updated successfully";
         SnackbarUtil.showSuccess(message);
-        
+
         // Update local constants with new values
         AppConst.USER_NAME = username;
         AppConst.fullName = name;
@@ -240,12 +259,14 @@ class UserController extends GetxController {
         if (finalProfileUrl != null && finalProfileUrl.isNotEmpty) {
           AppConst.USER_PROFILE = finalProfileUrl;
         }
-        
+
         if (onSuccess != null) onSuccess();
       } else {
-        final error = body['error'] ?? body['message'] ?? "Something went wrong";
-        SnackbarUtil.showError("Update failed: $error (Status: ${response.statusCode})");
-        
+        final error =
+            body['error'] ?? body['message'] ?? "Something went wrong";
+        SnackbarUtil.showError(
+            "Update failed: $error (Status: ${response.statusCode})");
+
         // Log more details for debugging
         log("❌ Update failed with status: ${response.statusCode}");
         log("❌ Response body: ${response.body}");
@@ -258,8 +279,6 @@ class UserController extends GetxController {
       SnackbarUtil.showError("Invalid response format: $e");
     }
   }
-
-
 
   Future<void> checkUsernameAvailability(String username) async {
     swopUsername.value = username; // Update instantly
@@ -283,7 +302,9 @@ class UserController extends GetxController {
     }
   }
 
-  Future<void> submitReviewRating(int rating, String review, BuildContext context, {VoidCallback? onSuccess}) async {
+  Future<void> submitReviewRating(
+      int rating, String review, BuildContext context,
+      {VoidCallback? onSuccess}) async {
     reviewLoader.value = true;
     final mapData = {
       "stars": rating,
@@ -302,13 +323,14 @@ class UserController extends GetxController {
       }
 
       // First check status code
-      if (response.statusCode == 200||response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         try {
           // Parse response body
           final data = json.decode(response.body);
 
           // Check if response contains success message
-          if (data['message'] != null && data['message'] == "Review submitted.") {
+          if (data['message'] != null &&
+              data['message'] == "Review submitted.") {
             // Call the success callback to clear the form
             onSuccess?.call();
             await _showSuccessDialog(context);
@@ -324,24 +346,27 @@ class UserController extends GetxController {
         try {
           final errorData = json.decode(response.body);
           if (errorData['message']?['fieldErrors'] != null) {
-            final errors = errorData['message']['fieldErrors'] as Map<String, dynamic>;
+            final errors =
+                errorData['message']['fieldErrors'] as Map<String, dynamic>;
             errors.forEach((field, messages) {
               if (messages is List && messages.isNotEmpty) {
                 SnackbarUtil.showError(messages.first);
               }
             });
           } else {
-            SnackbarUtil.showError(errorData['message'] ?? "Failed to submit review");
+            SnackbarUtil.showError(
+                errorData['message'] ?? "Failed to submit review");
           }
         } catch (e) {
           log('❌ Error parsing error response: $e');
-          SnackbarUtil.showError("Failed to submit review (${response.statusCode})");
+          SnackbarUtil.showError(
+              "Failed to submit review (${response.statusCode})");
         }
       }
     } catch (e) {
       log('❌ Error submitting review: $e');
       SnackbarUtil.showError("An error occurred while submitting review");
-    }finally{
+    } finally {
       reviewLoader.value = false;
     }
   }
@@ -361,7 +386,7 @@ class UserController extends GetxController {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final user = data['user'];
-        log("user detail---->",error: user);
+        log("user detail---->", error: user);
         if (user != null) {
           final userId = user['id'];
           final username = user['username'];
@@ -405,11 +430,10 @@ class UserController extends GetxController {
     } catch (e) {
       print('❌ Error fetching user: $e');
       return null;
-    }finally{
+    } finally {
       fetchUserProfile.value = false;
     }
   }
-
 
   Future<void> _showSuccessDialog(BuildContext context) async {
     return showDialog(
@@ -425,85 +449,84 @@ class UserController extends GetxController {
           child: Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: const [
-              BoxShadow(
-              color: Colors.black26,
-              blurRadius: 10.0,
-              offset: Offset(0.0, 10.0),
-            ),]
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              // Animated checkmark
-              Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.green.shade100,
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 10.0,
+                    offset: Offset(0.0, 10.0),
+                  ),
+                ]),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                // Animated checkmark
+                Container(
+                  height: 100,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.green.shade100,
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.check,
+                      size: 60,
+                      color: Colors.green,
+                    ),
+                  ),
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.check,
-                    size: 60,
+                const SizedBox(height: 20),
+
+                // Success title
+                const Text(
+                  "Thank You!",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                     color: Colors.green,
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 10),
 
-              // Success title
-              const Text(
-                "Thank You!",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // Success message
-              Text(
-                "Your review has been submitted successfully",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey.shade700,
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Close button
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text(
-                  "Close",
+                // Success message
+                Text(
+                  "Your review has been submitted successfully",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white,
+                    color: Colors.grey.shade700,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+
+                // Close button
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 30, vertical: 12),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text(
+                    "Close",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
         );
       },
     );
-
   }
-
 }
