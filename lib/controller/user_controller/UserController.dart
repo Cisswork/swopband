@@ -185,6 +185,8 @@ class UserController extends GetxController {
     required String name,
     required String email,
     required String bio,
+    String? phone,
+    String? countryCode,
     String? profileUrl,
     File? profileFile, // Keep for backward compatibility but won't be used
     VoidCallback? onSuccess,
@@ -206,6 +208,14 @@ class UserController extends GetxController {
       "email": email,
       "bio": bio,
     };
+
+    // Add phone and country_code if provided
+    if (phone != null && phone.isNotEmpty) {
+      fields["phone_number"] = phone;
+    }
+    if (countryCode != null && countryCode.isNotEmpty) {
+      fields["country_code"] = countryCode;
+    }
 
     // Add profile_url if provided (imageUrl from /uploads/ API)
     if (profileUrl != null && profileUrl.isNotEmpty) {
@@ -394,6 +404,8 @@ class UserController extends GetxController {
           final email = user['email'];
           final bio = user['bio'] ?? '';
           final profileUrl = user['profile_url'] ?? '';
+          final phoneNumber = user['phone_number'] ?? '';
+          final countryCode = user['country_code'] ?? '';
 
           if (userId != null) {
             await SharedPrefService.saveString('backend_user_id', userId);
@@ -417,6 +429,14 @@ class UserController extends GetxController {
 
           if (profileUrl != null) {
             AppConst.USER_PROFILE = profileUrl;
+          }
+
+          if (phoneNumber != null) {
+            AppConst.phoneNumber = phoneNumber;
+          }
+
+          if (countryCode != null) {
+            AppConst.countryCode = countryCode;
           }
 
           log("Exist User Data---------------$user");

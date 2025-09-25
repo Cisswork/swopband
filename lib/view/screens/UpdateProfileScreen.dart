@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:flutter_intl_phone_field/flutter_intl_phone_field.dart';
 import 'package:swopband/controller/user_controller/UserController.dart';
 import 'package:swopband/view/utils/shared_pref/SharedPrefHelper.dart';
 import 'package:swopband/view/widgets/custom_button.dart';
@@ -22,7 +23,7 @@ import '../translations/app_strings.dart';
 import 'package:swopband/view/widgets/custom_snackbar.dart';
 
 class UpdateProfileScreen extends StatefulWidget {
-   const UpdateProfileScreen({super.key});
+  const UpdateProfileScreen({super.key});
 
   @override
   State<UpdateProfileScreen> createState() => _UpdateProfileScreenState();
@@ -32,8 +33,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   final TextEditingController swopUserNameController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-
+  final TextEditingController phoneController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
+
+  // Phone number variables
+  String _phoneNumber = '';
+  String _countryCode = '';
+
   final controller = Get.put(UserController());
   String imageUrl = "";
 
@@ -59,8 +65,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     }
   }
 
-
-
   bool _validateForm() {
     if (swopUserNameController.text.trim().isEmpty) {
       SnackbarUtil.showError('Please enter a username');
@@ -78,13 +82,25 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     }
 
     // Basic email validation
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(emailController.text.trim())) {
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+        .hasMatch(emailController.text.trim())) {
       SnackbarUtil.showError('Please enter a valid email address');
       return false;
     }
+
+    // Phone validation (required)
+    if (_phoneNumber.isEmpty) {
+      SnackbarUtil.showError('Please enter your phone number');
+      return false;
+    }
+
+    if (_phoneNumber.length < 7) {
+      SnackbarUtil.showError('Please enter a valid phone number');
+      return false;
+    }
+
     return true;
   }
-
 
   @override
   void initState() {
@@ -92,23 +108,34 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     _checkAuth();
   }
 
-  Future<void> _checkAuth()async {
+  Future<void> _checkAuth() async {
     final firebaseId = await SharedPrefService.getString('firebase_id');
 
     log("firebaseId  : $firebaseId");
 
     if (firebaseId != null && firebaseId.isNotEmpty) {
       await controller.fetchUserByFirebaseId(firebaseId);
-        imageUrl =  sanitizeProfileUrl(AppConst.USER_PROFILE as String?);
-        nameController.text = AppConst.fullName;
-        bioController.text = AppConst.BIO;
-        swopUserNameController.text = AppConst.USER_NAME;
-        emailController.text = AppConst.EMAIL;
-        
-        // Initialize image picker variables
-        if (AppConst.USER_PROFILE != null && AppConst.USER_PROFILE!.isNotEmpty) {
-          _selectedImageUrl = AppConst.USER_PROFILE;
-        }
+      imageUrl = sanitizeProfileUrl(AppConst.USER_PROFILE as String?);
+      nameController.text = AppConst.fullName;
+      bioController.text = AppConst.BIO;
+      swopUserNameController.text = AppConst.USER_NAME;
+      emailController.text = AppConst.EMAIL;
+
+      // Initialize phone data from API response
+      // Assuming the API response has phone_number and country_code fields
+      // You may need to adjust these field names based on your actual API response
+      if (AppConst.phoneNumber != null && AppConst.phoneNumber!.isNotEmpty) {
+        _phoneNumber = AppConst.phoneNumber!;
+        phoneController.text = AppConst.phoneNumber!;
+      }
+      if (AppConst.countryCode != null && AppConst.countryCode!.isNotEmpty) {
+        _countryCode = AppConst.countryCode!;
+      }
+
+      // Initialize image picker variables
+      if (AppConst.USER_PROFILE.isNotEmpty) {
+        _selectedImageUrl = AppConst.USER_PROFILE;
+      }
     }
   }
 
@@ -127,7 +154,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       name: nameController.text,
       email: emailController.text, // Use the email from form
       bio: bioController.text,
-      profileFile: null, // No file upload needed as image is already uploaded to API
+      phone: _phoneNumber.isNotEmpty ? _phoneNumber : null,
+      countryCode: _countryCode.isNotEmpty ? _countryCode : null,
+      profileFile:
+          null, // No file upload needed as image is already uploaded to API
       profileUrl: profileUrl,
       onSuccess: () {
         SnackbarUtil.showSuccess("Profile updated successfully!");
@@ -139,13 +169,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   // Method to get current profile image (selected file or existing image)
   Future<String> _getCurrentProfileImage() async {
     log("=== _getCurrentProfileImage called ===");
-    
+
     // Use selected URL if available
     if (_selectedImageUrl != null && _selectedImageUrl!.isNotEmpty) {
       log("✅ Using selected URL: $_selectedImageUrl");
       return _selectedImageUrl!;
     }
-    
+
     // Final fallback to existing profile
     log("⚠️ No suitable image available, sending empty string");
     return "";
@@ -169,19 +199,22 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
             radius: 55,
             backgroundColor: MyColors.primaryColor.withOpacity(0.1),
             backgroundImage: _isLoadingImage ? null : _getBackgroundImage(),
-            onBackgroundImageError: (_isLoadingImage || _getBackgroundImage() == null) ? null : (exception, stackTrace) {
-              print('Error loading profile image: $exception');
-              // Fallback to default image on error
-              setState(() {
-                _selectedImageUrl = null;
-                _selectedImageFile = null;
-              });
-            },
+            onBackgroundImageError:
+                (_isLoadingImage || _getBackgroundImage() == null)
+                    ? null
+                    : (exception, stackTrace) {
+                        print('Error loading profile image: $exception');
+                        // Fallback to default image on error
+                        setState(() {
+                          _selectedImageUrl = null;
+                          _selectedImageFile = null;
+                        });
+                      },
             child: _isLoadingImage
                 ? const CircularProgressIndicator(
-              color: MyColors.primaryColor,
-              strokeWidth: 3,
-            )
+                    color: MyColors.primaryColor,
+                    strokeWidth: 3,
+                  )
                 : _buildProfileImageContent(),
           ),
           // Camera icon overlay to indicate it's clickable
@@ -261,7 +294,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
             ),
             const SizedBox(height: 8),
             // Only show remove option if there's an image
-            if (_selectedImageFile != null || (_selectedImageUrl != null && _selectedImageUrl!.isNotEmpty))
+            if (_selectedImageFile != null ||
+                (_selectedImageUrl != null && _selectedImageUrl!.isNotEmpty))
               Column(
                 children: [
                   const Divider(height: 1, indent: 20, endIndent: 20),
@@ -310,17 +344,17 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       _selectedImageUrl = null;
       _isImageRemoved = true; // Mark that image has been removed
     });
-    
+
     // Call API to remove image from server
     _removeImageFromAPI();
-    
+
     _showSuccessSnackbar('Profile photo removed');
   }
 
   Future<void> _removeImageFromAPI() async {
     try {
       log('🗑️ Removing profile image from server...');
-      
+
       // Call update user API with empty profileUrl to remove image
       await controller.updateUser(
         username: swopUserNameController.text,
@@ -333,7 +367,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
           log('✅ Profile image removed successfully from server');
         },
       );
-      
     } catch (e) {
       log('❌ Error removing image from server: $e');
       SnackbarUtil.showError('Failed to remove image from server: $e');
@@ -356,9 +389,12 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               fit: BoxFit.cover,
             ),
           ),
-          Obx((){
-            if(controller.fetchUserProfile.value){
-              return const Center(child: CircularProgressIndicator(color: Colors.black,));
+          Obx(() {
+            if (controller.fetchUserProfile.value) {
+              return const Center(
+                  child: CircularProgressIndicator(
+                color: Colors.black,
+              ));
             }
             return SafeArea(
               child: Padding(
@@ -388,7 +424,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         myFieldAdvance(
                           readOnly: true,
                           onChanged: (username) {
-                            controller.checkUsernameAvailability(username.trim());
+                            controller
+                                .checkUsernameAvailability(username.trim());
                           },
                           context: context,
                           controller: swopUserNameController,
@@ -437,14 +474,15 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         );
                       }),*/
 
-
                         const SizedBox(height: 15),
                         myFieldAdvance(
                           context: context,
                           controller: nameController,
                           hintText: "Enter Full Name",
                           inputType: TextInputType.text,
-                          textInputAction: TextInputAction.done, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
+                          textInputAction: TextInputAction.done,
+                          fillColor: MyColors.textWhite,
+                          textBack: MyColors.textWhite,
                         ),
                         const SizedBox(height: 20),
                         myFieldAdvance(
@@ -453,22 +491,81 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                           controller: emailController,
                           hintText: "Email",
                           inputType: TextInputType.text,
-                          textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
+                          textInputAction: TextInputAction.next,
+                          fillColor: MyColors.textWhite,
+                          textBack: MyColors.textWhite,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 15),
+                        // Phone number field with country code
+                        IntlPhoneField(
+                          controller: phoneController,
+                          decoration: const InputDecoration(
+                            hintText: "Phone Number",
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                              fontFamily: "Chromatica",
+                              color: MyColors.textBlack,
+                              decoration: TextDecoration.none,
+                              wordSpacing: 1.2,
+                            ),
+                            filled: true,
+                            fillColor: MyColors.textWhite,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black,
+                                width: 1.2,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(28)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: MyColors.textBlack,
+                                width: 1.2,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(28)),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(28)),
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 10,
+                            ),
+                          ),
+                          initialCountryCode:
+                              _countryCode.isNotEmpty ? _countryCode : 'US',
+                          onChanged: (phone) {
+                            _phoneNumber = phone.number;
+                            _countryCode = phone.countryCode;
+                          },
+                          onCountryChanged: (country) {
+                            _countryCode = country.code;
+                          },
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.phone,
+                          validator: (phone) {
+                            if (phone != null &&
+                                phone.number.isNotEmpty &&
+                                phone.number.length < 7) {
+                              return 'Please enter a valid phone number';
+                            }
+                            return null;
+                          },
+                        ),
                         const SizedBox(height: 8),
 
                         Text(
                           AppStrings.addYourBio.tr,
                           style: AppTextStyles.medium.copyWith(
                               color: MyColors.textBlack,
-                              fontWeight: FontWeight.bold
-                          ),
+                              fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
 
                         TextFormField(
-                          onTap: () async{
+                          onTap: () async {
                             // await signOut();
                           },
                           maxLines: 4,
@@ -494,10 +591,12 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                 color: Colors.black,
                                 width: 1.2,
                               ),
-                              borderRadius: BorderRadius.all(Radius.circular(28)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(28)),
                             ),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(28)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(28)),
                             ),
                           ),
                         ),
@@ -506,7 +605,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
                         CustomButton(
                           text: "Update Profile",
-                          onPressed:() {
+                          onPressed: () {
                             _updateProfile();
                           },
                         ),
@@ -557,26 +656,26 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         //   }
         // }
       }
-      
+
       setState(() {
         _isLoadingImage = true;
       });
-      
+
       // Add a small delay to ensure permission is fully granted
       await Future.delayed(const Duration(milliseconds: 200));
-      
+
       log('📱 Opening ${source == ImageSource.camera ? 'camera' : 'gallery'}...');
-      
+
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
         imageQuality: 30, // Very low quality for minimal file size
-        maxWidth: 200,    // Very small max width
-        maxHeight: 200,   // Very small max height
+        maxWidth: 200, // Very small max width
+        maxHeight: 200, // Very small max height
       );
 
       if (pickedFile != null) {
         File file = File(pickedFile.path);
-        
+
         // Validate file size (allow up to 5MB)
         int fileSize = await file.length();
         log('Selected image size: $fileSize bytes (${(fileSize / 1024).toStringAsFixed(2)} KB)');
@@ -595,12 +694,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         setState(() {
           _selectedImageFile = processedFile;
           _selectedImageUrl = null; // Clear URL since we have a file
-          _isImageRemoved = false; // Reset remove flag when new image is selected
+          _isImageRemoved =
+              false; // Reset remove flag when new image is selected
         });
 
         // Upload image to API
         await _uploadImageToAPI(processedFile);
-        
+
         _showSuccessSnackbar('Profile photo updated successfully');
         log('✅ Image selected and stored: ${processedFile.path}');
       } else {
@@ -609,12 +709,16 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       }
     } catch (e) {
       log('❌ Error picking image: $e');
-      
+
       // Check if it's a permission error
-      if (e.toString().contains('permission') || e.toString().contains('Permission')) {
-        _showPermissionDialog('Permission denied. Please enable camera/photos permission in settings.');
-      } else if (e.toString().contains('camera') || e.toString().contains('Camera')) {
-        _showErrorSnackbar('Camera not available. Please check if camera is working properly.');
+      if (e.toString().contains('permission') ||
+          e.toString().contains('Permission')) {
+        _showPermissionDialog(
+            'Permission denied. Please enable camera/photos permission in settings.');
+      } else if (e.toString().contains('camera') ||
+          e.toString().contains('Camera')) {
+        _showErrorSnackbar(
+            'Camera not available. Please check if camera is working properly.');
       } else {
         _showErrorSnackbar('Failed to pick image: $e');
       }
@@ -630,25 +734,25 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       // Get file extension
       String filePath = originalFile.path;
       String extension = filePath.split('.').last.toLowerCase();
-      
+
       log('Original file extension: $extension');
-      
+
       // Check if file is already in supported format
       if (['jpg', 'jpeg', 'png', 'heic'].contains(extension)) {
         log('✅ File is already in supported format: $extension');
         return originalFile;
       }
-      
+
       // For unsupported formats, show error and ask user to select supported format
       if (extension == 'webp' || extension == 'gif' || extension == 'bmp') {
-        _showErrorSnackbar('Please select JPEG, PNG, or HEIC format. WebP, GIF, and BMP are not supported.');
+        _showErrorSnackbar(
+            'Please select JPEG, PNG, or HEIC format. WebP, GIF, and BMP are not supported.');
         return null;
       }
-      
+
       // If we can't determine format, try to proceed (might be a valid image)
       log('⚠️ Unknown file extension: $extension, attempting to proceed');
       return originalFile;
-      
     } catch (e) {
       log('❌ Error processing image file: $e');
       return null;
@@ -672,16 +776,16 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       // Add image file with proper extension and content type
       var stream = http.ByteStream(imageFile.openRead());
       var length = await imageFile.length();
-      
+
       // Determine file extension from the actual file
       String filePath = imageFile.path;
       String extension = filePath.split('.').last.toLowerCase();
-      
+
       // Ensure we have a valid extension for the API
       if (!['jpg', 'jpeg', 'png', 'heic'].contains(extension)) {
         extension = 'jpg'; // Default to jpg if extension is not supported
       }
-      
+
       // Determine content type based on file extension
       String contentType;
       switch (extension) {
@@ -698,10 +802,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         default:
           contentType = 'image/jpeg';
       }
-      
+
       // Try different field names that the API might expect
       String fieldName = 'profile'; // Default field name
-      
+
       var multipartFile = http.MultipartFile(
         fieldName,
         stream,
@@ -709,7 +813,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         filename: 'profile_${DateTime.now().millisecondsSinceEpoch}.$extension',
         contentType: MediaType.parse(contentType),
       );
-      
+
       request.files.add(multipartFile);
 
       log('📤 Sending request with file: ${multipartFile.filename}');
@@ -721,30 +825,30 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       // Send request
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
-      
+
       log('📡 Upload response status: ${response.statusCode}');
       log('📡 Upload response body: $responseData');
 
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(responseData);
-        
+
         // Extract imageUrl from the expected response format
         String? imageUrl = jsonResponse['imageUrl'];
         String? fileName = jsonResponse['fileName'];
         String? message = jsonResponse['message'];
-        
+
         log('✅ Image uploaded successfully!');
         log('📁 File name: $fileName');
         log('🔗 Image URL: $imageUrl');
         log('💬 Message: $message');
-        
+
         if (imageUrl != null && imageUrl.isNotEmpty) {
           // Update the selected image URL with the uploaded image URL
           setState(() {
             _selectedImageUrl = imageUrl;
             _isImageRemoved = false; // Reset remove flag when image is uploaded
           });
-          
+
           log('✅ Image URL set in state: $_selectedImageUrl');
           _showSuccessSnackbar('Image uploaded successfully!');
         } else {
@@ -753,22 +857,24 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         }
       } else {
         log('❌ Upload failed: ${response.statusCode} - $responseData');
-        
+
         // Try to parse error response
         try {
           var jsonResponse = json.decode(responseData);
-          String errorMessage = jsonResponse['message'] ?? 'Failed to upload image';
-          
+          String errorMessage =
+              jsonResponse['message'] ?? 'Failed to upload image';
+
           if (errorMessage.contains('Invalid file type')) {
             // Try with different field names
             log('🔄 Trying with different field names...');
-            bool success = await _tryAlternativeFieldNames(imageFile, extension, contentType);
+            bool success = await _tryAlternativeFieldNames(
+                imageFile, extension, contentType);
             if (success) {
               return; // Success with alternative field name
             }
             errorMessage = 'Please select JPEG, PNG, or HEIC format only.';
           }
-          
+
           _showErrorSnackbar(errorMessage);
         } catch (e) {
           _showErrorSnackbar('Failed to upload image (${response.statusCode})');
@@ -786,9 +892,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
   Widget? _buildProfileImageContent() {
     // Show profile image content when not loading
-    if (_selectedImageFile != null || 
-        (_selectedImageUrl != null && _selectedImageUrl!.isNotEmpty) || 
-        (!_isImageRemoved && AppConst.USER_PROFILE != null && AppConst.USER_PROFILE!.isNotEmpty)) {
+    if (_selectedImageFile != null ||
+        (_selectedImageUrl != null && _selectedImageUrl!.isNotEmpty) ||
+        (!_isImageRemoved && AppConst.USER_PROFILE.isNotEmpty)) {
       return null; // Let backgroundImage handle the display
     } else {
       // Show default profile icon when no image
@@ -829,9 +935,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       return FileImage(_selectedImageFile!);
     } else if (_selectedImageUrl != null && _selectedImageUrl!.isNotEmpty) {
       return NetworkImage(_selectedImageUrl!);
-    } else if (!_isImageRemoved && AppConst.USER_PROFILE != null && AppConst.USER_PROFILE!.isNotEmpty) {
+    } else if (!_isImageRemoved && AppConst.USER_PROFILE.isNotEmpty) {
       // Only show original profile image if it hasn't been removed
-      return NetworkImage(AppConst.USER_PROFILE!);
+      return NetworkImage(AppConst.USER_PROFILE);
     } else {
       return null; // Return null to show default icon instead of asset image
     }
@@ -846,13 +952,14 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   }
 
   // Method to try alternative field names if the first attempt fails
-  Future<bool> _tryAlternativeFieldNames(File imageFile, String extension, String contentType) async {
+  Future<bool> _tryAlternativeFieldNames(
+      File imageFile, String extension, String contentType) async {
     List<String> alternativeFieldNames = ['image', 'file', 'upload', 'photo'];
-    
+
     for (String fieldName in alternativeFieldNames) {
       try {
         log('🔄 Trying field name: $fieldName');
-        
+
         var request = http.MultipartRequest(
           'POST',
           Uri.parse('https://profile.swopband.com/uploads/'),
@@ -860,33 +967,35 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
         var stream = http.ByteStream(imageFile.openRead());
         var length = await imageFile.length();
-        
+
         var multipartFile = http.MultipartFile(
           fieldName,
           stream,
           length,
-          filename: 'profile_${DateTime.now().millisecondsSinceEpoch}.$extension',
+          filename:
+              'profile_${DateTime.now().millisecondsSinceEpoch}.$extension',
           contentType: MediaType.parse(contentType),
         );
-        
+
         request.files.add(multipartFile);
 
         var response = await request.send();
         var responseData = await response.stream.bytesToString();
-        
+
         log('📡 Alternative field "$fieldName" response status: ${response.statusCode}');
         log('📡 Alternative field "$fieldName" response body: $responseData');
 
         if (response.statusCode == 200) {
           var jsonResponse = json.decode(responseData);
           String? imageUrl = jsonResponse['imageUrl'];
-          
+
           if (imageUrl != null && imageUrl.isNotEmpty) {
             setState(() {
               _selectedImageUrl = imageUrl;
-              _isImageRemoved = false; // Reset remove flag when image is uploaded
+              _isImageRemoved =
+                  false; // Reset remove flag when image is uploaded
             });
-            
+
             log('✅ Success with field name: $fieldName');
             log('✅ Image URL: $imageUrl');
             _showSuccessSnackbar('Image uploaded successfully!');
@@ -897,9 +1006,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         log('❌ Error with field name $fieldName: $e');
       }
     }
-    
+
     log('❌ All alternative field names failed');
     return false;
   }
-
 }
