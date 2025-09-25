@@ -61,7 +61,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
             Text(
               controller.connectionCount.toString(),
               style: AppTextStyles.large.copyWith(
-                fontSize: 60,
+                fontSize: 70,
                 fontWeight: FontWeight.bold,
                 color: MyColors.textBlack,
               ),
@@ -72,7 +72,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                 Text(
                   "Connections",
                   style: AppTextStyles.large.copyWith(
-                    fontSize: 25,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: MyColors.textBlack,
                   ),
@@ -90,7 +90,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
-                decoration: BoxDecoration(
+                decoration: BoxDecoration(border: Border.all(color: Colors.black,width: 1.3),
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(25),
                   boxShadow: [
@@ -117,7 +117,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                   },
                   decoration: const InputDecoration(
                     hintText: 'Search Connections',
-                    hintStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: Colors.black),
                     suffixIcon: Icon(Icons.search, color: Colors.grey),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -230,12 +230,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                             borderRadius: BorderRadius.circular(40),
 
                           ),
-                          child: ListTile(
-                            // contentPadding: EdgeInsetsGeometry.all(3),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(40)
-                            ),
-                            selectedTileColor: Colors.orange[100],
+                          child: GestureDetector(
                             onTap: () {
                               // Navigate to the user's profile
                               Get.to(() => SwopbandWebViewScreen(
@@ -246,48 +241,78 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                             onLongPress: () {
                               _showUserOptions(user);
                             },
-                            leading:
-                                CircleAvatar(
-                                  radius: 25,
-                                  backgroundColor: MyColors.textBlack,
-                                  backgroundImage: user.profileUrl != null && user.profileUrl!.isNotEmpty
-                                      ? NetworkImage(user.profileUrl!)
-                                      : null,
-                                  child: user.profileUrl == null || user.profileUrl!.isEmpty
-                                      ? Image.asset(
-                                          MyImages.profileImage,
-                                        )
-                                      : null,
-                                ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(3.0),
+                              child: Row(
+                                children: [
+                                  // Leading (Profile Picture)
 
-
-                            title: Text(
-                              user.name,
-                              style: AppTextStyles.medium.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: MyColors.textWhite,
-                              ),
-                            ),
-                            subtitle: Text(
-                              '@${user.username}',
-                              style: AppTextStyles.small.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontSize: 13,
-                              ),
-                            ),
-                            contentPadding: EdgeInsets.only(left: 8),
-                            trailing:
-                                                           const CircleAvatar(
-                                  backgroundColor: Colors.white,
-                                  radius: 35,
-                                  child: Icon(
-                                    Icons.arrow_forward,
-                                    color: Colors.black,
-                                    size: 28,
+                                  Container(
+                                    width: 60,
+                                    height: 60,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: MyColors.textBlack,
+                                    ),
+                                    child: ClipOval(
+                                      child: user.profileUrl != null && user.profileUrl!.isNotEmpty
+                                          ? Image.network(
+                                        user.profileUrl!,
+                                        fit: BoxFit.cover,
+                                        width: 60,
+                                        height: 60,
+                                      )
+                                          : Image.asset(
+                                        MyImages.profileImage,
+                                        fit: BoxFit.cover,
+                                        width: 60,
+                                        height: 60,
+                                      ),
+                                    ),
                                   ),
-                                ),
+
+                              const SizedBox(width: 12),
+
+                                  // Title and Subtitle
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          user.name,
+                                          style: AppTextStyles.medium.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: MyColors.textWhite,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '@${user.username}',
+                                          style: AppTextStyles.small.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  // Trailing (Arrow icon)
+                                  const CircleAvatar(
+                                    backgroundColor: Colors.white,
+                                    radius: 26,
+                                    child: Icon(
+                                      Icons.arrow_forward,
+                                      color: Colors.black,
+                                      size: 28,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
+
                         ),
                       );
                     },
