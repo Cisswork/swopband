@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "172436055817-s0lnmpjgv6j1bl80marduhac8ov3oukj.apps.googleusercontent.com",
+          "client_id": "172436055817-pjhbvocu0ka416gbe7k5nl7oq50sk59l.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.swopband.nfc.swopband",
-            "certificate_hash": "1a0d8b6e5792dae99fedbe563829423f00b1be54"
+            "certificate_hash": "b6ba703e3a68a88bc62af544e86cddec94c3a521"
           }
         },
         {

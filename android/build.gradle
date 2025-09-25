@@ -5,8 +5,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.2' // ✅ Correct place
-        classpath 'com.google.gms:google-services:4.4.3' // ✅ Firebase plugin
+        classpath 'com.android.tools.build:gradle:8.4.2'
+        classpath 'com.google.gms:google-services:4.4.3'
     }
 }
 
