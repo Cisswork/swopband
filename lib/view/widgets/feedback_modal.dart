@@ -27,15 +27,17 @@ class _FeedbackModalState extends State<FeedbackModal> {
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          // mainAxisSize: MainAxisSize.min,
           children: [
             // Header with close button
             Row(
               children: [
-                Expanded(
+                const Expanded(
                   child: Text(
                     "With your feedback, we can\nmake SwopBand even better!",
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
                 IconButton(
@@ -47,17 +49,23 @@ class _FeedbackModalState extends State<FeedbackModal> {
             const SizedBox(height: 20),
 
             // Rating stars
-            RatingBar(
-              filledIcon: Icons.star,
-              emptyIcon: Icons.star_border,
-              onRatingChanged: (value) {
-                log("rating----->$value");
-                setState(() {
-                  _rating = value;
-                });
-              },
-              initialRating: 0,
-              maxRating: 5,
+            Align(
+              alignment: Alignment.center,
+              child: RatingBar(
+                alignment: Alignment.center,
+                filledIcon: Icons.star,
+                filledColor: Colors.white,
+
+                emptyIcon: Icons.star_border,
+                onRatingChanged: (value) {
+                  log("rating----->$value");
+                  setState(() {
+                    _rating = value;
+                  });
+                },
+                initialRating: 0,
+                maxRating: 5,
+              ),
             ),
             const SizedBox(height: 16),
 
@@ -96,7 +104,7 @@ class _FeedbackModalState extends State<FeedbackModal> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 47, vertical: 12),
                     ),
                     onPressed: () {
                       final rating = int.tryParse(_rating.toString().substring(0, 1)) ?? 0;

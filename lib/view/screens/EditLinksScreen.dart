@@ -240,8 +240,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
   Widget _buildPlatformImage(String platform, bool isActive) {
     return Image.asset(
       _platformImages[platform] ?? MyImages.insta,
-      width: 40,
-      height: 40,
+      width: 45,
+      height: 45,
     );
   }
 
@@ -264,23 +264,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                       children: [
                         const SizedBox(height: 30),
                         const SizedBox(height: 20),
-                        Text(
-                          AppStrings.editLinks.tr,
-                          style: AppTextStyles.extraLarge.copyWith(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 20),
-                        Text(
-                          AppStrings.addLinksDescription.tr,
-                          style: AppTextStyles.extraLarge.copyWith(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+
                         const SizedBox(height: 20),
                         Container(
                           padding: const EdgeInsets.all(15),
@@ -290,7 +274,26 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                           ),
                           child: Column(
                             children: [
+                              Text(
+                                AppStrings.editLinks.tr,
+                                style: AppTextStyles.extraLarge.copyWith(color: Colors.white,
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
 
+                                AppStrings.addLinksDescription.tr,
+                                style: AppTextStyles.medium.copyWith(
+                                  fontSize: 15,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 15),
 
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -326,7 +329,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                               Text(
                                 AppStrings.supportedLinks.tr,
                                 style: AppTextStyles.extraLarge.copyWith(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.white,
                                 ),
@@ -342,7 +345,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                             Row(
                               children: [
                                 Expanded(
-                                  flex: 4,
+                                  flex: 3,
                                   child: DropdownButtonFormField<String>(
                                     value: controller.links[index].type,
                                     isExpanded: true,
@@ -397,11 +400,11 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
-                                  flex: 7,
+                                  flex: 8,
                                   child: GestureDetector(
                                     onTap: () => _launchUrl(controller.links[index].url),
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                                      padding: const EdgeInsets.only(left: 7,right: 0,top: 3,bottom: 3),
                                       decoration: BoxDecoration(
                                         border: Border.all(color: Colors.grey),
                                         borderRadius: BorderRadius.circular(10),
@@ -418,46 +421,48 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
-                                          const Icon(Icons.open_in_new, color: Colors.blue, size: 16),
+                                          PopupMenuButton<String>(
+                                            menuPadding: EdgeInsetsGeometry.all(0),
+                                            padding: EdgeInsetsGeometry.all(0),
+                                              color: Colors.white,
+                                              icon: const Icon(Icons.more_vert, color: Colors.black,size: 20,weight: 10,),
+                                              onSelected: (String value) async {
+                                                final link = controller.links[index];
+                                                if (value == 'edit') {
+                                                  _showEditDialog(index);
+                                                } else if (value == 'delete') {
+                                                  await controller.deleteLink(link.id);
+                                                }
+                                              },
+                                              itemBuilder: (BuildContext context) => [
+                                                const PopupMenuItem<String>(
+                                                  value: 'edit',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.edit, color: Colors.black,size: 17,),
+                                                      SizedBox(width: 8),
+                                                      Text('Edit'),
+                                                    ],
+                                                  ),
+                                                ),
+                                                const PopupMenuItem<String>(
+                                                  value: 'delete',
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(Icons.delete, color: Colors.black),
+                                                      SizedBox(width: 8),
+                                                      Text('Delete'),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ]
+                                          ),       
                                         ],
                                       ),
                                     ),
                                   ),
                                 ),
-                                PopupMenuButton<String>(
-                                  color: Colors.white,
-                                  icon: const Icon(Icons.more_vert, color: Colors.black,size: 17),
-                                  onSelected: (String value) async {
-                                    final link = controller.links[index];
-                                    if (value == 'edit') {
-                                      _showEditDialog(index);
-                                    } else if (value == 'delete') {
-                                      await controller.deleteLink(link.id);
-                                    }
-                                  },
-                                  itemBuilder: (BuildContext context) => [
-                                    const PopupMenuItem<String>(
-                                      value: 'edit',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.edit, color: Colors.black,size: 17,),
-                                          SizedBox(width: 8),
-                                          Text('Edit'),
-                                        ],
-                                      ),
-                                    ),
-                                    const PopupMenuItem<String>(
-                                      value: 'delete',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.delete, color: Colors.black),
-                                          SizedBox(width: 8),
-                                          Text('Delete'),
-                                        ],
-                                      ),
-                                    ),
-                                  ]
-                                ),
+
                               ],
                             ),
                             const SizedBox(height: 20),
@@ -548,8 +553,10 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                       ),
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.red),
+
+                                      icon:  const Icon(Icons.delete, color: Colors.red),
                                       onPressed: () {
+
                                         setState(() {
                                           if (_linkCount > controller.links.length) {
                                             _linkControllers.removeAt(index);
@@ -558,6 +565,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                           }
                                         });
                                       },
+
                                     ),
                                   ],
                                 ),
@@ -585,7 +593,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                           Obx(() => controller.isLoading.value?
                           const Center(child: CircularProgressIndicator(color: Colors.black,)):
                           Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.only(left: 60.0,right: 60.0,top: 10),
                             child: CustomButton(
                               buttonColor: MyColors.textBlack,
                               textColor: MyColors.textWhite,

@@ -39,8 +39,17 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
-
   final TextEditingController bioController = TextEditingController();
+
+  final FocusNode usernameFocus = FocusNode();
+  final FocusNode nameFocus = FocusNode();
+  final FocusNode emailFocus = FocusNode();
+  final FocusNode ageFocus = FocusNode();
+  final FocusNode phoneFocus = FocusNode();
+  final FocusNode bioFocus = FocusNode();
+
+
+
   final controller = Get.put(UserController());
   final NfcBackgroundService _nfcBackgroundService = NfcBackgroundService();
 
@@ -56,6 +65,15 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   @override
   void dispose() {
     // Cancel timeout timer if running
+
+
+      usernameFocus.dispose();
+      nameFocus.dispose();
+      emailFocus.dispose();
+      ageFocus.dispose();
+      phoneFocus.dispose();
+      bioFocus.dispose();
+
     _nfcTimeoutTimer?.cancel();
     _nfcTimeoutTimer = null;
     
@@ -511,231 +529,245 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     log("user image>>>>>>>>${widget.userImage}");
     return Scaffold(
       backgroundColor: MyColors.backgroundColor,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              MyImages.background1,
-              fit: BoxFit.cover,
-            ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Center(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(MyImages.nameLogo, height: 40),
-                      const SizedBox(height: 10),
-                      Text(
-                        AppStrings.createProfile.tr,
-                        style: AppTextStyles.large.copyWith(fontSize: 20),
-                        textAlign: TextAlign.center,
-                      ),
-                      ImagePickerExample(
-                        key: _imagePickerKey,
-                        profileImage: widget.userImage ?? "",
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        AppStrings.createSwopHandle.tr,
-                        style: AppTextStyles.large.copyWith(fontSize: 13,fontWeight: FontWeight.w600),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 5),
-                      myFieldAdvance(
-                        onChanged: (username) {
-                          controller.checkUsernameAvailability(username.trim());
-                        },
-                        context: context,
-                        controller: swopUserNameController,
-                        hintText: "Enter username",
-                        inputType: TextInputType.text,
-                        textInputAction: TextInputAction.next,
-                        fillColor: MyColors.textWhite,
-                        textBack: MyColors.textWhite,
-                      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 25),
 
-                      const SizedBox(height: 8),
-                      Obx(() {
-                        final username = controller.swopUsername.value.trim();
-                        if (username.isEmpty) return const SizedBox(); // Hide when empty
+                  Image.asset(MyImages.nameLogo, height: 40),
+                  const SizedBox(height: 10),
+                  Text(
+                    AppStrings.createProfile.tr,
+                    style: AppTextStyles.large.copyWith(fontSize: 20),
+                    textAlign: TextAlign.center,
+                  ),
+                  ImagePickerExample(
+                    key: _imagePickerKey,
+                    profileImage: widget.userImage ?? "",
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    AppStrings.createSwopHandle.tr,
+                    style: AppTextStyles.large.copyWith(fontSize: 13,fontWeight: FontWeight.w600),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 5),
+                  myFieldAdvance(
+                    focusNode: usernameFocus,
+                    nextFocusNode: nameFocus,
+                    onChanged: (username) {
+                      controller.checkUsernameAvailability(username.trim());
+                    },
+                    context: context,
+                    controller: swopUserNameController,
+                    hintText: "Enter username",
+                    inputType: TextInputType.text,
+                    textInputAction: TextInputAction.next,
+                    fillColor: MyColors.textWhite,
+                    textBack: MyColors.textWhite,
+                  ),
 
-                        return Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(3),
-                              decoration: const BoxDecoration(
-                                color: MyColors.textBlack,
-                                borderRadius: BorderRadius.all(Radius.circular(20)),
+                  const SizedBox(height: 8),
+                  Obx(() {
+                    final username = controller.swopUsername.value.trim();
+                    if (username.isEmpty) return const SizedBox(); // Hide when empty
+
+                    return Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: const BoxDecoration(
+                            color: MyColors.textBlack,
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                          ),
+                          //height: 30,
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text(
+                              username,
+                              style: AppTextStyles.small.copyWith(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: MyColors.textWhite,
                               ),
-                              //height: 30,
-                              child: Padding(
-                                padding: const EdgeInsets.all(5.0),
-                                child: Text(
-                                  username,
-                                  style: AppTextStyles.small.copyWith(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: MyColors.textWhite,
-                                  ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          controller.usernameMessage.value,
+                          style: AppTextStyles.small.copyWith(
+                            color: controller.isUsernameAvailable.value ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                  const SizedBox(height: 8),
+                  myFieldAdvance(
+focusNode: nameFocus,
+                    nextFocusNode: emailFocus,
+                    context: context,
+                    controller: nameController,
+                    hintText: "Enter Full Name",
+                    inputType: TextInputType.text,
+                    textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
+                  ),
+                  const SizedBox(height: 15),
+                  myFieldAdvance(
+                    focusNode: emailFocus,
+                    nextFocusNode: ageFocus,
+                    context: context,
+                    controller: emailController,
+                    hintText: "Email",
+                    inputType: TextInputType.text,
+                    textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
+                  ),
+                  const SizedBox(height: 15),
+                  myFieldAdvance(
+                    focusNode: ageFocus,
+                    nextFocusNode: phoneFocus,
+                    context: context,
+                    controller: ageController,
+                    hintText: "Age",
+                    inputType: TextInputType.number,
+                    textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
+                  ),
+                  const SizedBox(height: 15),
+                  myFieldAdvance(
+                    focusNode: phoneFocus,
+                    nextFocusNode: bioFocus,
+                    context: context,
+                    controller: phoneController,
+                    hintText: "Phone Number",
+                    inputType: TextInputType.phone,
+                    textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
+                  ),
+                  const SizedBox(height: 15),
+
+
+                  TextFormField(
+                    focusNode: bioFocus,
+                    maxLength: 100,
+                    controller: bioController,
+                    maxLines: 4,
+                    textInputAction: TextInputAction.done,
+                    decoration: InputDecoration(
+                      counterText: '', // default counter hatane ke liye
+                      counter: ValueListenableBuilder<TextEditingValue>(
+                        valueListenable: bioController,
+                        builder: (context, value, child) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 16.0, top: 8),
+                            child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: Text(
+                                "${value.text.length}/100",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                  fontFamily: "Chromatica",
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              controller.usernameMessage.value,
-                              style: AppTextStyles.small.copyWith(
-                                color: controller.isUsernameAvailable.value ? Colors.green : Colors.red,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        );
-                      }),
-                      const SizedBox(height: 8),
-                      myFieldAdvance(
-                        context: context,
-                        controller: nameController,
-                        hintText: "Enter Full Name",
-                        inputType: TextInputType.text,
-                        textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
-                      ),
-                      const SizedBox(height: 20),
-                      myFieldAdvance(
-                        context: context,
-                        controller: emailController,
-                        hintText: "Email",
-                        inputType: TextInputType.text,
-                        textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
-                      ),
-                      const SizedBox(height: 8),
-                      myFieldAdvance(
-                        context: context,
-                        controller: ageController,
-                        hintText: "Age",
-                        inputType: TextInputType.number,
-                        textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
-                      ),
-                      const SizedBox(height: 8),
-                      myFieldAdvance(
-                        context: context,
-                        controller: phoneController,
-                        hintText: "Phone Number",
-                        inputType: TextInputType.phone,
-                        textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite,
-                      ),
-                      const SizedBox(height: 8),
-
-                      Text(
-                        AppStrings.addYourBio.tr,
-                        style: AppTextStyles.medium.copyWith(
-                          color: MyColors.textBlack,
-                          fontWeight: FontWeight.bold
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-
-                      TextFormField(
-                        maxLength: 100,
-                        onTap: () async{
-                        // await signOut();
-                        },
-                        maxLines: 4,
-
-                        controller: bioController,
-                        textInputAction: TextInputAction.done,
-                        decoration: const InputDecoration(
-                          counterText: '',
-                          contentPadding: EdgeInsets.only(
-                            top: 40,
-                            left: 20,
-                          ),
-                          hintText: "Enter a bio",
-                          hintStyle: TextStyle(
-                            fontSize: 12,
-                            fontFamily: "Chromatica",
-                            color: MyColors.textBlack,
-                            decoration: TextDecoration.none,
-                            wordSpacing: 1.2,
-                          ),
-                          filled: true,
-                          fillColor: Colors.transparent,
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.black,
-                              width: 1.2,
-                            ),
-                            borderRadius: BorderRadius.all(Radius.circular(28)),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(28)),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-                      
-                      // NFC Status display
-                      if (_nfcStatus.isNotEmpty)
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          margin: const EdgeInsets.only(bottom: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            _nfcStatus,
-                            style: const TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      _nfcInProgress
-                          ? const Center(child: CircularProgressIndicator(color: Colors.black))
-                          : CustomButton(
-                          text: AppStrings.connectSwopband.tr,
-                          //onPressed:_startNfcSessionAndWrite// _connectAndWriteToNfc,
-                        onPressed: () {
-                          // Pass all create profile data to ConnectSwopbandScreen
-                          Get.to(() => ConnectSwopbandScreen(
-                            username: swopUserNameController.text,
-                            name: nameController.text,
-                            email: emailController.text,
-                            bio: bioController.text,
-                            age: ageController.text.trim().isNotEmpty ? int.tryParse(ageController.text.trim()) : null,
-                            phone: phoneController.text.trim().isNotEmpty ? phoneController.text.trim() : null,
-                            userImage: widget.userImage,
-                            imagePickerKey: _imagePickerKey,
-                          ));
+                          );
                         },
                       ),
+                      // contentPadding: const EdgeInsets.only(
+                      //   top: 40,
+                      //   left: 20,
+                      //   right: 20,
+                      //   bottom: 20,
+                      // ),
+                      hintText: "Add your bio",
 
-                      const SizedBox(height:10),
-                      CustomButton(
-                        buttonColor: MyColors.textWhite,
-                        textColor: MyColors.textBlack,
-                        text: AppStrings.purchaseSwopband.tr,
-                        onPressed: ()async{
-                          Get.to(()=>const PurchaseScreen());
-                        },
+                      hintStyle: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: "Chromatica",
+                        color: MyColors.textBlack,
+                        decoration: TextDecoration.none,
+                        wordSpacing: 1.2,
                       ),
-
-                      const SizedBox(height: 16),
-
-                    ],
+                      filled: true,
+                      fillColor: Colors.transparent,
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.black,
+                          width: 1.2,
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(28)),
+                      ),
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(28)),
+                      ),
+                    ),
                   ),
-                ),
+
+                  const SizedBox(height: 24),
+
+                  // NFC Status display
+                  if (_nfcStatus.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        _nfcStatus,
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  _nfcInProgress
+                      ? const Center(child: CircularProgressIndicator(color: Colors.black))
+                      : CustomButton(
+                      text: AppStrings.connectSwopband.tr,
+                      //onPressed:_startNfcSessionAndWrite// _connectAndWriteToNfc,
+                    onPressed: () {
+                      // Pass all create profile data to ConnectSwopbandScreen
+                      Get.to(() => ConnectSwopbandScreen(
+                        username: swopUserNameController.text,
+                        name: nameController.text,
+                        email: emailController.text,
+                        bio: bioController.text,
+                        age: ageController.text.trim().isNotEmpty ? int.tryParse(ageController.text.trim()) : null,
+                        phone: phoneController.text.trim().isNotEmpty ? phoneController.text.trim() : null,
+                        userImage: widget.userImage,
+                        imagePickerKey: _imagePickerKey,
+                      ));
+                    },
+                  ),
+
+                  const SizedBox(height:10),
+                  CustomButton(
+                    border: Colors.black,
+                    buttonColor: MyColors.textWhite,
+                    textColor: MyColors.textBlack,
+                    text: AppStrings.purchaseSwopband.tr,
+                    onPressed: ()async{
+                      Get.to(()=>const PurchaseScreen());
+                    },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                ],
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }

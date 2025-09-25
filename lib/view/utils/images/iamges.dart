@@ -14,7 +14,7 @@ class MyImages {
   static const linkedId = "assets/images/linkedin.png";
   static const youtube = "assets/images/youtube.png";
   static const xmaster = "assets/images/xmaster.png";
-  static const tindi = "assets/images/tindi.png";
+  // static const tindi = "assets/images/tindi.png";
   static const spotify = "assets/images/spotify.png";
   static const snapchat = "assets/images/snapchat.png";
   static const music = "assets/images/music.png";

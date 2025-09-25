@@ -97,46 +97,66 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white, // Dummy background color
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Image.asset(
-                    MyImages.welcomeLogo,
-                    height: 450,
-                    width: double.infinity,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              MyImages.background6,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+
+                      Image.asset(
+                        height: 40,
+                        MyImages.nameLogo,
+                      ),
+                      SizedBox(height: 120,),
+                      Image.asset(
+                        MyImages.welcomeLogo,
+                        height: 200,
+                        width: double.infinity,
+                      ),
+                      SizedBox(height: 60,),
+
+                      _loadingApple
+                          ?  CupertinoActivityIndicator(color: Colors.black,)
+                          : CustomButton(
+                        border: Colors.black,
+                        widget: Icon(Icons.apple,color: Colors.white,size: 28,),
+                        text: 'Sign up with Apple',
+                        onPressed: () {
+                          signInWithApple();
+                        },
+                      ),
+                      SizedBox(height: 16),
+                      _loading
+                          ? const CircularProgressIndicator(color: Colors.black,)
+                          : CustomButton(
+                        buttonColor: Colors.white,
+                        textColor: Colors.black,
+                        border: MyColors.primaryColor,
+                        widget: Image.asset("assets/images/google.png"),
+                        text: 'Sign up with Google',
+                        onPressed: ()async{
+                          await signInWithGoogle();
+                        },
+                      ),
+                      SizedBox(height: 120,),
+
+                    ],
                   ),
-                  _loadingApple
-                      ?  CupertinoActivityIndicator(color: Colors.black,)
-                      : CustomButton(
-                      border: Colors.black,
-                      widget: Icon(Icons.apple,color: Colors.white,size: 28,),
-                      text: 'Sign up with Apple',
-                      onPressed: () {
-                        signInWithApple();
-                      },
-                  ),
-                  SizedBox(height: 16),
-                  _loading
-                      ? const CircularProgressIndicator(color: Colors.black,)
-                      : CustomButton(
-                    buttonColor: Colors.white,
-                    textColor: Colors.black,
-                    border: MyColors.primaryColor,
-                    widget: Image.asset("assets/images/google.png"),
-                    text: 'Sign up with Google',
-                    onPressed: ()async{
-                      await signInWithGoogle();
-                    },
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

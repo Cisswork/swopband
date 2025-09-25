@@ -29,6 +29,7 @@ Future<void> main() async {
   }
 
   runApp(MyApp(initialNfcUrl: initialLink));
+
 }
 
 

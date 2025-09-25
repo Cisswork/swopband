@@ -43,6 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const SizedBox(height: 20),
               Text(
                 "Settings",
                 style: AppTextStyles.large.copyWith(
@@ -51,8 +52,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: MyColors.textBlack,
                 ),
               ),
-
               const SizedBox(height: 10),
+
+              CustomButton(
+                border: Colors.black,
+                buttonColor: MyColors.textWhite,
+                textColor: MyColors.textBlack,
+                text: "Enter the SWOPSTORE",
+                onPressed: ()async{
+                  Get.to(()=>const PurchaseScreen());
+                },
+              ),
+              const SizedBox(height: 10),
+
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: CustomButton(
@@ -64,30 +76,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 10),
 
-              CustomButton(
-                buttonColor: MyColors.primaryColor,
-                textColor: MyColors.textBlack,
-                text: "Enter the SWOPSTORE",
-                onPressed: ()async{
-                  Get.to(()=>const PurchaseScreen());
-                },
-              ),
               const SizedBox(height: 24),
 
               // Account Information section
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(20),
                   color: Colors.black,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildSectionTitle('Account Information'),
-                    const SizedBox(height: 5),
 
                     _buildTappableAccountOption(
                       title: 'Edit Profile',
@@ -132,24 +134,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         type: 'Term & Condition',)),
                     ),
 
+
+
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              CustomButton(
+                buttonColor: MyColors.textBlack,
+                textColor: MyColors.textWhite,
+                text: "Sign Out of your Account",
+                onPressed: (){
+                  _showSignOutDialog();
+                },
+              ),
+              const SizedBox(height: 20),
+
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.black,
+                ),
+                child: Column(
+                  children: [
+                    _buildSectionTitle('Reset SWOPBAND'),
+                    Text(
+                      "Resetting SWOPBAND will disconnect the band and your account will be deleted.",
+                      style: AppTextStyles.medium.copyWith(
+                          color: MyColors.textWhite,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13
+                      ),
+                    ),
                     const SizedBox(height: 20),
 
-                    // Sign Out Option
-                    _buildTappableAccountOption(
-                      title: 'Sign Out',
-                      icon: Icons.logout,
-                      onTap: () => _showSignOutDialog(),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CustomButton(
+                        buttonColor: MyColors.textWhite,
+                        textColor: MyColors.textBlack,
+                        text: "Reset SWOPBAND",
+                        onPressed: () {
+                          _showDeleteAccountDialog();
+                        },
+                      ),
                     ),
 
-                    const SizedBox(height: 5),
-
-                    // Delete Account Option
-                    _buildTappableAccountOption(
-                      title: 'Delete Account',
-                      icon: Icons.delete_forever,
-                      iconColor: Colors.red,
-                      onTap: () => _showDeleteAccountDialog(),
-                    ),
                   ],
                 ),
               ),
@@ -170,7 +202,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         style: AppTextStyles.medium.copyWith(
             color: MyColors.textWhite,
             fontWeight: FontWeight.w500,
-            fontSize: 24
+            fontSize: 20
         ),
       ),
     );
@@ -181,7 +213,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
         child: Row(
           children: [
             Icon(icon, color: iconColor, size: 24),

@@ -55,14 +55,23 @@ class _FeedbackPopupState extends State<FeedbackPopup> {
             ),
             const SizedBox(height: 20),
 
-            RatingBar(
-              filledIcon: Icons.star,
-              emptyIcon: Icons.star_border,
-              onRatingChanged: (value) {
-                setState(() => _rating = value);
-              },
-              initialRating: 0,
-              maxRating: 5,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                RatingBar(emptyColor: Colors.white,
+
+                   size: 40,
+                  filledColor: Colors.white,
+                  filledIcon: Icons.star,
+                  emptyIcon: Icons.star_border,
+                  onRatingChanged: (value) {
+                    setState(() => _rating = value);
+                  },
+                  initialRating: 0,
+                  maxRating: 5,
+                ),
+              ],
             ),
             const SizedBox(height: 16),
 
@@ -96,7 +105,7 @@ class _FeedbackPopupState extends State<FeedbackPopup> {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 40, vertical: 12),
+                    horizontal: 50, vertical: 15),
               ),
               onPressed: () {
                 final rating = _rating.toInt();

@@ -426,156 +426,152 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MyColors.backgroundColor,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(MyImages.background2, fit: BoxFit.cover),
-          ),
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    MyImages.nameLogo,
+                    height: 40,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    AppStrings.connectYourSwopband.tr,
+                    style: AppTextStyles.extraLarge.copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 60),
+                  Stack(
+                    clipBehavior: Clip.none,
                     children: [
-                      SizedBox(height: 30,),
-                      Image.asset(
-                        MyImages.nameLogo,
-                        height: 40,
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          border: Border.all(
+                            color: MyColors.textBlack,
+                            width: 2,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(height: 25),
+                              Text(
+                                AppStrings.connectingYourBand.tr,
+                                style: AppTextStyles.extraLarge.copyWith(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 10),
+                              _buildInstructionItem(
+                                AppStrings.tapConnectInstruction.tr,
+                                MyImages.tr1mg,
+                              ),
+                              _buildInstructionItem(
+                                AppStrings.keepPositionInstruction.tr,
+                                MyImages.tr2mg,
+                              ),
+                              _buildInstructionItem(
+                                AppStrings.readyToScanInstruction.tr,
+                                MyImages.tr3mg,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: _nfcInProgress
+                                    ? const Center(child: CircularProgressIndicator(color: Colors.black))
+                                    : CustomButton(
+                                        text: AppStrings.connectYourSwopbandButton.tr,
+                                        onPressed: _startNfcSessionAndWrite,
+                                      ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 20),
-                      Text(
-                        AppStrings.connectYourSwopband.tr,
-                        style: AppTextStyles.extraLarge.copyWith(
-                          fontSize: 18,
+                      Positioned(
+                        top: -75,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Image.asset(
+                            MyImages.ringImage,
+                            height: 140,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+
+                  // NFC Status display
+                  if (_nfcStatus.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        _nfcStatus,
+                        style: const TextStyle(
+                          color: Colors.blue,
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 40),
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(30)),
-                              border: Border.all(
-                                color: MyColors.textBlack,
-                                width: 2,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 23),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(height: 30),
-                                  Text(
-                                    AppStrings.connectingYourBand.tr,
-                                    style: AppTextStyles.extraLarge.copyWith(
-                                      fontSize: 19,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  SizedBox(height: 20),
-                                  _buildInstructionItem(
-                                    AppStrings.tapConnectInstruction.tr,
-                                    MyImages.tr1mg,
-                                  ),
-                                  _buildInstructionItem(
-                                    AppStrings.keepPositionInstruction.tr,
-                                    MyImages.tr2mg,
-                                  ),
-                                  _buildInstructionItem(
-                                    AppStrings.readyToScanInstruction.tr,
-                                    MyImages.tr3mg,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: _nfcInProgress
-                                        ? const Center(child: CircularProgressIndicator(color: Colors.black))
-                                        : CustomButton(
-                                            text: AppStrings.connectYourSwopbandButton.tr,
-                                            onPressed: _startNfcSessionAndWrite,
-                                          ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: -60,
-                            left: 0,
-                            right: 0,
-                            child: Center(
-                              child: Image.asset(
-                                MyImages.ringImage,
-                                height: 130,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 5),
-                      
-                      // NFC Status display
-                      if (_nfcStatus.isNotEmpty)
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          margin: const EdgeInsets.only(bottom: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            _nfcStatus,
-                            style: const TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CustomButton(
-                          buttonColor: MyColors.textWhite,
-                          textColor: MyColors.textBlack,
-                          text: AppStrings.faqTroubleshooting.tr,
-                          onPressed: () {
-                            Get.to(()=>FAQScreen());
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
+                    ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CustomButton(
+                      buttonColor: MyColors.textBlack,
+                      textColor: MyColors.textWhite,
+                      text: AppStrings.faqTroubleshooting.tr,
+                      onPressed: () {
+                        Get.to(()=>FAQScreen());
+                      },
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 24),
+                ],
               ),
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildInstructionItem(String text,String image) {
-    return ListTile(
-        visualDensity: VisualDensity.comfortable,
-        contentPadding: EdgeInsets.all(0),
-        leading:   Image(image: AssetImage(image),height: 55,alignment: Alignment.center,),
-        title: Text(
-          text,
-          style: AppTextStyles.medium.copyWith(
-            fontSize: 14,
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0,left: 8.0),
+      child: ListTile(
+          visualDensity: VisualDensity.comfortable,
+          contentPadding: EdgeInsets.all(0),
+
+          leading:   Image(image: AssetImage(image),height: 55,alignment: Alignment.center,),
+          title: Text(
+            text,
+            style: AppTextStyles.medium.copyWith(
+              fontSize: 12,
+            ),
+            textAlign: TextAlign.left,
           ),
-          textAlign: TextAlign.left,
         ),
-      );
+    );
   }
 }
 

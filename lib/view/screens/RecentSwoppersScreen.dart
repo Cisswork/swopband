@@ -58,54 +58,23 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
         child: Column(
           children: [
             SizedBox(height: 40,),
-            
-            // Header with title and NFC status
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      AppStrings.recentSwoppers.tr,
-                      style: AppTextStyles.large.copyWith(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: MyColors.textBlack,
-                      ),
-                    ),
-                  ),
-                  // NFC Status indicator
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(15),
-                      border: Border.all(color: Colors.green.withOpacity(0.3)),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.nfc,
-                          color: Colors.green,
-                          size: 16,
-                        ),
-                        SizedBox(width: 4),
-                        Text(
-                          'NFC Active',
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+            Text(
+              controller.connectionCount.toString(),
+              style: AppTextStyles.large.copyWith(
+                fontSize: 60,
+                fontWeight: FontWeight.bold,
+                color: MyColors.textBlack,
               ),
             ),
+            Text(
+              "Connections",
+              style: AppTextStyles.large.copyWith(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: MyColors.textBlack,
+              ),
+            ),
+
 
             SizedBox(height: 15),
 
@@ -126,6 +95,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                   ],
                 ),
                 child: TextField(
+
                   controller: _searchController,
                   onChanged: (value) {
                     setState(() {
@@ -137,9 +107,10 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                       }
                     });
                   },
-                  decoration: InputDecoration(
-                    hintText: 'Search connections...',
-                    prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  decoration: const InputDecoration(
+                    hintText: 'Search Connections',
+                    hintStyle: TextStyle(color: Colors.grey),
+                    suffixIcon: Icon(Icons.search, color: Colors.grey),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   ),
@@ -150,6 +121,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
             SizedBox(height: 15),
 
             // Connection count and refresh button
+/*
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -188,6 +160,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                 ],
               ),
             ),
+*/
 
             SizedBox(height: 10),
 
@@ -206,10 +179,10 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircularProgressIndicator(
+                        const CircularProgressIndicator(
                           color: MyColors.textBlack,
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
                           'Loading connections...',
                           style: AppTextStyles.medium.copyWith(
@@ -226,7 +199,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           Icons.nfc,
                           size: 64,
                           color: MyColors.textDisabledColor,
@@ -240,39 +213,40 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'When someone touches their NFC ring to your device,\nthey will appear here automatically',
+                          'When someone touches their NFC ring to your device,\n they will appear here automatically',
                           style: AppTextStyles.small.copyWith(
                             color: MyColors.textDisabledColor,
                           ),
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 20),
-                        Container(
-                          padding: EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.blue.withOpacity(0.3)),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.info_outline, color: Colors.blue, size: 20),
-                              SizedBox(width: 8),
-                              Text(
-                                'NFC is active and listening',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        // Container(
+                        //   padding: EdgeInsets.all(16),
+                        //   decoration: BoxDecoration(
+                        //     color: Colors.blue.withOpacity(0.1),
+                        //     borderRadius: BorderRadius.circular(12),
+                        //     border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                        //   ),
+                        //   child: Row(
+                        //     mainAxisSize: MainAxisSize.min,
+                        //     children: [
+                        //       Icon(Icons.info_outline, color: Colors.blue, size: 20),
+                        //       SizedBox(width: 8),
+                        //       Text(
+                        //         'NFC is active and listening',
+                        //         style: TextStyle(
+                        //           color: Colors.blue,
+                        //           fontWeight: FontWeight.w600,
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
                       ],
                     ),
                   );
                 }
+
 
                 return RefreshIndicator(
                   onRefresh: () => controller.fetchRecentSwoppers(),
@@ -286,14 +260,12 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 5),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: MyColors.textDisabledColor,
+                            color: MyColors.textBlack,
                             borderRadius: BorderRadius.circular(40),
-                            border: Border.all(
-                              color: Colors.green.withOpacity(0.3),
-                              width: 1,
-                            ),
+
                           ),
                           child: ListTile(
+                            contentPadding: EdgeInsetsGeometry.all(3),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(40)
                             ),
@@ -345,14 +317,14 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                               user.name,
                               style: AppTextStyles.medium.copyWith(
                                 fontWeight: FontWeight.w600,
-                                color: MyColors.textBlack,
+                                color: MyColors.textWhite,
                               ),
                             ),
                             subtitle: Text(
                               '@${user.username}',
                               style: AppTextStyles.small.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: Colors.white,
                                 fontSize: 13,
                               ),
                             ),
@@ -368,12 +340,12 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                                 ),
                                 SizedBox(width: 8),
                                 CircleAvatar(
-                                  backgroundColor: Colors.black,
-                                  radius: 15,
+                                  backgroundColor: Colors.white,
+                                  radius: 35,
                                   child: Icon(
                                     Icons.arrow_forward,
-                                    color: Colors.white,
-                                    size: 16,
+                                    color: Colors.black,
+                                    size: 23,
                                   ),
                                 ),
                               ],
@@ -492,7 +464,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.black,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Container(
