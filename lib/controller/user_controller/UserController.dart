@@ -43,7 +43,7 @@ class UserController extends GetxController {
       fields["age"] = age.toString();
     }
     if (phone != null && phone.isNotEmpty) {
-      fields["phone"] = phone;
+      fields["phone_number"] = phone;
     }
     if (countryCode != null && countryCode.isNotEmpty) {
       fields["country_code"] = countryCode;

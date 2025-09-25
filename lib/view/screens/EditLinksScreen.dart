@@ -422,8 +422,6 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                             ),
                                           ),
                                           PopupMenuButton<String>(
-                                            menuPadding: EdgeInsetsGeometry.all(0),
-                                            padding: EdgeInsetsGeometry.all(0),
                                               color: Colors.white,
                                               icon: const Icon(Icons.more_vert, color: Colors.black,size: 20,weight: 10,),
                                               onSelected: (String value) async {

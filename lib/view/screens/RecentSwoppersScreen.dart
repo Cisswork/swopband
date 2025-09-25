@@ -265,7 +265,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
 
                           ),
                           child: ListTile(
-                            contentPadding: EdgeInsetsGeometry.all(3),
+                            // contentPadding: EdgeInsetsGeometry.all(3),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(40)
                             ),
