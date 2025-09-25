@@ -437,6 +437,8 @@ class UserController extends GetxController {
 
           if (countryCode != null) {
             AppConst.countryCode = countryCode;
+            log("Exist countryCode Data---------------$countryCode");
+
           }
 
           log("Exist User Data---------------$user");

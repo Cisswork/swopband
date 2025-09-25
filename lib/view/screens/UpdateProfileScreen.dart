@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_intl_phone_field/countries.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
@@ -39,6 +40,17 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   // Phone number variables
   String _phoneNumber = '';
   String _countryCode = '';
+
+  /// Convert dial code (+91, +1876) to ISO country code (IN, JM, etc.)
+  String getIsoCodeFromDialCode(String dialCode) {
+    final dial = dialCode.replaceFirst('+', ''); // remove +
+    final country = countries.firstWhere(
+          (c) => c.dialCode == dial,
+      orElse: () =>
+          countries.firstWhere((c) => c.code == 'US'), // default fallback
+    );
+    return country.code;
+  }
 
   final controller = Get.put(UserController());
   String imageUrl = "";
@@ -130,6 +142,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       }
       if (AppConst.countryCode != null && AppConst.countryCode!.isNotEmpty) {
         _countryCode = AppConst.countryCode!;
+        log("_countryCode----$_countryCode");
       }
 
       // Initialize image picker variables
@@ -223,7 +236,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               bottom: 0,
               right: 0,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: MyColors.primaryColor,
                   shape: BoxShape.circle,
@@ -381,245 +394,254 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         backgroundColor: Colors.white,
         title: const Text("Update your profile"),
       ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              MyImages.background1,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Obx(() {
-            if (controller.fetchUserProfile.value) {
-              return const Center(
-                  child: CircularProgressIndicator(
-                color: Colors.black,
-              ));
-            }
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Center(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
+      body: Obx(() {
+        if (controller.fetchUserProfile.value) {
+          return const Center(
+              child: CircularProgressIndicator(
+            color: Colors.black,
+          ));
+        }
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(MyImages.nameLogo, height: 40),
+                    const SizedBox(height: 10),
+                    // Text(
+                    //   "Update your profile",
+                    //   style: AppTextStyles.large.copyWith(fontSize: 20),
+                    //   textAlign: TextAlign.center,
+                    // ),
+
+                    _buildImagePicker(),
+                    const SizedBox(height: 24),
+                    /*      Text(
+                    AppStrings.createSwopHandle.tr,
+                    style: AppTextStyles.large.copyWith(fontSize: 13,fontWeight: FontWeight.w600),
+                    textAlign: TextAlign.center,
+                  ),*/
+                    const SizedBox(height: 5),
+                    myFieldAdvance(
+                      readOnly: true,
+                      onChanged: (username) {
+                        controller
+                            .checkUsernameAvailability(username.trim());
+                      },
+                      context: context,
+                      controller: swopUserNameController,
+                      hintText: "Enter username",
+                      inputType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      fillColor: MyColors.textWhite,
+                      textBack: MyColors.textWhite,
+                    ),
+
+                    /*SizedBox(height: 8),
+                  Obx(() {
+                    final username = controller.swopUsername.value.trim();
+                    if (username.isEmpty) return const SizedBox(); // Hide when empty
+
+                    return Column(
                       children: [
-                        Image.asset(MyImages.nameLogo, height: 40),
-                        const SizedBox(height: 10),
-                        // Text(
-                        //   "Update your profile",
-                        //   style: AppTextStyles.large.copyWith(fontSize: 20),
-                        //   textAlign: TextAlign.center,
-                        // ),
-
-                        _buildImagePicker(),
-                        const SizedBox(height: 24),
-                        /*      Text(
-                        AppStrings.createSwopHandle.tr,
-                        style: AppTextStyles.large.copyWith(fontSize: 13,fontWeight: FontWeight.w600),
-                        textAlign: TextAlign.center,
-                      ),*/
-                        const SizedBox(height: 5),
-                        myFieldAdvance(
-                          readOnly: true,
-                          onChanged: (username) {
-                            controller
-                                .checkUsernameAvailability(username.trim());
-                          },
-                          context: context,
-                          controller: swopUserNameController,
-                          hintText: "Enter username",
-                          inputType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          fillColor: MyColors.textWhite,
-                          textBack: MyColors.textWhite,
-                        ),
-
-                        /*SizedBox(height: 8),
-                      Obx(() {
-                        final username = controller.swopUsername.value.trim();
-                        if (username.isEmpty) return const SizedBox(); // Hide when empty
-
-                        return Column(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(3),
-                              decoration: BoxDecoration(
-                                color: MyColors.textBlack,
-                                borderRadius: BorderRadius.all(Radius.circular(20)),
+                        Container(
+                          padding: EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            color: MyColors.textBlack,
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                          ),
+                          //height: 30,
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: Text(
+                              username,
+                              style: AppTextStyles.small.copyWith(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: MyColors.textWhite,
                               ),
-                              //height: 30,
-                              child: Padding(
-                                padding: const EdgeInsets.all(5.0),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          controller.usernameMessage.value,
+                          style: AppTextStyles.small.copyWith(
+                            color: controller.isUsernameAvailable.value ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    );
+                  }),*/
+
+                    const SizedBox(height: 15),
+                    myFieldAdvance(
+                      context: context,
+                      controller: nameController,
+                      hintText: "Enter Full Name",
+                      inputType: TextInputType.text,
+                      textInputAction: TextInputAction.done,
+                      fillColor: MyColors.textWhite,
+                      textBack: MyColors.textWhite,
+                    ),
+                    const SizedBox(height: 20),
+                    myFieldAdvance(
+                      readOnly: true,
+                      context: context,
+                      controller: emailController,
+                      hintText: "Email",
+                      inputType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      fillColor: MyColors.textWhite,
+                      textBack: MyColors.textWhite,
+                    ),
+                    const SizedBox(height: 15),
+                    // Phone number field with country code
+                    IntlPhoneField(
+
+                      controller: phoneController,
+                      decoration: const InputDecoration(
+                        hintText: "Phone Number",
+                        hintStyle: TextStyle(
+                          fontSize: 14,
+                          fontFamily: "Chromatica",
+                          color: MyColors.textBlack,
+                          decoration: TextDecoration.none,
+                          wordSpacing: 1.2,
+                        ),
+                        filled: true,
+                        fillColor: MyColors.textWhite,
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                            width: 1.2,
+                          ),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(28)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: MyColors.textBlack,
+                            width: 1.2,
+                          ),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(28)),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(28)),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 10,
+                        ),
+                      ),
+                      initialCountryCode:getIsoCodeFromDialCode(_countryCode),
+                      onChanged: (phone) {
+                        _phoneNumber = phone.number;
+                        _countryCode = phone.countryCode;
+                      },
+                      onCountryChanged: (country) {
+                        _countryCode = country.code;
+                      },
+                      textInputAction: TextInputAction.next,
+                      keyboardType: TextInputType.phone,
+                      validator: (phone) {
+                        if (phone != null &&
+                            phone.number.isNotEmpty &&
+                            phone.number.length < 7) {
+                          return 'Please enter a valid phone number';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 8),
+
+                    Text(
+                      AppStrings.addYourBio.tr,
+                      style: AppTextStyles.medium.copyWith(
+                          color: MyColors.textBlack,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+
+                    TextFormField(
+                      maxLength: 100,
+                      controller: bioController,
+                      maxLines: 4,
+                      textInputAction: TextInputAction.done,
+                      decoration: InputDecoration(
+                        counterText: '', // default counter hatane ke liye
+                        counter: ValueListenableBuilder<TextEditingValue>(
+                          valueListenable: bioController,
+                          builder: (context, value, child) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 16.0, top: 8),
+                              child: Align(
+                                alignment: Alignment.bottomRight,
                                 child: Text(
-                                  username,
-                                  style: AppTextStyles.small.copyWith(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: MyColors.textWhite,
+                                  "${value.text.length}/100",
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                    fontFamily: "Chromatica",
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              controller.usernameMessage.value,
-                              style: AppTextStyles.small.copyWith(
-                                color: controller.isUsernameAvailable.value ? Colors.green : Colors.red,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        );
-                      }),*/
+                            );
+                          },
+                        ),
+                        // contentPadding: const EdgeInsets.only(
+                        //   top: 40,
+                        //   left: 20,
+                        //   right: 20,
+                        //   bottom: 20,
+                        // ),
+                        hintText: "Add your bio",
 
-                        const SizedBox(height: 15),
-                        myFieldAdvance(
-                          context: context,
-                          controller: nameController,
-                          hintText: "Enter Full Name",
-                          inputType: TextInputType.text,
-                          textInputAction: TextInputAction.done,
-                          fillColor: MyColors.textWhite,
-                          textBack: MyColors.textWhite,
+                        hintStyle: const TextStyle(
+                          fontSize: 14,
+                          fontFamily: "Chromatica",
+                          color: MyColors.textBlack,
+                          decoration: TextDecoration.none,
+                          wordSpacing: 1.2,
                         ),
-                        const SizedBox(height: 20),
-                        myFieldAdvance(
-                          readOnly: true,
-                          context: context,
-                          controller: emailController,
-                          hintText: "Email",
-                          inputType: TextInputType.text,
-                          textInputAction: TextInputAction.next,
-                          fillColor: MyColors.textWhite,
-                          textBack: MyColors.textWhite,
-                        ),
-                        const SizedBox(height: 15),
-                        // Phone number field with country code
-                        IntlPhoneField(
-                          controller: phoneController,
-                          decoration: const InputDecoration(
-                            hintText: "Phone Number",
-                            hintStyle: TextStyle(
-                              fontSize: 14,
-                              fontFamily: "Chromatica",
-                              color: MyColors.textBlack,
-                              decoration: TextDecoration.none,
-                              wordSpacing: 1.2,
-                            ),
-                            filled: true,
-                            fillColor: MyColors.textWhite,
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.black,
-                                width: 1.2,
-                              ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(28)),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: MyColors.textBlack,
-                                width: 1.2,
-                              ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(28)),
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(28)),
-                            ),
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 10,
-                            ),
+                        filled: true,
+                        fillColor: Colors.transparent,
+                        enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                            width: 1.2,
                           ),
-                          initialCountryCode:
-                              _countryCode.isNotEmpty ? _countryCode : 'US',
-                          onChanged: (phone) {
-                            _phoneNumber = phone.number;
-                            _countryCode = phone.countryCode;
-                          },
-                          onCountryChanged: (country) {
-                            _countryCode = country.code;
-                          },
-                          textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.phone,
-                          validator: (phone) {
-                            if (phone != null &&
-                                phone.number.isNotEmpty &&
-                                phone.number.length < 7) {
-                              return 'Please enter a valid phone number';
-                            }
-                            return null;
-                          },
+                          borderRadius: BorderRadius.all(Radius.circular(28)),
                         ),
-                        const SizedBox(height: 8),
-
-                        Text(
-                          AppStrings.addYourBio.tr,
-                          style: AppTextStyles.medium.copyWith(
-                              color: MyColors.textBlack,
-                              fontWeight: FontWeight.bold),
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(28)),
                         ),
-                        const SizedBox(height: 8),
-
-                        TextFormField(
-                          onTap: () async {
-                            // await signOut();
-                          },
-                          maxLines: 4,
-                          controller: bioController,
-                          textInputAction: TextInputAction.done,
-                          decoration: const InputDecoration(
-                            contentPadding: EdgeInsets.only(
-                              top: 40,
-                              left: 20,
-                            ),
-                            hintText: "Enter a bio",
-                            hintStyle: TextStyle(
-                              fontSize: 12,
-                              fontFamily: "Chromatica",
-                              color: MyColors.textBlack,
-                              decoration: TextDecoration.none,
-                              wordSpacing: 1.2,
-                            ),
-                            filled: true,
-                            fillColor: Colors.transparent,
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Colors.black,
-                                width: 1.2,
-                              ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(28)),
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(28)),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        CustomButton(
-                          text: "Update Profile",
-                          onPressed: () {
-                            _updateProfile();
-                          },
-                        ),
-
-                        const SizedBox(height: 16),
-                      ],
+                      ),
                     ),
-                  ),
+
+                    const SizedBox(height: 24),
+
+                    CustomButton(
+                      text: "Update Profile",
+                      onPressed: () {
+                        _updateProfile();
+                      },
+                    ),
+
+                    const SizedBox(height: 16),
+                  ],
                 ),
               ),
-            );
-          })
-        ],
-      ),
+            ),
+          ),
+        );
+      }),
     );
   }
 
@@ -898,11 +920,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       return null; // Let backgroundImage handle the display
     } else {
       // Show default profile icon when no image
-      return Icon(
-        Icons.person,
-        size: 50,
-        color: MyColors.primaryColor.withOpacity(0.5),
-      );
+      return  Image.asset(
+        "assets/images/img.png",
+      ) ;
     }
   }
 

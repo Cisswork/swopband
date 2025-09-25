@@ -26,7 +26,8 @@ import 'package:swopband/services/nfc_background_service.dart';
 
 import 'connect_swopband_screen.dart';
 
-class CreateProfileScreen extends StatefulWidget {
+class
+CreateProfileScreen extends StatefulWidget {
   final userImage, name, email;
   CreateProfileScreen({Key? key, this.userImage, this.name, this.email})
       : super(key: key);
