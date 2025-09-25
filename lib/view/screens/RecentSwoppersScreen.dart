@@ -66,13 +66,21 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                 color: MyColors.textBlack,
               ),
             ),
-            Text(
-              "Connections",
-              style: AppTextStyles.large.copyWith(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: MyColors.textBlack,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Connections",
+                  style: AppTextStyles.large.copyWith(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                    color: MyColors.textBlack,
+                  ),
+                ),
+                SizedBox(width: 3,),
+
+                CircleAvatar(radius: 15,backgroundColor: Colors.grey.shade300,)
+              ],
             ),
 
 
@@ -118,51 +126,9 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
               ),
             ),
 
-            SizedBox(height: 15),
+            SizedBox(height: 8),
 
-            // Connection count and refresh button
-/*
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Obx(() => Text(
-                    '${controller.connectionCount} connections',
-                    style: AppTextStyles.medium.copyWith(
-                      color: MyColors.textBlack,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  )),
-                  Row(
-                    children: [
-                      if (_searchController.text.isNotEmpty)
-                        TextButton(
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() {
-                              _filteredSwoppers = controller.recentSwoppers;
-                            });
-                          },
-                          child: Text(
-                            'Clear',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ),
-                      SizedBox(width: 8),
-                      IconButton(
-                        onPressed: () => controller.refreshConnections(),
-                        icon: Icon(Icons.refresh, color: Colors.blue),
-                        tooltip: 'Refresh connections',
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-*/
 
-            SizedBox(height: 10),
 
             Expanded(
               child: Obx(() {
@@ -280,8 +246,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                             onLongPress: () {
                               _showUserOptions(user);
                             },
-                            leading: Stack(
-                              children: [
+                            leading:
                                 CircleAvatar(
                                   radius: 25,
                                   backgroundColor: MyColors.textBlack,
@@ -294,25 +259,8 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                                         )
                                       : null,
                                 ),
-                                // NFC indicator
-                                Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: Container(
-                                    padding: EdgeInsets.all(2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.nfc,
-                                      color: Colors.white,
-                                      size: 12,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+
+
                             title: Text(
                               user.name,
                               style: AppTextStyles.medium.copyWith(
@@ -328,28 +276,17 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                                 fontSize: 13,
                               ),
                             ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  _formatLastSeen(user.updatedAt),
-                                  style: AppTextStyles.small.copyWith(
-                                    color: MyColors.textDisabledColor,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                CircleAvatar(
+                            contentPadding: EdgeInsets.only(left: 8),
+                            trailing:
+                                                           const CircleAvatar(
                                   backgroundColor: Colors.white,
                                   radius: 35,
                                   child: Icon(
                                     Icons.arrow_forward,
                                     color: Colors.black,
-                                    size: 23,
+                                    size: 28,
                                   ),
                                 ),
-                              ],
-                            ),
                           ),
                         ),
                       );

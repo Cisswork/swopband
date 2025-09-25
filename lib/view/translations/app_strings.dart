@@ -129,7 +129,7 @@ class AppStrings extends Translations {
       addYourBio: 'Add your bio',
       bioHint: 'Design Director and Creative Partner at SWOPBAND.',
       characters: 'characters',
-      connectSwopband: 'Connect your\nSWOPBAND',
+      connectSwopband: 'Connect your SWOPBAND',
       purchaseSwopband: 'Purchase a SWOPBAND',
       connectYourSwopband: 'Connect your SWOPBAND',
       holdDeviceNear: 'Hold your device near your SWOPBAND to connect.',

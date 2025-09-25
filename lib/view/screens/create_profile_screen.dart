@@ -45,8 +45,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   final TextEditingController bioController = TextEditingController();
 
   // Phone number variables
-  String _phoneNumber = '';
-  String _countryCode = '';
+  String _phoneNumber = 'UK';
+  String _countryCode = '+44';
 
   final FocusNode usernameFocus = FocusNode();
   final FocusNode nameFocus = FocusNode();
@@ -198,7 +198,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   const SizedBox(height: 10),
                   Text(
                     AppStrings.createProfile.tr,
-                    style: AppTextStyles.large.copyWith(fontSize: 16),
+                    style: AppTextStyles.large.copyWith(fontSize: 19),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 10),
@@ -223,7 +223,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     },
                     context: context,
                     controller: swopUserNameController,
-                    hintText: "Enter username",
+                    hintText: "Enter your Swop Handle",
                     inputType: TextInputType.text,
                     textInputAction: TextInputAction.next,
                     fillColor: MyColors.textWhite,
@@ -259,7 +259,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          controller.usernameMessage.value,
+                          controller.isUsernameAvailable.value?  controller.usernameMessage.value:"Swop already taken",
                           style: AppTextStyles.small.copyWith(
                             color: controller.isUsernameAvailable.value
                                 ? Colors.green
@@ -297,7 +297,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     nextFocusNode: ageFocus,
                     context: context,
                     controller: emailController,
-                    hintText: "Email",
+                    hintText: "Email Address",
                     inputType: TextInputType.text,
                     textInputAction: TextInputAction.next,
                     fillColor: MyColors.textWhite,
@@ -308,7 +308,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     inputFormatters: [
                       LengthLimitingTextInputFormatter(2), // max 2 digits
 
-                      FilteringTextInputFormatter.digitsOnly, // only numbers
+                      FilteringTextInputFormatter.digitsOnly,
                     ],
                     focusNode: ageFocus,
                     nextFocusNode: phoneFocus,

@@ -105,6 +105,7 @@ class BottomNavScreen extends StatelessWidget {
       return GestureDetector(
         onTap: () {
           if (index == 3) { // Feedback tab
+
             showFeedbackPopup(context);
 
           } else {
@@ -161,14 +162,14 @@ class BottomNavScreen extends StatelessWidget {
       barrierDismissible: true,
       barrierColor: Colors.black54,
       builder: (context) {
-        return Stack(
+        return const Stack(
           children: [
             // Align bottom with padding = nav bar height
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 60), // 👈 nav bar ki height
-                child: const FeedbackPopup(),
+                padding: EdgeInsets.only(bottom: 60), // 👈 nav bar ki height
+                child: FeedbackPopup(),
               ),
             ),
           ],

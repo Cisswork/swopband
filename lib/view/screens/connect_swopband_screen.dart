@@ -453,11 +453,22 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  GestureDetector(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.only(top: 8.0,bottom: 8),
+                      child: Align(
+                          alignment: AlignmentDirectional.topStart,
+                          child: Icon(Icons.arrow_back_ios)),
+                    ),
+                  ),
                   Image.asset(
                     MyImages.nameLogo,
                     height: 40,
@@ -527,13 +538,13 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                         ),
                       ),
                       Positioned(
-                        top: -75,
+                        top: -80,
                         left: 0,
                         right: 0,
                         child: Center(
                           child: Image.asset(
                             MyImages.ringImage,
-                            height: 140,
+                            height: 150,
                           ),
                         ),
                       ),
