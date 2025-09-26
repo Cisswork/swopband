@@ -472,6 +472,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
     return Scaffold(
       backgroundColor: MyColors.backgroundColor,
       body: SafeArea(
+
         child: Center(
           child: SingleChildScrollView(
             child: Padding(

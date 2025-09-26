@@ -206,7 +206,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         children: [
           CircleAvatar(
             radius: 55,
-            backgroundColor: MyColors.primaryColor.withOpacity(0.1),
+            backgroundColor: MyColors.textWhite,
             backgroundImage: _isLoadingImage ? null : _getBackgroundImage(),
             onBackgroundImageError:
                 (_isLoadingImage || _getBackgroundImage() == null)
@@ -515,7 +515,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                               );
                             },
                             child: Container(
-                              height: 56,
+                              height: 48,
                               decoration: BoxDecoration(
                                 color: MyColors.textWhite,
                                 border: Border.all(
@@ -526,7 +526,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                               ),
                               child: Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
+                                    const EdgeInsets.symmetric(horizontal: 10),
                                 child: Row(
                                   children: [
                                     Text(
@@ -614,15 +614,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 15),
 
-                    Text(
-                      AppStrings.addYourBio.tr,
-                      style: AppTextStyles.medium.copyWith(
-                          color: MyColors.textBlack,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
+
 
                     TextFormField(
                       maxLength: 100,

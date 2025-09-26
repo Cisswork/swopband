@@ -249,7 +249,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: MyColors.textWhite,
+      backgroundColor: MyColors.backgroundColor,
       body: SafeArea(
         child: Obx(() => controller.fetchLinkLoader.value
             ? const Center(child: CircularProgressIndicator())
