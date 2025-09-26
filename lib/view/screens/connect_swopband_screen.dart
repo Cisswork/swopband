@@ -494,7 +494,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 70),
+                  const SizedBox(height: 80),
                   Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -511,11 +511,11 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              SizedBox(height: 25),
+                              SizedBox(height: 28),
                               Text(
                                 AppStrings.connectingYourBand.tr,
                                 style: AppTextStyles.extraLarge.copyWith(
-                                  fontSize: 19,
+                                  fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 textAlign: TextAlign.center,
@@ -619,7 +619,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
           text,
           style: AppTextStyles.medium.copyWith(
             fontSize: 13,
-            fontWeight: FontWeight.w600
+            fontWeight: FontWeight.bold
           ),
           textAlign: TextAlign.left,
         ),

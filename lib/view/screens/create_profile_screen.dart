@@ -448,7 +448,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     focusNode: bioFocus,
                     maxLength: 100,
                     controller: bioController,
-                    maxLines: 4,
+                    maxLines: 3,
                     textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
                       hintStyle: const TextStyle(
