@@ -407,6 +407,9 @@ class UserController extends GetxController {
           final phoneNumber = user['phone_number'] ?? '';
           final countryCode = user['country_code'] ?? '';
 
+          log("📱 API Response - Phone Number: $phoneNumber");
+          log("📱 API Response - Country Code: $countryCode");
+
           if (userId != null) {
             await SharedPrefService.saveString('backend_user_id', userId);
           }
@@ -436,7 +439,8 @@ class UserController extends GetxController {
           }
 
           if (countryCode != null) {
-            AppConst.countryCode = countryCode;
+            // Remove the + symbol if present, as IntlPhoneField expects just the country code
+            AppConst.countryCode = countryCode.replaceFirst('+', '');
             log("Exist countryCode Data---------------$countryCode");
 
           }

@@ -126,6 +126,28 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
   }
 
   Future<void> _startNfcSessionAndWrite() async {
+
+    log("[NFC] Calling controller.createUser()");
+    File? selectedFile = (widget.imagePickerKey.currentState as dynamic)
+        ?.getSelectedImageFile();
+    String profileImage = await _getCurrentProfileImage();
+    await controller.createUser(
+      username: widget.username,
+      name: widget.name,
+      email: widget.email,
+      bio: widget.bio,
+      age: widget.age,
+      phone: widget.phone,
+      countryCode: widget.countryCode,
+      profileFile: selectedFile,
+      profileUrl: selectedFile == null ? profileImage : null,
+      onSuccess: () {
+        log("[NFC] User created successfully, navigating to AddLinkScreen.");
+        // Resume background operations after successful operation
+        _nfcBackgroundService.resumeBackgroundOperations();
+        Get.offAll(() => const AddLinkScreen());
+      },
+    );
     log("[NFC] Starting NFC session and write process...");
     setState(() {
       _nfcStatus = "Hold your iPhone near the Swopband ring...";
@@ -458,31 +480,21 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.only(top: 8.0,bottom: 8),
-                      child: Align(
-                          alignment: AlignmentDirectional.topStart,
-                          child: Icon(Icons.arrow_back_ios)),
-                    ),
-                  ),
+
                   Image.asset(
                     MyImages.nameLogo,
-                    height: 40,
+                    height: 45,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
                   Text(
                     AppStrings.connectYourSwopband.tr,
                     style: AppTextStyles.extraLarge.copyWith(
-                      fontSize: 18,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 70),
                   Stack(
                     clipBehavior: Clip.none,
                     children: [
@@ -538,13 +550,13 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                         ),
                       ),
                       Positioned(
-                        top: -80,
+                        top: -100,
                         left: 0,
                         right: 0,
                         child: Center(
                           child: Image.asset(
                             MyImages.ringImage,
-                            height: 150,
+                            height: 180,
                           ),
                         ),
                       ),
@@ -606,7 +618,8 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
         title: Text(
           text,
           style: AppTextStyles.medium.copyWith(
-            fontSize: 12,
+            fontSize: 13,
+            fontWeight: FontWeight.w600
           ),
           textAlign: TextAlign.left,
         ),

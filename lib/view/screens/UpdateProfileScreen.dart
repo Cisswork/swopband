@@ -4,14 +4,13 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_intl_phone_field/countries.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:flutter_intl_phone_field/flutter_intl_phone_field.dart';
 import 'package:swopband/controller/user_controller/UserController.dart';
 import 'package:swopband/view/utils/shared_pref/SharedPrefHelper.dart';
 import 'package:swopband/view/widgets/custom_button.dart';
@@ -39,18 +38,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
   // Phone number variables
   String _phoneNumber = '';
-  String _countryCode = '';
-
-  /// Convert dial code (+91, +1876) to ISO country code (IN, JM, etc.)
-  String getIsoCodeFromDialCode(String dialCode) {
-    final dial = dialCode.replaceFirst('+', ''); // remove +
-    final country = countries.firstWhere(
-          (c) => c.dialCode == dial,
-      orElse: () =>
-          countries.firstWhere((c) => c.code == 'US'), // default fallback
-    );
-    return country.code;
-  }
+  Country _selectedCountry = Country.parse('GB');
 
   final controller = Get.put(UserController());
   String imageUrl = "";
@@ -141,8 +129,14 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         phoneController.text = AppConst.phoneNumber!;
       }
       if (AppConst.countryCode != null && AppConst.countryCode!.isNotEmpty) {
-        _countryCode = AppConst.countryCode!;
-        log("_countryCode----$_countryCode");
+        // Parse the country code to set the selected country
+        String countryCode = AppConst.countryCode!.replaceFirst('+', '');
+        try {
+          _selectedCountry = Country.parse(countryCode);
+        } catch (e) {
+          _selectedCountry = Country.parse('GB'); // Default fallback
+        }
+        log("_countryCode----${AppConst.countryCode}");
       }
 
       // Initialize image picker variables
@@ -168,7 +162,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       email: emailController.text, // Use the email from form
       bio: bioController.text,
       phone: _phoneNumber.isNotEmpty ? _phoneNumber : null,
-      countryCode: _countryCode.isNotEmpty ? _countryCode : null,
+      countryCode: _selectedCountry.phoneCode.isNotEmpty
+          ? '+${_selectedCountry.phoneCode}'
+          : null,
       profileFile:
           null, // No file upload needed as image is already uploaded to API
       profileUrl: profileUrl,
@@ -429,8 +425,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     myFieldAdvance(
                       readOnly: true,
                       onChanged: (username) {
-                        controller
-                            .checkUsernameAvailability(username.trim());
+                        controller.checkUsernameAvailability(username.trim());
                       },
                       context: context,
                       controller: swopUserNameController,
@@ -501,63 +496,123 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       textBack: MyColors.textWhite,
                     ),
                     const SizedBox(height: 15),
-                    // Phone number field with country code
-                    IntlPhoneField(
-
-                      controller: phoneController,
-                      decoration: const InputDecoration(
-                        hintText: "Phone Number",
-                        hintStyle: TextStyle(
-                          fontSize: 14,
-                          fontFamily: "Chromatica",
-                          color: MyColors.textBlack,
-                          decoration: TextDecoration.none,
-                          wordSpacing: 1.2,
-                        ),
-                        filled: true,
-                        fillColor: MyColors.textWhite,
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Colors.black,
-                            width: 1.2,
+                    // Phone number field with separated country code and phone number
+                    Row(
+                      children: [
+                        // Country code field with flag
+                        Expanded(
+                          flex: 2,
+                          child: GestureDetector(
+                            onTap: () {
+                              showCountryPicker(
+                                context: context,
+                                onSelect: (Country country) {
+                                  setState(() {
+                                    _selectedCountry = country;
+                                  });
+                                },
+                                showPhoneCode: true,
+                              );
+                            },
+                            child: Container(
+                              height: 56,
+                              decoration: BoxDecoration(
+                                color: MyColors.textWhite,
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 1.2,
+                                ),
+                                borderRadius: BorderRadius.circular(28),
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 15),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      _selectedCountry.flagEmoji,
+                                      style: const TextStyle(fontSize: 20),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '+${_selectedCountry.phoneCode}',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: "Chromatica",
+                                        color: MyColors.textBlack,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    const Icon(
+                                      Icons.arrow_drop_down,
+                                      color: MyColors.textBlack,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(28)),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: MyColors.textBlack,
-                            width: 1.2,
+                        const SizedBox(width: 10), // Space between fields
+                        // Phone number field
+                        Expanded(
+                          flex: 3,
+                          child: TextFormField(
+                            controller: phoneController,
+                            decoration: const InputDecoration(
+                              hintText: "Phone Number",
+                              hintStyle: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: "Chromatica",
+                                color: MyColors.textBlack,
+                                decoration: TextDecoration.none,
+                                wordSpacing: 1.2,
+                              ),
+                              filled: true,
+                              fillColor: MyColors.textWhite,
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.black,
+                                  width: 1.2,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(28)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: MyColors.textBlack,
+                                  width: 1.2,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(28)),
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(28)),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                horizontal: 15,
+                                vertical: 12,
+                              ),
+                            ),
+                            textInputAction: TextInputAction.next,
+                            keyboardType: TextInputType.phone,
+                            validator: (value) {
+                              if (value != null &&
+                                  value.isNotEmpty &&
+                                  value.length < 7) {
+                                return 'Please enter a valid phone number';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              _phoneNumber = value;
+                            },
                           ),
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(28)),
                         ),
-                        border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(28)),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 10,
-                        ),
-                      ),
-                      initialCountryCode:getIsoCodeFromDialCode(_countryCode),
-                      onChanged: (phone) {
-                        _phoneNumber = phone.number;
-                        _countryCode = phone.countryCode;
-                      },
-                      onCountryChanged: (country) {
-                        _countryCode = country.code;
-                      },
-                      textInputAction: TextInputAction.next,
-                      keyboardType: TextInputType.phone,
-                      validator: (phone) {
-                        if (phone != null &&
-                            phone.number.isNotEmpty &&
-                            phone.number.length < 7) {
-                          return 'Please enter a valid phone number';
-                        }
-                        return null;
-                      },
+                      ],
                     ),
                     const SizedBox(height: 8),
 
@@ -580,7 +635,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                           valueListenable: bioController,
                           builder: (context, value, child) {
                             return Padding(
-                              padding: const EdgeInsets.only(right: 16.0, top: 8),
+                              padding:
+                                  const EdgeInsets.only(right: 16.0, top: 8),
                               child: Align(
                                 alignment: Alignment.bottomRight,
                                 child: Text(
@@ -920,9 +976,9 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       return null; // Let backgroundImage handle the display
     } else {
       // Show default profile icon when no image
-      return  Image.asset(
+      return Image.asset(
         "assets/images/img.png",
-      ) ;
+      );
     }
   }
 

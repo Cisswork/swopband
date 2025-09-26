@@ -240,8 +240,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
   Widget _buildPlatformImage(String platform, bool isActive) {
     return Image.asset(
       _platformImages[platform] ?? MyImages.insta,
-      width: 45,
-      height: 45,
+      width: 50,
+      height: 50,
     );
   }
 
@@ -277,7 +277,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                               Text(
                                 AppStrings.editLinks.tr,
                                 style: AppTextStyles.extraLarge.copyWith(color: Colors.white,
-                                  fontSize: 23,
+                                  fontSize: 30,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 textAlign: TextAlign.center,
@@ -287,7 +287,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
 
                                 AppStrings.addLinksDescription.tr,
                                 style: AppTextStyles.medium.copyWith(
-                                  fontSize: 15,
+                                  fontSize: 17,
                                   color: Colors.white,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -330,11 +330,13 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                 AppStrings.supportedLinks.tr,
                                 style: AppTextStyles.extraLarge.copyWith(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
+                              const SizedBox(height: 15),
+
                             ],
                           ),
                         ),
@@ -345,21 +347,20 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                             Row(
                               children: [
                                 Expanded(
-                                  flex: 3,
+                                  flex: 2,
                                   child: DropdownButtonFormField<String>(
+                                    iconEnabledColor: Colors.black,
+                                    iconDisabledColor: Colors.black,
                                     value: controller.links[index].type,
                                     isExpanded: true,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: Colors.transparent,
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: const BorderSide(color: Colors.grey),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: const BorderSide(color: Colors.grey),
-                                      ),
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      enabledBorder: InputBorder.none,
+                                      focusedBorder: InputBorder.none,
+                                      errorBorder: InputBorder.none,
+                                      focusedErrorBorder: InputBorder.none,
+                                      disabledBorder: InputBorder.none,
+                                      contentPadding: EdgeInsets.zero,
                                     ),
                                     // Show only icon in selected item
                                     selectedItemBuilder: (BuildContext context) {
@@ -368,8 +369,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                           alignment: Alignment.center,
                                           child: Image.asset(
                                             entry.value['icon'],
-                                            width: 24,
-                                            height: 24,
+                                            width: 35,
+                                            height: 35,
                                           ),
                                         );
                                       }).toList();
@@ -381,8 +382,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                           children: [
                                             Image.asset(
                                               entry.value['icon'],
-                                              width: 24,
-                                              height: 24,
+                                              width: 35,
+                                              height: 35,
                                             ),
                                             const SizedBox(width: 8),
                                             Flexible(
@@ -404,10 +405,10 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                   child: GestureDetector(
                                     onTap: () => _launchUrl(controller.links[index].url),
                                     child: Container(
-                                      padding: const EdgeInsets.only(left: 7,right: 0,top: 3,bottom: 3),
+                                      padding: const EdgeInsets.only(left: 7,right: 0,top: 0,bottom: 0),
                                       decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.grey),
-                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: Colors.black),
+                                        borderRadius: BorderRadius.circular(30),
                                       ),
                                       child: Row(
                                         children: [
@@ -415,7 +416,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                             child: Text(
                                               controller.links[index].url,
                                               style: const TextStyle(
-                                                color: Colors.blue,
+                                                color: Colors.black,
                                                 decoration: TextDecoration.underline,
                                               ),
                                               overflow: TextOverflow.ellipsis,
@@ -474,23 +475,21 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      flex: 4,
+                                      flex: 2,
                                       child: DropdownButtonFormField<String>(
+                                        iconEnabledColor: Colors.black,
                                         value: _supportedLinks.entries.any((entry) => entry.key == _linkTypes[index]) 
                                             ? _linkTypes[index] 
                                             : 'instagram', // Fallback to 'instagram' if current value is not available
                                         isExpanded: true,
-                                        decoration: InputDecoration(
-                                          filled: true,
-                                          fillColor: Colors.transparent,
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                            borderSide: const BorderSide(color: Colors.grey),
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                            borderSide: const BorderSide(color: Colors.grey),
-                                          ),
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          errorBorder: InputBorder.none,
+                                          focusedErrorBorder: InputBorder.none,
+                                          disabledBorder: InputBorder.none,
+                                          contentPadding: EdgeInsets.zero,
                                         ),
                                         // Show only icon in selected item
                                         selectedItemBuilder: (BuildContext context) {
@@ -552,7 +551,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                     ),
                                     IconButton(
 
-                                      icon:  const Icon(Icons.delete, color: Colors.red),
+                                      icon:  const Icon(Icons.delete, color: Colors.grey),
                                       onPressed: () {
 
                                         setState(() {
@@ -567,7 +566,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 20), ///farja
+                                const SizedBox(height: 20),
                               ],
                             );
                           },

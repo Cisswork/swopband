@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_intl_phone_field: ^0.0.7
+  country_picker: ^2.0.24
   image_picker: ^1.1.2
   permission_handler: ^12.0.0+1
   custom_rating_bar: ^3.0.0

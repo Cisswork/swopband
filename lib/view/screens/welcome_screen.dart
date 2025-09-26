@@ -112,19 +112,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      SizedBox(height: 50,),
 
                       Image.asset(
                         height: 40,
                         MyImages.nameLogo,
                       ),
-                      SizedBox(height: 80,),
+                      SizedBox(height: 90,),
                       Image.asset(
                         MyImages.welcomeLogo,
-                        height: 200,
+                        height: 220,
                         width: double.infinity,
                       ),
-                      SizedBox(height: 60,),
+                      SizedBox(height: 33,),
 
                       _loadingApple
                           ?  CupertinoActivityIndicator(color: Colors.black,)

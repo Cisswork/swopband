@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_intl_phone_field/flutter_intl_phone_field.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:swopband/controller/user_controller/UserController.dart';
 
 import 'package:swopband/view/widgets/custom_button.dart';
@@ -23,11 +23,9 @@ import 'bottom_nav/PurchaseScreen.dart';
 import 'package:swopband/view/widgets/custom_snackbar.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:swopband/services/nfc_background_service.dart';
-
 import 'connect_swopband_screen.dart';
 
-class
-CreateProfileScreen extends StatefulWidget {
+class CreateProfileScreen extends StatefulWidget {
   final userImage, name, email;
   CreateProfileScreen({Key? key, this.userImage, this.name, this.email})
       : super(key: key);
@@ -45,8 +43,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   final TextEditingController bioController = TextEditingController();
 
   // Phone number variables
-  String _phoneNumber = 'UK';
-  String _countryCode = '+44';
+  String _phoneNumber = '';
+  Country _selectedCountry = Country.parse('GB');
 
   final FocusNode usernameFocus = FocusNode();
   final FocusNode nameFocus = FocusNode();
@@ -192,13 +190,13 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 35),
 
                   Image.asset(MyImages.nameLogo, height: 38),
                   const SizedBox(height: 10),
                   Text(
                     AppStrings.createProfile.tr,
-                    style: AppTextStyles.large.copyWith(fontSize: 19),
+                    style: AppTextStyles.large.copyWith(fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 10),
@@ -208,12 +206,12 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     profileImage: widget.userImage ?? "",
                   ),
                   const SizedBox(height: 24),
-                  Text(
-                    AppStrings.createSwopHandle.tr,
-                    style: AppTextStyles.large
-                        .copyWith(fontSize: 13, fontWeight: FontWeight.w600),
-                    textAlign: TextAlign.center,
-                  ),
+                  // Text(
+                  //   AppStrings.createSwopHandle.tr,
+                  //   style: AppTextStyles.large
+                  //       .copyWith(fontSize: 13, fontWeight: FontWeight.w600),
+                  //   textAlign: TextAlign.center,
+                  // ),
                   const SizedBox(height: 5),
                   myFieldAdvance(
                     focusNode: usernameFocus,
@@ -259,7 +257,9 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          controller.isUsernameAvailable.value?  controller.usernameMessage.value:"Swop already taken",
+                          controller.isUsernameAvailable.value
+                              ? controller.usernameMessage.value
+                              : "Swop already taken",
                           style: AppTextStyles.small.copyWith(
                             color: controller.isUsernameAvailable.value
                                 ? Colors.green
@@ -321,60 +321,126 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     textBack: MyColors.textWhite,
                   ),
                   const SizedBox(height: 15),
-                  // Phone number field with country code
-                  IntlPhoneField(
-                    controller: phoneController,
-                    focusNode: phoneFocus,
-                    decoration: const InputDecoration(
-                      hintText: "Phone Number",
-                      hintStyle: TextStyle(
-                        fontSize: 14,
-                        fontFamily: "Chromatica",
-                        color: MyColors.textBlack,
-                        decoration: TextDecoration.none,
-                        wordSpacing: 1.2,
-                      ),
-                      filled: true,
-                      fillColor: MyColors.textWhite,
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.black,
-                          width: 1.2,
+                  // Phone number field with separated country code and phone number
+                  Row(
+                    children: [
+                      // Country code field with flag
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () {
+                            showCountryPicker(
+                              context: context,
+                              onSelect: (Country country) {
+                                setState(() {
+                                  _selectedCountry = country;
+                                });
+                              },
+                              showPhoneCode: true,
+                            );
+                          },
+                          child: Container(
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: MyColors.textWhite,
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 1.2,
+                              ),
+                              borderRadius: BorderRadius.circular(28),
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    _selectedCountry.flagEmoji,
+                                    style: const TextStyle(fontSize: 20),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    '+${_selectedCountry.phoneCode}',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: "Chromatica",
+                                      color: MyColors.textBlack,
+                                    ),
+                                  ),
+                                  const Icon(
+                                    size: 20,
+                                    Icons.arrow_drop_down,
+                                    color: MyColors.textBlack,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        borderRadius: BorderRadius.all(Radius.circular(28)),
                       ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: MyColors.textBlack,
-                          width: 1.2,
+                      SizedBox(
+                        width: 10,
+                      ),
+                      // Phone number field
+                      Expanded(
+                        flex: 3,
+                        child: TextFormField(
+                          controller: phoneController,
+                          focusNode: phoneFocus,
+                          decoration: const InputDecoration(
+                            hintText: "Phone Number",
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Chromatica",
+                              color: MyColors.textBlack,
+                              decoration: TextDecoration.none,
+                              wordSpacing: 1.2,
+                            ),
+                            filled: true,
+                            fillColor: MyColors.textWhite,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black,
+                                width: 1.2,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(28)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: MyColors.textBlack,
+                                width: 1.2,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(28)),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(28)),
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 12,
+                            ),
+                          ),
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.phone,
+                          validator: (value) {
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                value.length < 7) {
+                              return 'Please enter a valid phone number';
+                            }
+                            return null;
+                          },
+                          onChanged: (value) {
+                            _phoneNumber = value;
+                          },
                         ),
-                        borderRadius: BorderRadius.all(Radius.circular(28)),
                       ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(28)),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                      ),
-                    ),
-                    initialCountryCode: 'US',
-                    onChanged: (phone) {
-                      _phoneNumber = phone.number;
-                      _countryCode = phone.countryCode;
-                    },
-                    onCountryChanged: (country) {
-                      _countryCode = country.code;
-                    },
-                    textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.phone,
-                    validator: (phone) {
-                      if (phone != null &&
-                          phone.number.isNotEmpty &&
-                          phone.number.length < 7) {
-                        return 'Please enter a valid phone number';
-                      }
-                      return null;
-                    },
+                    ],
                   ),
                   const SizedBox(height: 15),
 
@@ -385,6 +451,14 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     maxLines: 4,
                     textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
+                      hintStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "Chromatica",
+                        color: MyColors.textBlack,
+                        decoration: TextDecoration.none,
+                        wordSpacing: 1.2,
+                      ),
                       counterText: '', // default counter hatane ke liye
                       counter: ValueListenableBuilder<TextEditingValue>(
                         valueListenable: bioController,
@@ -405,21 +479,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                           );
                         },
                       ),
-                      // contentPadding: const EdgeInsets.only(
-                      //   top: 40,
-                      //   left: 20,
-                      //   right: 20,
-                      //   bottom: 20,
-                      // ),
-                      hintText: "Add your bio",
 
-                      hintStyle: const TextStyle(
-                        fontSize: 14,
-                        fontFamily: "Chromatica",
-                        color: MyColors.textBlack,
-                        decoration: TextDecoration.none,
-                        wordSpacing: 1.2,
-                      ),
+                      hintText: "Add your bio",
                       filled: true,
                       fillColor: Colors.transparent,
                       enabledBorder: const OutlineInputBorder(
@@ -479,9 +540,10 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                   phone: _phoneNumber.isNotEmpty
                                       ? _phoneNumber
                                       : null,
-                                  countryCode: _countryCode.isNotEmpty
-                                      ? _countryCode
-                                      : null,
+                                  countryCode:
+                                      _selectedCountry.phoneCode.isNotEmpty
+                                          ? '+${_selectedCountry.phoneCode}'
+                                          : null,
                                   userImage: widget.userImage,
                                   imagePickerKey: _imagePickerKey,
                                 ));
@@ -541,8 +603,8 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
       child: Stack(
         children: [
           CircleAvatar(
-            radius: 55,
-            backgroundColor: MyColors.primaryColor.withOpacity(0.1),
+            backgroundColor: Color(0xffFFFAFA),
+            radius: 60,
             backgroundImage: _isLoadingImage ? null : _getBackgroundImage(),
             onBackgroundImageError: _isLoadingImage
                 ? null
@@ -567,7 +629,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
               bottom: 0,
               right: 0,
               child: Container(
-                padding: const EdgeInsets.all(4),
+                padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
                   color: MyColors.primaryColor,
                   shape: BoxShape.circle,

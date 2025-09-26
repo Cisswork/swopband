@@ -18,7 +18,8 @@ class RecentSwoppersScreen extends StatefulWidget {
 }
 
 class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
-  final RecentSwoppersController controller = Get.put(RecentSwoppersController());
+  final RecentSwoppersController controller =
+      Get.put(RecentSwoppersController());
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   List<User> _filteredSwoppers = [];
@@ -32,7 +33,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
         _filteredSwoppers = controller.recentSwoppers;
       });
     });
-    
+
     // Listen to changes in the controller's recentSwoppers list
     ever(controller.recentSwoppers, (List<User> swoppers) {
       if (mounted) {
@@ -57,7 +58,9 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            SizedBox(height: 40,),
+            SizedBox(
+              height: 40,
+            ),
             Text(
               controller.connectionCount.toString(),
               style: AppTextStyles.large.copyWith(
@@ -77,12 +80,23 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                     color: MyColors.textBlack,
                   ),
                 ),
-                SizedBox(width: 3,),
-
-                CircleAvatar(radius: 15,backgroundColor: Colors.grey.shade300,)
+                SizedBox(
+                  width: 3,
+                ),
+                GestureDetector(
+                    onTap: () {
+                      controller.fetchRecentSwoppers();
+                    },
+                    child: CircleAvatar(
+                      radius: 15,
+                      backgroundColor: Colors.grey.shade300,
+                      child: Icon(
+                        Icons.refresh,
+                        color: Colors.blue,
+                      ),
+                    ))
               ],
             ),
-
 
             SizedBox(height: 15),
 
@@ -90,9 +104,11 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
-                decoration: BoxDecoration(border: Border.all(color: Colors.black,width: 1.3),
+                height: 45,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black, width: 1.3),
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
+                  borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey.withOpacity(0.2),
@@ -103,24 +119,37 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                   ],
                 ),
                 child: TextField(
-
                   controller: _searchController,
                   onChanged: (value) {
                     setState(() {
                       if (value.isEmpty) {
                         _filteredSwoppers = controller.recentSwoppers;
                       } else {
-                        _filteredSwoppers = controller.recentSwoppers.where((swopper) => swopper.name.toLowerCase().contains(value.toLowerCase())
-                            || swopper.username.toLowerCase().contains(value.toLowerCase())).toList();
+                        _filteredSwoppers = controller.recentSwoppers
+                            .where((swopper) =>
+                                swopper.name
+                                    .toLowerCase()
+                                    .contains(value.toLowerCase()) ||
+                                swopper.username
+                                    .toLowerCase()
+                                    .contains(value.toLowerCase()))
+                            .toList();
                       }
                     });
                   },
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Search Connections',
-                    hintStyle: TextStyle(color: Colors.black),
-                    suffixIcon: Icon(Icons.search, color: Colors.grey),
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    suffixIcon: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationY(3.1416),
+                      // 180° rotate horizontally
+                      child: const Icon(Icons.search,
+                          color: Colors.black), // <- ye palat jayega
+                    ),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                   ),
                 ),
               ),
@@ -128,18 +157,18 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
 
             SizedBox(height: 8),
 
-
-
             Expanded(
               child: Obx(() {
                 // Compute visible list based on current search text to avoid stale state
-                final String query = _searchController.text.trim().toLowerCase();
+                final String query =
+                    _searchController.text.trim().toLowerCase();
                 final List<User> visible = query.isEmpty
                     ? controller.recentSwoppers
-                    : controller.recentSwoppers.where((swopper) =>
-                        swopper.name.toLowerCase().contains(query) ||
-                        swopper.username.toLowerCase().contains(query)
-                      ).toList();
+                    : controller.recentSwoppers
+                        .where((swopper) =>
+                            swopper.name.toLowerCase().contains(query) ||
+                            swopper.username.toLowerCase().contains(query))
+                        .toList();
                 if (controller.fetchRecentSwoppersLoader.value) {
                   return Center(
                     child: Column(
@@ -213,7 +242,6 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                   );
                 }
 
-
                 return RefreshIndicator(
                   onRefresh: () => controller.fetchRecentSwoppers(),
                   child: ListView.builder(
@@ -228,15 +256,14 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                           decoration: BoxDecoration(
                             color: MyColors.textBlack,
                             borderRadius: BorderRadius.circular(40),
-
                           ),
                           child: GestureDetector(
                             onTap: () {
                               // Navigate to the user's profile
                               Get.to(() => SwopbandWebViewScreen(
-                                username: user.username,
-                                url: '',
-                              ));
+                                    username: user.username,
+                                    url: '',
+                                  ));
                             },
                             onLongPress: () {
                               _showUserOptions(user);
@@ -255,28 +282,30 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                                       color: MyColors.textBlack,
                                     ),
                                     child: ClipOval(
-                                      child: user.profileUrl != null && user.profileUrl!.isNotEmpty
+                                      child: user.profileUrl != null &&
+                                              user.profileUrl!.isNotEmpty
                                           ? Image.network(
-                                        user.profileUrl!,
-                                        fit: BoxFit.cover,
-                                        width: 60,
-                                        height: 60,
-                                      )
+                                              user.profileUrl!,
+                                              fit: BoxFit.cover,
+                                              width: 60,
+                                              height: 60,
+                                            )
                                           : Image.asset(
-                                        MyImages.profileImage,
-                                        fit: BoxFit.cover,
-                                        width: 60,
-                                        height: 60,
-                                      ),
+                                              MyImages.profileImage,
+                                              fit: BoxFit.cover,
+                                              width: 60,
+                                              height: 60,
+                                            ),
                                     ),
                                   ),
 
-                              const SizedBox(width: 12),
+                                  const SizedBox(width: 12),
 
                                   // Title and Subtitle
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           user.name,
@@ -312,7 +341,6 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                               ),
                             ),
                           ),
-
                         ),
                       );
                     },
@@ -392,7 +420,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
 
       // Create connection
       final success = await controller.createConnection(username);
-      
+
       // Close loading dialog
       Get.back();
 
@@ -452,9 +480,9 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
               onTap: () {
                 Navigator.pop(context);
                 Get.to(() => SwopbandWebViewScreen(
-                  username: user.username,
-                  url: '',
-                ));
+                      username: user.username,
+                      url: '',
+                    ));
               },
             ),
             ListTile(
@@ -480,7 +508,8 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Remove Connection'),
-        content: Text('Are you sure you want to remove @${user.username} from your connections?'),
+        content: Text(
+            'Are you sure you want to remove @${user.username} from your connections?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

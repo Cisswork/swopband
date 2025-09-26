@@ -123,18 +123,19 @@ class BottomNavScreen extends StatelessWidget {
             minWidth: screenWidth * 0.12, // 12% of screen width
             maxWidth: screenWidth * 0.18, // 18% of screen width
           ),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.white.withOpacity(0.3) : Colors.transparent,
-            borderRadius: BorderRadius.circular(15),
-          ),
+          // decoration: BoxDecoration(
+          //   color: isSelected ? Colors.white.withOpacity(0.3) : Colors.transparent,
+          //   borderRadius: BorderRadius.circular(15),
+          // ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                height: 25, 
-                width: 25,
-                image,
+                height: isSelected?30:27,
+                width: isSelected?30:27,
+                image,filterQuality: FilterQuality.high,
+
                 color: isSelected ? Colors.white : Colors.grey,
               ),
               if (isSelected && shouldShowLabels) ...[

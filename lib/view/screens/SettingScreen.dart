@@ -43,16 +43,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 50),
               Text(
                 "Settings",
                 style: AppTextStyles.large.copyWith(
-                  fontSize: 25,
+                  fontSize: 27,
                   fontWeight: FontWeight.bold,
                   color: MyColors.textBlack,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
 
               CustomButton(
                 border: Colors.black,
@@ -83,7 +83,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(30),
                   color: Colors.black,
                 ),
                 child: Column(
@@ -154,18 +154,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(30),
                   color: Colors.black,
                 ),
                 child: Column(
                   children: [
                     _buildSectionTitle('Reset SWOPBAND'),
-                    Text(
-                      "Resetting SWOPBAND will disconnect the band and your account will be deleted.",
-                      style: AppTextStyles.medium.copyWith(
-                          color: MyColors.textWhite,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13
+                    Padding(
+                      padding: const EdgeInsets.only(left: 6.0),
+                      child: Text(
+                        "Resetting SWOPBAND will disconnect the band and your account will be deleted.",
+                        style: AppTextStyles.medium.copyWith(
+                            color: MyColors.textWhite,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -195,14 +198,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(
-        title,
-        style: AppTextStyles.medium.copyWith(
-            color: MyColors.textWhite,
-            fontWeight: FontWeight.w500,
-            fontSize: 20
+    return Align(
+      alignment: AlignmentDirectional.topStart,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 5.0,left: 5),
+        child: Text(
+          title,
+          style: AppTextStyles.medium.copyWith(
+              color: MyColors.textWhite,
+              fontWeight: FontWeight.w600,
+              fontSize: 20
+          ),
         ),
       ),
     );
@@ -213,11 +219,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 6.0),
         child: Row(
           children: [
-            Icon(icon, color: iconColor, size: 24),
-            const SizedBox(width: 12),
             Text(
               title,
               style: AppTextStyles.medium.copyWith(

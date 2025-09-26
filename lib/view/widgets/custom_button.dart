@@ -13,7 +13,9 @@ class CustomButton extends StatelessWidget {
     required this.onPressed,
     this.buttonColor,
     this.textColor,
-    super.key, this.widget, this.border,
+    super.key,
+    this.widget,
+    this.border,
   });
 
   @override
@@ -25,20 +27,28 @@ class CustomButton extends StatelessWidget {
         backgroundColor: effectiveButtonColor,
         foregroundColor: effectiveTextColor,
         minimumSize: Size(double.infinity, 48),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28),side: BorderSide(
-            color: border??Colors.transparent
-        )),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+            side: BorderSide(color: border ?? Colors.transparent)),
       ),
       onPressed: onPressed,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          widget??SizedBox(),
-          SizedBox(width: 10,),
+          widget ?? SizedBox(),
+          SizedBox(
+            width: 10,
+          ),
           Text(
             text,
-            style: TextStyle(fontSize: 14, color: effectiveTextColor,fontFamily: "Chromatica"),textAlign: TextAlign.center,
-          maxLines: 3),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+                fontSize: 15,
+                color: effectiveTextColor,
+                fontFamily: "Chromatica"),
+            textAlign: TextAlign.center,
+            maxLines: 3,
+          ),
         ],
       ),
     );

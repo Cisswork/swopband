@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:swopband/view/widgets/custom_button.dart';
 import 'package:swopband/view/widgets/custom_textfield.dart';
 import '../translations/app_strings.dart';
@@ -28,6 +29,10 @@ class _SignupScreenState extends State<SignupScreen> {
       TextEditingController();
   final phoneController = TextEditingController();
 
+  // Country variables
+  Country _selectedCountry = Country.parse('GB');
+  String _phoneNumber = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,15 +59,16 @@ class _SignupScreenState extends State<SignupScreen> {
                       Expanded(
                         flex: 1,
                         child: myFieldAdvance(
-                          autofillHints: [
-                            AutofillHints.namePrefix,
-                          ],
-                          context: context,
-                          controller: nameController,
-                          hintText: AppStrings.firstName.tr,
-                          inputType: TextInputType.name,
-                          textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite
-                        ),
+                            autofillHints: [
+                              AutofillHints.namePrefix,
+                            ],
+                            context: context,
+                            controller: nameController,
+                            hintText: AppStrings.firstName.tr,
+                            inputType: TextInputType.name,
+                            textInputAction: TextInputAction.next,
+                            fillColor: MyColors.textWhite,
+                            textBack: MyColors.textWhite),
                       ),
                       SizedBox(
                         width: 10,
@@ -70,65 +76,164 @@ class _SignupScreenState extends State<SignupScreen> {
                       Expanded(
                         flex: 1,
                         child: myFieldAdvance(
-                          autofillHints: [
-                            AutofillHints.familyName,
-                          ],
-                          context: context,
-                          controller: nameController,
-                          hintText: AppStrings.lastName.tr,
-                          inputType: TextInputType.name,
-                          textInputAction: TextInputAction.next, fillColor: MyColors.textWhite, textBack: MyColors.textWhite
-                        ),
+                            autofillHints: [
+                              AutofillHints.familyName,
+                            ],
+                            context: context,
+                            controller: nameController,
+                            hintText: AppStrings.lastName.tr,
+                            inputType: TextInputType.name,
+                            textInputAction: TextInputAction.next,
+                            fillColor: MyColors.textWhite,
+                            textBack: MyColors.textWhite),
                       ),
                     ],
                   ),
                   SizedBox(height: 16),
                   ageGenderField(),
                   SizedBox(height: 16),
-                  customPhoneField(
-                    controller: phoneController,
-                    hintText: 'Mobile Number',
-                    initialCountryCode: 'IN',
-                    // Optional - defaults to 'US'
-                    textInputAction: TextInputAction.next,
-                    onChanged: (phone) {
-                      print(phone
-                          ?.completeNumber); // Get complete number with country code
-                    },
-                    onCountryChanged: (country) {
-                      print('Country changed to: ${country.code}');
-                    },
-                  ),
-                  SizedBox(height: 16),
-                  myFieldAdvance(
-                    autofillHints: [
-                      AutofillHints.email,
+                  // Phone number field with separated country code and phone number
+                  Row(
+                    children: [
+                      // Country code field with flag
+                      Expanded(
+                        flex: 2,
+                        child: GestureDetector(
+                          onTap: () {
+                            showCountryPicker(
+                              context: context,
+                              onSelect: (Country country) {
+                                setState(() {
+                                  _selectedCountry = country;
+                                });
+                              },
+                              showPhoneCode: true,
+                            );
+                          },
+                          child: Container(
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: MyColors.textWhite,
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 1.2,
+                              ),
+                              borderRadius: BorderRadius.circular(28),
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    _selectedCountry.flagEmoji,
+                                    style: const TextStyle(fontSize: 20),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '+${_selectedCountry.phoneCode}',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: "Chromatica",
+                                      color: MyColors.textBlack,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  const Icon(
+                                    Icons.arrow_drop_down,
+                                    color: MyColors.textBlack,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10), // Space between fields
+                      // Phone number field
+                      Expanded(
+                        flex: 3,
+                        child: TextFormField(
+                          controller: phoneController,
+                          decoration: const InputDecoration(
+                            hintText: "Mobile Number",
+                            hintStyle: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Chromatica",
+                              color: MyColors.textBlack,
+                              decoration: TextDecoration.none,
+                              wordSpacing: 1.2,
+                            ),
+                            filled: true,
+                            fillColor: MyColors.textWhite,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.black,
+                                width: 1.2,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(28)),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: MyColors.textBlack,
+                                width: 1.2,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(28)),
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(28)),
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 12,
+                            ),
+                          ),
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.phone,
+                          onChanged: (value) {
+                            _phoneNumber = value;
+                          },
+                        ),
+                      ),
                     ],
-                    context: context,
-                    controller: emailController,
-                    hintText: 'email'.tr,
-                    inputType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next
-                      , fillColor: MyColors.textWhite, textBack: MyColors.textWhite
                   ),
                   SizedBox(height: 16),
                   myFieldAdvance(
-                    context: context,
-                    controller: passwordController,
-                    hintText: 'password'.tr,
-                    inputType: TextInputType.text,
-                    textInputAction: TextInputAction.next,
-                    showPasswordToggle: true,
-                    autofillHints: [AutofillHints.password], fillColor: MyColors.textWhite, textBack: MyColors.textWhite
-                  ),
+                      autofillHints: [
+                        AutofillHints.email,
+                      ],
+                      context: context,
+                      controller: emailController,
+                      hintText: 'email'.tr,
+                      inputType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      fillColor: MyColors.textWhite,
+                      textBack: MyColors.textWhite),
                   SizedBox(height: 16),
                   myFieldAdvance(
-                    context: context,
-                    controller: confirmPasswordController,
-                    hintText: 'Confirm Password',
-                    inputType: TextInputType.text,
-                    textInputAction: TextInputAction.done, fillColor: MyColors.textWhite, textBack: MyColors.textWhite
-                  ),
+                      context: context,
+                      controller: passwordController,
+                      hintText: 'password'.tr,
+                      inputType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                      showPasswordToggle: true,
+                      autofillHints: [AutofillHints.password],
+                      fillColor: MyColors.textWhite,
+                      textBack: MyColors.textWhite),
+                  SizedBox(height: 16),
+                  myFieldAdvance(
+                      context: context,
+                      controller: confirmPasswordController,
+                      hintText: 'Confirm Password',
+                      inputType: TextInputType.text,
+                      textInputAction: TextInputAction.done,
+                      fillColor: MyColors.textWhite,
+                      textBack: MyColors.textWhite),
                   SizedBox(height: 24),
                   CustomButton(
                     text: 'sign_up'.tr,
