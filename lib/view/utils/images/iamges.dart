@@ -25,4 +25,10 @@ class MyImages {
   static const website = "assets/images/web.png";
   static const discord = "assets/images/discord.png";
   static const tiktok = "assets/images/tiktok.png";
+
+  static const bottomImg1 = "assets/images/TR_APP_IMAGES-32.png";
+  static const bottomImg2 = "assets/images/TR_APP_IMAGES-33.png";
+  static const bottomImg3 = "assets/images/TR_APP_IMAGES-34.png";
+  static const bottomImg4 = "assets/images/TR_APP_IMAGES-35.png";
+  static const bottomImg5 = "assets/images/TR_APP_IMAGES-36.png";
 }

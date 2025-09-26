@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swopband/controller/nav_controller/NavController.dart';
+import '../../utils/images/iamges.dart';
 import '../FeedbackScreen.dart';
 import '../EditLinksScreen.dart';
 import '../HubScreen.dart';
@@ -78,11 +79,11 @@ class BottomNavScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildNavItem(0, Icons.link, 'Links',context),
-                    _buildNavItem(1, Icons.account_circle_outlined, 'Profile',context),
-                    _buildNavItem(2, Icons.group_outlined, 'Groups',context),
-                    _buildNavItem(3, Icons.star_border, 'Feedback',context),
-                    _buildNavItem(4, Icons.settings, 'Settings',context),
+                    _buildNavItem(0, MyImages.bottomImg5, 'Links',context),
+                    _buildNavItem(1, MyImages.bottomImg4, 'Profile',context),
+                    _buildNavItem(2, MyImages.bottomImg1, 'Groups',context),
+                    _buildNavItem(3, MyImages.bottomImg3, 'Feedback',context),
+                    _buildNavItem(4, MyImages.bottomImg2, 'Settings',context),
                   ],
                 ),
               ),
@@ -93,7 +94,7 @@ class BottomNavScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label,BuildContext context) {
+  Widget _buildNavItem(int index, String image, String label,BuildContext context) {
     return Obx(() {
       final isSelected = navController.selectedIndex.value == index;
       final screenWidth = MediaQuery.of(context).size.width;
@@ -123,17 +124,18 @@ class BottomNavScreen extends StatelessWidget {
             maxWidth: screenWidth * 0.18, // 18% of screen width
           ),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white.withOpacity(0.2) : Colors.transparent,
+            color: isSelected ? Colors.white.withOpacity(0.3) : Colors.transparent,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
+              Image.asset(
+                height: 25, 
+                width: 25,
+                image,
                 color: isSelected ? Colors.white : Colors.grey,
-                size: screenWidth * 0.06, // 6% of screen width
               ),
               if (isSelected && shouldShowLabels) ...[
                 SizedBox(height: screenHeight * 0.005), // 0.5% of screen height
