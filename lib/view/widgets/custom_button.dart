@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -35,10 +36,10 @@ class CustomButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          widget ?? SizedBox(),
-          SizedBox(
-            width: 10,
-          ),
+          if (widget != null) ...[
+            widget!,
+            const SizedBox(width: 10),
+          ],
           Text(
             text,
             style: TextStyle(

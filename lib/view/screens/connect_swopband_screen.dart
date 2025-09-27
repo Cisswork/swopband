@@ -476,7 +476,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 25),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -484,7 +484,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
 
                   Image.asset(
                     MyImages.nameLogo,
-                    height: 45,
+                    height: 40,
                   ),
                   const SizedBox(height: 18),
                   Text(
@@ -583,17 +583,14 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: CustomButton(
-                      buttonColor: MyColors.textBlack,
-                      textColor: MyColors.textWhite,
-                      text: AppStrings.faqTroubleshooting.tr,
-                      onPressed: () {
-                        Get.to(() => FAQScreen());
-                      },
-                    ),
+SizedBox(height: 10,),
+                  CustomButton(
+                    buttonColor: MyColors.textBlack,
+                    textColor: MyColors.textWhite,
+                    text: AppStrings.faqTroubleshooting.tr,
+                    onPressed: () {
+                      Get.to(() => FAQScreen());
+                    },
                   ),
                   const SizedBox(height: 24),
                 ],
@@ -607,26 +604,30 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
 
   Widget _buildInstructionItem(String text, String image) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0, left: 8.0),
-      child: ListTile(
-        visualDensity: VisualDensity.comfortable,
-        contentPadding: EdgeInsets.all(0),
-        leading: Image(
-          image: AssetImage(image),
-          height: 55,
-          alignment: Alignment.center,
-        ),
-        title: Text(
-          text,
-          style: AppTextStyles.medium.copyWith(
-            fontSize: 13,
-            fontWeight: FontWeight.bold
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center, // centers vertically
+        children: [
+          Image.asset(
+            image,
+            height: 60, // smaller height for proper alignment
+            width: 60,
           ),
-          textAlign: TextAlign.left,
-        ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTextStyles.medium.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+
 }
 
 // ImagePickerExample class for ConnectSwopbandScreen
@@ -674,7 +675,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
                   )
                 : null,
           ),
-          // Camera icon overlay to indicate it's clickable
+
           if (!_isLoadingImage)
             Positioned(
               bottom: 0,

@@ -59,12 +59,12 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
         child: Column(
           children: [
             SizedBox(
-              height: 40,
+              height: 20,
             ),
             Text(
               controller.connectionCount.toString(),
               style: AppTextStyles.large.copyWith(
-                fontSize: 70,
+                fontSize: 105,
                 fontWeight: FontWeight.bold,
                 color: MyColors.textBlack,
               ),
@@ -80,7 +80,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                     color: MyColors.textBlack,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 3,
                 ),
                 GestureDetector(
@@ -90,7 +90,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                     child: CircleAvatar(
                       radius: 15,
                       backgroundColor: Colors.grey.shade300,
-                      child: Icon(
+                      child: const Icon(
                         Icons.refresh,
                         color: Colors.blue,
                       ),

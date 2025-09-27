@@ -134,7 +134,7 @@ class BottomNavScreen extends StatelessWidget {
               Image.asset(
                 height: isSelected?30:27,
                 width: isSelected?30:27,
-                image,filterQuality: FilterQuality.high,
+                image,
 
                 color: isSelected ? Colors.white : Colors.grey,
               ),

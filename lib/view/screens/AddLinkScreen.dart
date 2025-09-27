@@ -52,6 +52,8 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
     'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok}, // Added TikTok
     'discord': {'name': 'Discord', 'icon': MyImages.discord}, // Added Discord
     'custom': {'name': 'Website', 'icon': MyImages.website}, // Added Website
+    'phone': {'name': 'Phone', 'icon': MyImages.phone}, // Added Website
+    'email': {'name': 'Email', 'icon': MyImages.email}, // Added Website
   };
 
   @override
@@ -154,7 +156,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                             AppStrings.addLinksDescription.tr,
                             style: AppTextStyles.extraLarge.copyWith(
                               color: Colors.white,
-                              fontSize: 17,
+                              fontSize: 15,
                               fontWeight: FontWeight.w500,
                             ),
                             textAlign: TextAlign.center,
@@ -165,13 +167,13 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                             children: [
                               Image.asset(MyImages.insta,
                                   width: 50, height: 50),
+                              Image.asset(MyImages.tiktok,
+                                  width: 50, height: 50),
                               Image.asset(MyImages.snapchat,
                                   width: 50, height: 50),
                               Image.asset(MyImages.linkedId,
                                   width: 50, height: 50),
                               Image.asset(MyImages.xmaster,
-                                  width: 50, height: 50),
-                              Image.asset(MyImages.spotify,
                                   width: 50, height: 50),
                             ],
                           ),
@@ -179,13 +181,13 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              Image.asset(MyImages.spotify,
+                                  width: 50, height: 50),
                               Image.asset(MyImages.facebook,
                                   width: 50, height: 50),
                               Image.asset(MyImages.strava,
                                   width: 50, height: 50),
                               Image.asset(MyImages.youtube,
-                                  width: 50, height: 50),
-                              Image.asset(MyImages.tiktok,
                                   width: 50, height: 50),
                               Image.asset(MyImages.discord,
                                   width: 50, height: 50),
@@ -257,7 +259,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      flex: 4,
+                                      flex: 3,
                                       child: GestureDetector(
                                         onTap: () {
                                           FocusManager.instance.primaryFocus
@@ -268,8 +270,10 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                               ?.unfocus();
                                         },
                                         child: DropdownButtonFormField<String>(
-                                          value: controller.links[index].type,
                                           isExpanded: true,
+                                          isDense: false,
+                                          itemHeight: null,
+                                          value: controller.links[index].type,
                                           menuMaxHeight: MediaQuery.of(context)
                                                   .size
                                                   .height *
@@ -319,8 +323,8 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                                 children: [
                                                   Image.asset(
                                                     entry.value['icon'],
-                                                    width: 35,
-                                                    height: 35,
+                                                    width: 50,
+                                                    height: 50,
                                                   ),
                                                   const SizedBox(width: 8),
                                                   Flexible(
@@ -350,7 +354,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                         controller: TextEditingController(
                                             text: controller.links[index].url),
                                         hintText:
-                                            'Enter ${_supportedLinks[controller.links[index].type]!['name']} URL or ID',
+                                        'Enter ${_supportedLinks[_linkTypes[index]]!['name']} ${_supportedLinks[_linkTypes[index]]!['name'] == "Phone" ? 'Number' : _supportedLinks[_linkTypes[index]]!['name'] == "Email" ? "Id" : _supportedLinks[_linkTypes[index]]!['name'] == "Website" ? "URL" : "URL or ID"}',
                                         inputType: TextInputType.text,
                                         textInputAction: TextInputAction.done,
                                         fillColor: Colors.transparent,
@@ -426,12 +430,14 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                           ?.unfocus();
                                     },
                                     child: DropdownButtonFormField<String>(
+                                      isExpanded: true,
+                                      isDense: false,
+                                      itemHeight: null,
                                       iconEnabledColor: Colors.black,
                                       value: _linkTypes[index],
-                                      isExpanded: true,
                                       menuMaxHeight:
                                           MediaQuery.of(context).size.height *
-                                              0.4,
+                                              0.6,
                                       decoration: const InputDecoration(
                                         border: InputBorder.none,
                                         enabledBorder: InputBorder.none,
@@ -446,12 +452,13 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                           (BuildContext context) {
                                         return _supportedLinks.entries
                                             .map((entry) {
-                                          return Container(
-                                            alignment: Alignment.topRight,
+                                          return SizedBox(
+                                            height: 50,
+                                            width: 50,
                                             child: Image.asset(
                                               entry.value['icon'],
-                                              width: 35,
-                                              height: 35,
+                                              width: 50,
+                                              height: 50,
                                             ),
                                           );
                                         }).toList();
@@ -461,22 +468,10 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                           _supportedLinks.entries.map((entry) {
                                         return DropdownMenuItem<String>(
                                           value: entry.key,
-                                          child: Row(
-                                            children: [
-                                              Image.asset(
-                                                entry.value['icon'],
-                                                width: 35,
-                                                height: 35,
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Flexible(
-                                                child: Text(
-                                                  entry.value['name'],
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
+                                          child: Image.asset(
+                                            entry.value['icon'],
+                                            width: 45,
+                                            height: 45,
                                           ),
                                         );
                                       }).toList(),
@@ -494,17 +489,15 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 10),
                                 Expanded(
                                   flex: 7,
                                   child: myFieldAdvance(
-
                                     focusNode: _linkFocusNodes[index],
                                     context: context,
                                     controller: _linkControllers[index],
                                     hintText:
-                                        'Enter ${_supportedLinks[_linkTypes[index]]!['name']} URL or ID',
-                                    inputType: TextInputType.text,
+                                    'Enter ${_supportedLinks[_linkTypes[index]]!['name']} ${_supportedLinks[_linkTypes[index]]!['name'] == "Phone" ? 'Number' : _supportedLinks[_linkTypes[index]]!['name'] == "Email" ? "Id" : _supportedLinks[_linkTypes[index]]!['name'] == "Website" ? "URL" : "URL or ID"}',
+                                    inputType:  _supportedLinks[_linkTypes[index]]!['name'] == "Phone"?TextInputType.phone:_supportedLinks[_linkTypes[index]]!['name'] == "Email" ?TextInputType.emailAddress:TextInputType.text,
                                     textInputAction: TextInputAction.done,
                                     fillColor: Colors.transparent,
                                     textBack: Colors.transparent,
@@ -513,6 +506,8 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                 IconButton(
                                   padding: EdgeInsetsGeometry.all(0),
                                   icon: const Icon(Icons.delete,
+                                      size: 20,
+
                                       color: Colors.grey),
                                   onPressed: () {
                                     setState(() {

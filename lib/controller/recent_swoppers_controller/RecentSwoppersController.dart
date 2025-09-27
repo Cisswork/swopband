@@ -64,7 +64,7 @@ class RecentSwoppersController extends GetxController {
       log("📡 Fetch Connections Response Body: ${connectionsResponse?.body}");
 
       if (connectionsResponse == null || connectionsResponse.statusCode != 200) {
-        SnackbarUtil.showError("Failed to load connections");
+        // SnackbarUtil.showError("Failed to load connections");
         fetchRecentSwoppersLoader.value = false;
         log("❌ Failed to fetch connections: ${connectionsResponse?.statusCode}");
         return;
@@ -118,12 +118,12 @@ class RecentSwoppersController extends GetxController {
         log("✅ Recent swoppers list updated with ${recentSwoppers.length} users");
         
       } catch (e) {
-        SnackbarUtil.showError("Failed to parse connections data");
+        // SnackbarUtil.showError("Failed to parse connections data");
         log("❌ JSON decode error: $e");
       }
       
     } catch (e) {
-      SnackbarUtil.showError("Error fetching recent swoppers: $e");
+      // SnackbarUtil.showError("Error fetching recent swoppers: $e");
       log("❌ Error fetching recent swoppers: $e");
     } finally {
       fetchRecentSwoppersLoader.value = false;

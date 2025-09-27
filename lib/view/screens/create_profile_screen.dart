@@ -180,6 +180,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   Widget build(BuildContext context) {
     log("user image>>>>>>>>${widget.userImage}");
     return Scaffold(
+
       backgroundColor: MyColors.backgroundColor,
       body: SafeArea(
         child: Padding(
@@ -192,7 +193,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                 children: [
                   const SizedBox(height: 35),
 
-                  Image.asset(MyImages.nameLogo, height: 38),
+                  Image.asset(MyImages.nameLogo, height: 40),
                   const SizedBox(height: 10),
                   Text(
                     AppStrings.createProfile.tr,
@@ -553,7 +554,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   const SizedBox(height: 10),
                   CustomButton(
                     border: Colors.black,
-                    buttonColor: MyColors.textWhite,
+                    buttonColor: MyColors.backgroundColor,
                     textColor: MyColors.textBlack,
                     text: AppStrings.purchaseSwopband.tr,
                     onPressed: () async {

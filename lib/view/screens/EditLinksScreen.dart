@@ -42,7 +42,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         finalUrl = 'https://$url';
       }
-      
+
       final Uri uri = Uri.parse(finalUrl);
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -56,23 +56,23 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
 
   final Map<String, String> _platformImages = {
     'instagram': MyImages.insta,
-    'snapchat': MyImages.snapchat,
-    'linkedin': MyImages.linkedId,
-    'x': MyImages.xmaster,
-    'spotify': MyImages.spotify,
-    'facebook': MyImages.facebook,
-    'strava': MyImages.strava,
-    'youtube': MyImages.youtube,
-    'tiktok': MyImages.tiktok,
+    'snapchat': MyImages.tiktok,
+    'linkedin': MyImages.snapchat,
+    'x': MyImages.linkedId,
+    'spotify': MyImages.xmaster,
+    'facebook': MyImages.spotify,
+    'strava': MyImages.facebook,
+    'youtube': MyImages.strava,
+    'tiktok': MyImages.youtube,
     'discord': MyImages.discord,
-    'custom': MyImages.website,
   };
 
   final Map<String, Map<String, dynamic>> _supportedLinks = {
     'instagram': {'name': 'Instagram', 'icon': MyImages.insta},
     'snapchat': {'name': 'Snapchat', 'icon': MyImages.snapchat},
     'linkedin': {'name': 'LinkedIn', 'icon': MyImages.linkedId},
-    'x': {'name': 'Twitter', 'icon': MyImages.xmaster}, // Changed from 'twitter' to 'x'
+    'x': {'name': 'Twitter', 'icon': MyImages.xmaster},
+    // Changed from 'twitter' to 'x'
     'spotify': {'name': 'Spotify', 'icon': MyImages.spotify},
     'facebook': {'name': 'Facebook', 'icon': MyImages.facebook},
     'strava': {'name': 'Strava', 'icon': MyImages.strava},
@@ -80,8 +80,11 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok},
     'discord': {'name': 'Discord', 'icon': MyImages.discord},
     'custom': {'name': 'Website', 'icon': MyImages.website},
+    'phone': {'name': 'Phone', 'icon': MyImages.phone},
+    // Added Website
+    'email': {'name': 'Email', 'icon': MyImages.email},
+    // A
   };
-
 
   @override
   void initState() {
@@ -101,7 +104,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
 
       // Clean up any invalid link types for new additions
       for (int i = 0; i < _linkTypes.length; i++) {
-        if (i >= controller.links.length) { // Only check new links, not existing ones
+        if (i >= controller.links.length) {
+          // Only check new links, not existing ones
           if (!_supportedLinks.containsKey(_linkTypes[i])) {
             _linkTypes[i] = 'instagram';
           }
@@ -122,19 +126,17 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     controller.fetchLinks();
   }
 
-  Future<void> _checkAuth()async {
+  Future<void> _checkAuth() async {
     final firebaseId = await SharedPrefService.getString('firebase_id');
     final backendUserId = await SharedPrefService.getString('backend_user_id');
 
     log("firebaseId  : $firebaseId");
 
     if (firebaseId != null && firebaseId.isNotEmpty) {
-       await userController.fetchUserByFirebaseId(firebaseId);
-       imageUrl =  sanitizeProfileUrl(AppConst.USER_PROFILE as String?);
-
+      await userController.fetchUserByFirebaseId(firebaseId);
+      imageUrl = sanitizeProfileUrl(AppConst.USER_PROFILE as String?);
     }
   }
-
 
   String sanitizeProfileUrl(String? url) {
     if (url == null || url.isEmpty) return '';
@@ -153,10 +155,10 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     super.dispose();
   }
 
-
   void _showEditDialog(int index) {
     final link = controller.links[index];
-    final TextEditingController urlController = TextEditingController(text: link.url);
+    final TextEditingController urlController =
+        TextEditingController(text: link.url);
     String selectedType = link.type;
     showDialog(
       context: context,
@@ -245,335 +247,414 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: MyColors.backgroundColor,
       body: SafeArea(
-        child: Obx(() => controller.fetchLinkLoader.value
-            ? const Center(child: CircularProgressIndicator())
-            : Align(
-                alignment: Alignment.topCenter,
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 30),
-                        const SizedBox(height: 20),
+        child: Obx(
+          () => controller.fetchLinkLoader.value
+              ? const Center(child: CircularProgressIndicator())
+              : Align(
+                  alignment: Alignment.topCenter,
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 30),
+                          const SizedBox(height: 20),
 
-                        const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.all(15),
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            children: [
-                              Text(
-                                AppStrings.editLinks.tr,
-                                style: AppTextStyles.extraLarge.copyWith(color: Colors.white,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-
-                                AppStrings.addLinksDescription.tr,
-                                style: AppTextStyles.medium.copyWith(
-                                  fontSize: 17,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 15),
-
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  _buildPlatformImage('instagram',
-                                      controller.links.any((link) => link.type == 'instagram')),
-                                  _buildPlatformImage('snapchat',
-                                      controller.links.any((link) => link.type == 'snapchat')),
-                                  _buildPlatformImage('linkedin',
-                                      controller.links.any((link) => link.type == 'linkedin')),
-                                  _buildPlatformImage('x',
-                                      controller.links.any((link) => link.type == 'x')),
-                                  _buildPlatformImage('spotify',
-                                      controller.links.any((link) => link.type == 'spotify')),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  _buildPlatformImage('facebook',
-                                      controller.links.any((link) => link.type == 'facebook')),
-                                  _buildPlatformImage('strava',
-                                      controller.links.any((link) => link.type == 'strava')),
-                                  _buildPlatformImage('youtube',
-                                      controller.links.any((link) => link.type == 'youtube')),
-                                  _buildPlatformImage('tiktok',controller.links.any((link) => link.type == 'tiktok')),
-                                  _buildPlatformImage('discord',
-                                      controller.links.any((link) => link.type == 'discord')),
-                                ],
-                              ),
-                              const SizedBox(height: 15),
-                              Text(
-                                AppStrings.supportedLinks.tr,
-                                style: AppTextStyles.extraLarge.copyWith(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 15),
-
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        // Readonly fields for API-fetched links
-                        ...List.generate(controller.links.length, (index) => Column(
-                          children: [
-                            Row(
+                          const SizedBox(height: 20),
+                          Container(
+                            padding: const EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                            child: Column(
                               children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: DropdownButtonFormField<String>(
-                                    iconEnabledColor: Colors.black,
-                                    iconDisabledColor: Colors.black,
-                                    value: controller.links[index].type,
-                                    isExpanded: true,
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                      enabledBorder: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      errorBorder: InputBorder.none,
-                                      focusedErrorBorder: InputBorder.none,
-                                      disabledBorder: InputBorder.none,
-                                      contentPadding: EdgeInsets.zero,
-                                    ),
-                                    // Show only icon in selected item
-                                    selectedItemBuilder: (BuildContext context) {
-                                      return _supportedLinks.entries.map((entry) {
-                                        return Container(
-                                          alignment: Alignment.center,
-                                          child: Image.asset(
-                                            entry.value['icon'],
-                                            width: 35,
-                                            height: 35,
-                                          ),
-                                        );
-                                      }).toList();
-                                    },
-                                    items: _supportedLinks.entries.map((entry) {
-                                      return DropdownMenuItem<String>(
-                                        value: entry.key,
-                                        child: Row(
-                                          children: [
-                                            Image.asset(
-                                              entry.value['icon'],
-                                              width: 35,
-                                              height: 35,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Flexible(
-                                              child: Text(
-                                                entry.value['name'],
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList(),
-                                    onChanged: null, // readonly
+                                Text(
+                                  AppStrings.editLinks.tr,
+                                  style: AppTextStyles.extraLarge.copyWith(
+                                    color: Colors.white,
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  flex: 8,
-                                  child: GestureDetector(
-                                    onTap: () => _launchUrl(controller.links[index].url),
-                                    child: Container(
-                                      padding: const EdgeInsets.only(left: 7,right: 0,top: 0,bottom: 0),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.black),
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              controller.links[index].url,
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                decoration: TextDecoration.underline,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          PopupMenuButton<String>(
-                                              color: Colors.white,
-                                              icon: const Icon(Icons.more_vert, color: Colors.black,size: 20,weight: 10,),
-                                              onSelected: (String value) async {
-                                                final link = controller.links[index];
-                                                if (value == 'edit') {
-                                                  _showEditDialog(index);
-                                                } else if (value == 'delete') {
-                                                  await controller.deleteLink(link.id);
-                                                }
-                                              },
-                                              itemBuilder: (BuildContext context) => [
-                                                const PopupMenuItem<String>(
-                                                  value: 'edit',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(Icons.edit, color: Colors.black,size: 17,),
-                                                      SizedBox(width: 8),
-                                                      Text('Edit'),
-                                                    ],
-                                                  ),
-                                                ),
-                                                const PopupMenuItem<String>(
-                                                  value: 'delete',
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(Icons.delete, color: Colors.black),
-                                                      SizedBox(width: 8),
-                                                      Text('Delete'),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ]
-                                          ),       
-                                        ],
-                                      ),
-                                    ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  AppStrings.addLinksDescription.tr,
+                                  style: AppTextStyles.medium.copyWith(
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
-
+                                const SizedBox(height: 15),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    _buildPlatformImage(
+                                        'instagram',
+                                        controller.links.any((link) =>
+                                            link.type == 'instagram')),
+                                    _buildPlatformImage(
+                                        'snapchat',
+                                        controller.links.any(
+                                            (link) => link.type == 'snapchat')),
+                                    _buildPlatformImage(
+                                        'linkedin',
+                                        controller.links.any(
+                                            (link) => link.type == 'linkedin')),
+                                    _buildPlatformImage(
+                                        'x',
+                                        controller.links
+                                            .any((link) => link.type == 'x')),
+                                    _buildPlatformImage(
+                                        'spotify',
+                                        controller.links.any(
+                                            (link) => link.type == 'spotify')),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    _buildPlatformImage(
+                                        'facebook',
+                                        controller.links.any(
+                                            (link) => link.type == 'facebook')),
+                                    _buildPlatformImage(
+                                        'strava',
+                                        controller.links.any(
+                                            (link) => link.type == 'strava')),
+                                    _buildPlatformImage(
+                                        'youtube',
+                                        controller.links.any(
+                                            (link) => link.type == 'youtube')),
+                                    _buildPlatformImage(
+                                        'tiktok',
+                                        controller.links.any(
+                                            (link) => link.type == 'tiktok')),
+                                    _buildPlatformImage(
+                                        'discord',
+                                        controller.links.any(
+                                            (link) => link.type == 'discord')),
+                                  ],
+                                ),
+                                const SizedBox(height: 15),
+                                Text(
+                                  AppStrings.supportedLinks.tr,
+                                  style: AppTextStyles.extraLarge.copyWith(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 15),
                               ],
                             ),
-                            const SizedBox(height: 20),
-                          ],
-                        )),
-                        // Editable fields for new links
-                        ...List.generate((_linkCount - controller.links.length).clamp(0, _linkCount), (i) {
-                            final index = controller.links.length + i;
-                            return Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 2,
-                                      child: DropdownButtonFormField<String>(
-                                        iconEnabledColor: Colors.black,
-                                        value: _supportedLinks.entries.any((entry) => entry.key == _linkTypes[index]) 
-                                            ? _linkTypes[index] 
-                                            : 'instagram', // Fallback to 'instagram' if current value is not available
-                                        isExpanded: true,
-                                        decoration: const InputDecoration(
-                                          border: InputBorder.none,
-                                          enabledBorder: InputBorder.none,
-                                          focusedBorder: InputBorder.none,
-                                          errorBorder: InputBorder.none,
-                                          focusedErrorBorder: InputBorder.none,
-                                          disabledBorder: InputBorder.none,
-                                          contentPadding: EdgeInsets.zero,
-                                        ),
-                                        // Show only icon in selected item
-                                        selectedItemBuilder: (BuildContext context) {
-                                          return _supportedLinks.entries.map((entry) {
-                                            return Container(
-                                              alignment: Alignment.center,
-                                              child: Image.asset(
-                                                entry.value['icon'],
-                                                width: 24,
-                                                height: 24,
+                          ),
+                          const SizedBox(height: 30),
+                          // Readonly fields for API-fetched links
+                          ...List.generate(
+                              controller.links.length,
+                              (index) => Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            flex: 2,
+                                            child:
+                                                DropdownButtonFormField<String>(
+                                                  isExpanded: true,
+                                                  isDense: false,
+                                                  itemHeight: null,
+                                              iconEnabledColor: Colors.black,
+                                              iconDisabledColor: Colors.black,
+                                              value:
+                                                  controller.links[index].type,
+                                              decoration: const InputDecoration(
+                                                border: InputBorder.none,
+                                                enabledBorder: InputBorder.none,
+                                                focusedBorder: InputBorder.none,
+                                                errorBorder: InputBorder.none,
+                                                focusedErrorBorder:
+                                                    InputBorder.none,
+                                                disabledBorder:
+                                                    InputBorder.none,
+                                                contentPadding: EdgeInsets.zero,
                                               ),
-                                            );
-                                          }).toList();
-                                        },
-                                        items: _supportedLinks.entries.map((entry) {
-                                          return DropdownMenuItem<String>(
-                                            value: entry.key,
-                                            child: Row(
-                                              children: [
-                                                Image.asset(
+
+                                              // Show only icon in selected item
+                                              selectedItemBuilder:
+                                                  (BuildContext context) {
+                                                return _supportedLinks.entries
+                                                    .map((entry) {
+                                                  return SizedBox(
+                                                    width: 40,
+                                                    height: 40,
+                                                    child: Image.asset(
+                                                      entry.value['icon'],
+
+                                                    ),
+                                                  );
+                                                }).toList();
+                                              },
+                                              items: _supportedLinks.entries
+                                                  .map((entry) {
+                                                return DropdownMenuItem<String>(
+                                                  value: entry.key,
+                                                  child: Row(
+                                                    children: [
+                                                      Image.asset(
+                                                        entry.value['icon'],
+                                                        width: 35,
+                                                        height: 35,
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Flexible(
+                                                        child: Text(
+                                                          entry.value['name'],
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }).toList(),
+                                              onChanged: null, // readonly
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            flex: 8,
+                                            child: GestureDetector(
+                                              onTap: () => _launchUrl(
+                                                  controller.links[index].url),
+                                              child: Container(
+                                                padding: const EdgeInsets.only(
+                                                    left: 7,
+                                                    right: 0,
+                                                    top: 0,
+                                                    bottom: 0),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Colors.black),
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        controller
+                                                            .links[index].url,
+                                                        style: const TextStyle(
+                                                          color: Colors.black,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .underline,
+                                                        ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ),
+                                                    PopupMenuButton<String>(
+                                                        color: Colors.white,
+                                                        icon: const Icon(
+                                                          Icons.more_vert,
+                                                          color: Colors.black,
+                                                          size: 20,
+                                                          weight: 10,
+                                                        ),
+                                                        onSelected: (String
+                                                            value) async {
+                                                          final link =
+                                                              controller
+                                                                  .links[index];
+                                                          if (value == 'edit') {
+                                                            _showEditDialog(
+                                                                index);
+                                                          } else if (value ==
+                                                              'delete') {
+                                                            await controller
+                                                                .deleteLink(
+                                                                    link.id);
+                                                          }
+                                                        },
+                                                        itemBuilder:
+                                                            (BuildContext
+                                                                    context) =>
+                                                                [
+                                                                  const PopupMenuItem<
+                                                                      String>(
+                                                                    value:
+                                                                        'edit',
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Icon(
+                                                                          Icons
+                                                                              .edit,
+                                                                          color:
+                                                                              Colors.black,
+                                                                          size:
+                                                                              17,
+                                                                        ),
+                                                                        SizedBox(
+                                                                            width:
+                                                                                8),
+                                                                        Text(
+                                                                            'Edit'),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  const PopupMenuItem<
+                                                                      String>(
+                                                                    value:
+                                                                        'delete',
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Icon(
+                                                                            Icons
+                                                                                .delete,
+                                                                            color:
+                                                                                Colors.black),
+                                                                        SizedBox(
+                                                                            width:
+                                                                                8),
+                                                                        Text(
+                                                                            'Delete'),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ]),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 20),
+                                    ],
+                                  )),
+                          // Editable fields for new links
+                          ...List.generate(
+                            (_linkCount - controller.links.length)
+                                .clamp(0, _linkCount),
+                            (i) {
+                              final index = controller.links.length + i;
+                              return Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 2,
+                                        child: DropdownButtonFormField<String>(
+                                          iconEnabledColor: Colors.black,
+                                          value: _supportedLinks.entries.any(
+                                                  (entry) =>
+                                                      entry.key ==
+                                                      _linkTypes[index])
+                                              ? _linkTypes[index]
+                                              : 'instagram',
+                                          // Fallback to 'instagram' if current value is not available
+                                          isExpanded: true,
+                                          decoration: const InputDecoration(
+                                            border: InputBorder.none,
+                                            enabledBorder: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            errorBorder: InputBorder.none,
+                                            focusedErrorBorder:
+                                                InputBorder.none,
+                                            disabledBorder: InputBorder.none,
+                                            contentPadding: EdgeInsets.zero,
+                                          ),
+                                          // Show only icon in selected item
+                                          selectedItemBuilder:
+                                              (BuildContext context) {
+                                            return _supportedLinks.entries
+                                                .map((entry) {
+                                              return Container(
+                                                alignment: Alignment.center,
+                                                child: Image.asset(
                                                   entry.value['icon'],
                                                   width: 24,
                                                   height: 24,
                                                 ),
-                                                const SizedBox(width: 8),
-                                                Flexible(
-                                                  child: Text(
-                                                    entry.value['name'],
-                                                    overflow: TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (String? newValue) {
-                                          if (newValue != null) {
-                                            setState(() {
-                                              _linkTypes[index] = newValue;
-                                            });
-                                          }
+                                              );
+                                            }).toList();
+                                          },
+                                          items: _supportedLinks.entries
+                                              .map((entry) {
+                                            return DropdownMenuItem<String>(
+                                              value: entry.key,
+                                              child: Image.asset(
+                                                entry.value['icon'],
+                                                width: 45,
+                                                height: 45,
+                                              ),
+                                            );
+                                          }).toList(),
+                                          onChanged: (String? newValue) {
+                                            if (newValue != null) {
+                                              setState(() {
+                                                _linkTypes[index] = newValue;
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        flex: 7,
+                                        child: myFieldAdvance(
+                                          context: context,
+                                          controller: _linkControllers[index],
+                                          hintText:
+                                              'Enter ${_supportedLinks[_linkTypes[index]]!['name']} ${_supportedLinks[_linkTypes[index]]!['name'] == "Phone" ? 'Number' : _supportedLinks[_linkTypes[index]]!['name'] == "Email" ? "Id" : _supportedLinks[_linkTypes[index]]!['name'] == "Website" ? "URL" : "URL or ID"}',
+                                          inputType:  _supportedLinks[_linkTypes[index]]!['name'] == "Phone"?TextInputType.phone:_supportedLinks[_linkTypes[index]]!['name'] == "Email" ?TextInputType.emailAddress:TextInputType.text,
+                                          textInputAction: index <
+                                                  _linkControllers.length - 1
+                                              ? TextInputAction.next
+                                              : TextInputAction.done,
+                                          fillColor: Colors.transparent,
+                                          textBack: Colors.transparent,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.delete,
+                                            size: 20,
+                                            color: Colors.grey),
+                                        onPressed: () {
+                                          setState(() {
+                                            if (_linkCount >
+                                                controller.links.length) {
+                                              _linkControllers.removeAt(index);
+                                              _linkTypes.removeAt(index);
+                                              _linkCount--;
+                                            }
+                                          });
                                         },
                                       ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      flex: 7,
-                                      child: myFieldAdvance(
-                                        context: context,
-                                        controller: _linkControllers[index],
-                                        hintText: 'Enter ${_supportedLinks[_linkTypes[index]]!['name']} URL or ID',
-                                        inputType: TextInputType.text,
-                                        textInputAction: index < _linkControllers.length - 1
-                                            ? TextInputAction.next
-                                            : TextInputAction.done,
-                                        fillColor: Colors.transparent,
-                                        textBack: Colors.transparent,
-                                      ),
-                                    ),
-                                    IconButton(
-
-                                      icon:  const Icon(Icons.delete, color: Colors.grey),
-                                      onPressed: () {
-
-                                        setState(() {
-                                          if (_linkCount > controller.links.length) {
-                                            _linkControllers.removeAt(index);
-                                            _linkTypes.removeAt(index);
-                                            _linkCount--;
-                                          }
-                                        });
-                                      },
-
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                              ],
-                            );
-                          },
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: CustomButton(
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20),
+                                ],
+                              );
+                            },
+                          ),
+                          CustomButton(
                             buttonColor: MyColors.textBlack,
                             textColor: MyColors.textWhite,
                             text: AppStrings.addAnotherLink.tr,
@@ -585,48 +666,56 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                               });
                             },
                           ),
-                        ),
-                        if (_linkCount > controller.links.length)
-                          Obx(() => controller.isLoading.value?
-                          const Center(child: CircularProgressIndicator(color: Colors.black,)):
-                          Padding(
-                            padding: const EdgeInsets.only(left: 60.0,right: 60.0,top: 10),
-                            child: CustomButton(
-                              buttonColor: MyColors.textBlack,
-                              textColor: MyColors.textWhite,
-                              text: AppStrings.apply.tr,
-                              onPressed: () async {
-                                bool hasEmpty = false;
+                          if (_linkCount > controller.links.length)
+                            Obx(
+                              () => controller.isLoading.value
+                                  ? const Center(
+                                      child: CircularProgressIndicator(
+                                      color: Colors.black,
+                                    ))
+                                  : Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 60.0, right: 60.0, top: 10),
+                                      child: CustomButton(
+                                        buttonColor: MyColors.textBlack,
+                                        textColor: MyColors.textWhite,
+                                        text: AppStrings.apply.tr,
+                                        onPressed: () async {
+                                          bool hasEmpty = false;
 
-                                // Loop backwards to safely remove empty links while iterating
-                                for (int i = _linkCount - 1; i >= controller.links.length; i--) {
-                                  final url = _linkControllers[i].text.trim();
+                                          // Loop backwards to safely remove empty links while iterating
+                                          for (int i = _linkCount - 1;
+                                              i >= controller.links.length;
+                                              i--) {
+                                            final url =
+                                                _linkControllers[i].text.trim();
 
-                                  if (url.isEmpty) {
-                                    _linkControllers.removeAt(i);
-                                    _linkTypes.removeAt(i);
-                                    _linkCount--;
-                                    hasEmpty = true;
-                                  } else {
-                                    // Create the link if not empty
-                                    await controller.createLink(
-                                      name: _linkTypes[i],
-                                      type: _linkTypes[i],
-                                      url: url, call: () {  },
-                                    );
-                                  }
-                                }
-                                controller.fetchLinks();
-                              },
+                                            if (url.isEmpty) {
+                                              _linkControllers.removeAt(i);
+                                              _linkTypes.removeAt(i);
+                                              _linkCount--;
+                                              hasEmpty = true;
+                                            } else {
+                                              // Create the link if not empty
+                                              await controller.createLink(
+                                                name: _linkTypes[i],
+                                                type: _linkTypes[i],
+                                                url: url,
+                                                call: () {},
+                                              );
+                                            }
+                                          }
+                                          controller.fetchLinks();
+                                        },
+                                      ),
+                                    ),
                             ),
-                          ),
-                          ),
-                        const SizedBox(height: 80)
-                      ],
+                          const SizedBox(height: 80)
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
         ),
       ),
     );
