@@ -418,7 +418,40 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                           children: [
                             Row(
                               children: [
-                                Expanded(
+                        Expanded(
+                        flex: 2,
+                          child: GestureDetector(
+                            onTap: () {
+                              FocusManager.instance.primaryFocus?.unfocus();
+                              _showLinkSelector(context, index);
+                            },
+                            child: Container(
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Image.asset(
+                                  _supportedLinks[_linkTypes[index]]!['icon'],
+                                  width: 40,
+                                  height: 40,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+
+                        /*     Expanded(
                                   flex: 2,
                                   child: GestureDetector(
                                     onTap: () {
@@ -488,7 +521,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                       },
                                     ),
                                   ),
-                                ),
+                                ),*/
                                 Expanded(
                                   flex: 7,
                                   child: myFieldAdvance(
@@ -629,4 +662,105 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
       ),
     );
   }
+  void _showLinkSelector(BuildContext context, int index) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        final screenHeight = MediaQuery.of(context).size.height;
+
+        return Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          height: screenHeight * 0.55,
+          width: screenHeight * 0.22,// 👈 only 45% of screen
+          child: Column(
+            children: [
+              // scrollable grid
+              Expanded(
+                child: GridView.count(
+                  crossAxisCount: 2, // 2 icons per row
+                  crossAxisSpacing: 1,
+                  mainAxisSpacing: 1,
+                  childAspectRatio: 1.5, // proper circle shape
+                  children: _supportedLinks.entries.map((entry) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          _linkTypes[index] = entry.key;
+                        });
+                      },
+                      child: Container(
+                        height: 55,
+                        width: 55,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Image.asset(
+                            entry.value['icon'],
+                            width: 28,
+                            height: 28,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Custom Button
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  // handle custom link
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 12, horizontal: 24),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.language, color: Colors.white, size: 18),
+                      SizedBox(width: 6),
+                      Text(
+                        "Custom",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 }

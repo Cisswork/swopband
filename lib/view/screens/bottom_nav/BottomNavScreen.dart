@@ -80,8 +80,8 @@ class BottomNavScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _buildNavItem(0, MyImages.bottomImg5, 'Links',context),
-                    _buildNavItem(1, MyImages.bottomImg4, 'Profile',context),
-                    _buildNavItem(2, MyImages.bottomImg1, 'Groups',context),
+                    _buildNavItem(1, MyImages.bottomImg1, 'Profile',context),
+                    _buildNavItem(2, MyImages.bottomImg4, 'Groups',context),
                     _buildNavItem(3, MyImages.bottomImg3, 'Feedback',context),
                     _buildNavItem(4, MyImages.bottomImg2, 'Settings',context),
                   ],

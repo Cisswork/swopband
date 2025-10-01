@@ -159,12 +159,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: Colors.black,
                 ),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+
                   children: [
                     _buildSectionTitle('Reset SWOPBAND'),
                     Padding(
                       padding: const EdgeInsets.only(left: 6.0),
                       child: Text(
-                        "Resetting SWOPBAND will disconnect the band and your account will be deleted.",
+                        "Resetting SWOPBAND will disconnect \nthe band and your account will be\ndeleted.",
                         style: AppTextStyles.medium.copyWith(
                             color: MyColors.textWhite,
                             fontWeight: FontWeight.w500,
