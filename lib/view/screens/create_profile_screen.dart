@@ -158,6 +158,47 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
     return true;
   }
 
+  Future<void> _handleConnectSwopband() async {
+    // Validate form before proceeding
+    if (!_validateForm()) {
+      return;
+    }
+
+    // Check username availability one more time before proceeding
+    if (swopUserNameController.text.trim().isNotEmpty) {
+      await controller
+          .checkUsernameAvailability(swopUserNameController.text.trim());
+
+      // Wait a moment for the API call to complete
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      // If username is not available, show error and return
+      if (controller.isUsernameAvailable.value == false) {
+        SnackbarUtil.showError(controller.usernameMessage.value.isNotEmpty
+            ? controller.usernameMessage.value
+            : 'Username is not available. Please choose a different username.');
+        return;
+      }
+    }
+
+    // Pass all create profile data to ConnectSwopbandScreen
+    Get.to(() => ConnectSwopbandScreen(
+          username: swopUserNameController.text,
+          name: nameController.text,
+          email: emailController.text,
+          bio: bioController.text,
+          age: ageController.text.trim().isNotEmpty
+              ? int.tryParse(ageController.text.trim())
+              : null,
+          phone: _phoneNumber.isNotEmpty ? _phoneNumber : null,
+          countryCode: _selectedCountry.phoneCode.isNotEmpty
+              ? '+${_selectedCountry.phoneCode}'
+              : null,
+          userImage: widget.userImage,
+          imagePickerKey: _imagePickerKey,
+        ));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -180,7 +221,6 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
   Widget build(BuildContext context) {
     log("user image>>>>>>>>${widget.userImage}");
     return Scaffold(
-
       backgroundColor: MyColors.backgroundColor,
       body: SafeArea(
         child: Padding(
@@ -517,39 +557,69 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
+
+                  // Username availability status
+/*
+                  Obx(() {
+                    if (controller.swopUsername.value.isNotEmpty) {
+                      return Container(
+                        padding: const EdgeInsets.all(8),
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: controller.isUsernameAvailable.value
+                              ? Colors.green.withOpacity(0.1)
+                              : Colors.red.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              controller.isUsernameAvailable.value
+                                  ? Icons.check_circle
+                                  : Icons.cancel,
+                              color: controller.isUsernameAvailable.value
+                                  ? Colors.green
+                                  : Colors.red,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                controller.isUsernameAvailable.value
+                                    ? 'Username is available'
+                                    : controller
+                                            .usernameMessage.value.isNotEmpty
+                                        ? controller.usernameMessage.value
+                                        : 'Username is not available',
+                                style: TextStyle(
+                                  color: controller.isUsernameAvailable.value
+                                      ? Colors.green
+                                      : Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  }),
+*/
                   _nfcInProgress
                       ? const Center(
                           child: CircularProgressIndicator(color: Colors.black))
-                      : CustomButton(
-                          text: AppStrings.connectSwopband.tr,
-                          //onPressed:_startNfcSessionAndWrite// _connectAndWriteToNfc,
-                          onPressed: () {
-                            // Validate form before proceeding
-                            if (!_validateForm()) {
-                              return;
-                            }
-
-                            // Pass all create profile data to ConnectSwopbandScreen
-                            Get.to(() => ConnectSwopbandScreen(
-                                  username: swopUserNameController.text,
-                                  name: nameController.text,
-                                  email: emailController.text,
-                                  bio: bioController.text,
-                                  age: ageController.text.trim().isNotEmpty
-                                      ? int.tryParse(ageController.text.trim())
-                                      : null,
-                                  phone: _phoneNumber.isNotEmpty
-                                      ? _phoneNumber
-                                      : null,
-                                  countryCode:
-                                      _selectedCountry.phoneCode.isNotEmpty
-                                          ? '+${_selectedCountry.phoneCode}'
-                                          : null,
-                                  userImage: widget.userImage,
-                                  imagePickerKey: _imagePickerKey,
-                                ));
-                          },
-                        ),
+                      : Obx(() => CustomButton(
+                            text: AppStrings.connectSwopband.tr,
+                            //onPressed:_startNfcSessionAndWrite// _connectAndWriteToNfc,
+                            onPressed:
+                                controller.isUsernameAvailable.value == false &&
+                                        controller.swopUsername.value.isNotEmpty
+                                    ? () {} // Empty function when disabled
+                                    : () {
+                                        _handleConnectSwopband();
+                                      },
+                          )),
 
                   const SizedBox(height: 10),
                   CustomButton(

@@ -8,4 +8,5 @@ class ApiUrls {
   static const String uploadImage = '$baseUrl/upload';  // For image uploads
   static const String connections = '$baseUrl/connections/';  // For connections
   static const String userDetails = '$baseUrl/users/';  // For user details (append userId)
+  static const String checkUsername = '$baseUrl/users/check_username/';  // For username availability check
 }

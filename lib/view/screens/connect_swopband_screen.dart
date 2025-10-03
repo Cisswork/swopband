@@ -501,7 +501,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          borderRadius: const BorderRadius.all(Radius.circular(30)),
                           border: Border.all(
                             color: MyColors.textBlack,
                             width: 2,
@@ -512,7 +512,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              SizedBox(height: 28),
+                              const SizedBox(height: 28),
                               Text(
                                 AppStrings.connectingYourBand.tr,
                                 style: AppTextStyles.extraLarge.copyWith(
@@ -521,7 +521,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               _buildInstructionItem(
                                 AppStrings.tapConnectInstruction.tr,
                                 MyImages.tr1mg,
@@ -583,13 +583,13 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-SizedBox(height: 10,),
+const SizedBox(height: 10,),
                   CustomButton(
                     buttonColor: MyColors.textBlack,
                     textColor: MyColors.textWhite,
                     text: AppStrings.faqTroubleshooting.tr,
                     onPressed: () {
-                      Get.to(() => FAQScreen());
+                      Get.to(() => const FAQScreen());
                     },
                   ),
                   const SizedBox(height: 24),

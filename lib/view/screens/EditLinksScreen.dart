@@ -79,6 +79,23 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     'youtube': {'name': 'YouTube', 'icon': MyImages.youtube},
     'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok},
     'discord': {'name': 'Discord', 'icon': MyImages.discord},
+     // 'custom': {'name': 'Website', 'icon': MyImages.website},
+    'phone': {'name': 'Phone', 'icon': MyImages.phone},
+    // Added Website
+    'email': {'name': 'Email', 'icon': MyImages.email},
+    // A
+  };  final Map<String, Map<String, dynamic>> _supportedLinksReadOnly = {
+    'instagram': {'name': 'Instagram', 'icon': MyImages.insta},
+    'snapchat': {'name': 'Snapchat', 'icon': MyImages.snapchat},
+    'linkedin': {'name': 'LinkedIn', 'icon': MyImages.linkedId},
+    'x': {'name': 'Twitter', 'icon': MyImages.xmaster},
+    // Changed from 'twitter' to 'x'
+    'spotify': {'name': 'Spotify', 'icon': MyImages.spotify},
+    'facebook': {'name': 'Facebook', 'icon': MyImages.facebook},
+    'strava': {'name': 'Strava', 'icon': MyImages.strava},
+    'youtube': {'name': 'YouTube', 'icon': MyImages.youtube},
+    'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok},
+    'discord': {'name': 'Discord', 'icon': MyImages.discord},
     'custom': {'name': 'Website', 'icon': MyImages.website},
     'phone': {'name': 'Phone', 'icon': MyImages.phone},
     // Added Website
@@ -106,7 +123,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
       for (int i = 0; i < _linkTypes.length; i++) {
         if (i >= controller.links.length) {
           // Only check new links, not existing ones
-          if (!_supportedLinks.containsKey(_linkTypes[i])) {
+          if (!_supportedLinksReadOnly.containsKey(_linkTypes[i])) {
             _linkTypes[i] = 'instagram';
           }
         }
@@ -129,7 +146,6 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
   Future<void> _checkAuth() async {
     final firebaseId = await SharedPrefService.getString('firebase_id');
     final backendUserId = await SharedPrefService.getString('backend_user_id');
-
     log("firebaseId  : $firebaseId");
 
     if (firebaseId != null && firebaseId.isNotEmpty) {
@@ -155,10 +171,10 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     super.dispose();
   }
 
+/*
   void _showEditDialog(int index) {
     final link = controller.links[index];
-    final TextEditingController urlController =
-        TextEditingController(text: link.url);
+    final TextEditingController urlController = TextEditingController(text: link.url);
     String selectedType = link.type;
     showDialog(
       context: context,
@@ -168,43 +184,64 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              DropdownButtonFormField<String>(
-                value: selectedType,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
-                // Show only icon in selected item
-                selectedItemBuilder: (BuildContext context) {
-                  return _supportedLinks.entries.map((entry) {
-                    return Container(
-                      alignment: Alignment.center,
-                      child: Image.asset(
-                        entry.value['icon'],
-                        width: 24,
-                        height: 24,
+              Expanded(
+                flex: 2,
+                child: GestureDetector(
+                  onTap: () => _showLinkSelector(context, index),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        _linkTypes[index] == 'custom'
+                            ? MyImages.website
+                            : _supportedLinks[_linkTypes[index]]!['icon'],
+                        width: 40,
+                        height: 40,
                       ),
-                    );
-                  }).toList();
-                },
-                items: _supportedLinks.entries.map((entry) {
-                  return DropdownMenuItem<String>(
-                    value: entry.key,
-                    child: Row(
-                      children: [
-                        Image.asset(entry.value['icon'], width: 24, height: 24),
-                        const SizedBox(width: 8),
-                        Text(entry.value['name']),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  if (newValue != null) {
-                    selectedType = newValue;
-                  }
-                },
+                      const SizedBox(width: 6),
+
+                      const Icon(Icons.arrow_drop_down, size: 20),
+                    ],
+                  ),
+                ),
               ),
+
+              // DropdownButtonFormField<String>(
+              //   value: selectedType,
+              //   isExpanded: true,
+              //   decoration: const InputDecoration(
+              //     border: OutlineInputBorder(),
+              //   ),
+              //   // Show only icon in selected item
+              //   selectedItemBuilder: (BuildContext context) {
+              //     return _supportedLinksReadOnly.entries.map((entry) {
+              //       return Container(
+              //         alignment: Alignment.center,
+              //         child: Image.asset(
+              //           entry.value['icon'],
+              //           width: 24,
+              //           height: 24,
+              //         ),
+              //       );
+              //     }).toList();
+              //   },
+              //   items: _supportedLinks.entries.map((entry) {
+              //     return DropdownMenuItem<String>(
+              //       value: entry.key,
+              //       child: Row(
+              //         children: [
+              //           Image.asset(entry.value['icon'], width: 24, height: 24),
+              //           const SizedBox(width: 8),
+              //           Text(entry.value['name']),
+              //         ],
+              //       ),
+              //     );
+              //   }).toList(),
+              //   onChanged: (String? newValue) {
+              //     if (newValue != null) {
+              //       selectedType = newValue;
+              //     }
+              //   },
+              // ),
               const SizedBox(height: 16),
               TextField(
                 controller: urlController,
@@ -238,6 +275,205 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
       },
     );
   }
+*/
+
+  void _showEditDialog(int index) {
+    final link = controller.links[index];
+    final TextEditingController urlController = TextEditingController(text: link.url);
+
+    // use the same list _linkTypes
+    String selectedType = _linkTypes[index];
+
+    if (!_supportedLinks.containsKey(selectedType) && selectedType != 'custom') {
+      selectedType = 'instagram'; // fallback
+      _linkTypes[index] = selectedType;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            final linkName = selectedType == 'custom'
+                ? 'Website'
+                : _supportedLinks[selectedType]!['name'];
+            final linkIcon = selectedType == 'custom'
+                ? MyImages.website
+                : _supportedLinks[selectedType]!['icon'];
+
+            return AlertDialog(
+                  backgroundColor: MyColors.backgroundColor,
+
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              title: const Text('Edit Link'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          _showLinkSelectorEdit(context, index, (newType) {
+                            setStateDialog(() {
+                              selectedType = newType;       // <- yaha local update
+                              _linkTypes[index] = newType;  // <- list bhi update
+                            });
+                          });
+                        },
+                        child: Row(
+                          children: [
+                            Image.asset(linkIcon, width: 40, height: 40),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.arrow_drop_down),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: TextField(
+                          controller: urlController,
+                          decoration: InputDecoration(
+                            labelText:
+                            'Enter $linkName ${linkName == "Phone" ? "Number" : linkName == "Email" ? "Id" : "URL"}',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                          ),
+                          keyboardType:TextInputType.text,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+                Obx(() => controller.isLoading.value
+                    ? const CircularProgressIndicator()
+                    : TextButton(
+                  onPressed: () async {
+                    await controller.updateLink(
+                      id: link.id,
+                      type: _linkTypes[index], // <-- abhi ka updated type
+                      url: urlController.text.trim(),
+                    );
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Save'),
+                )),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  /// update showLinkSelector to accept callback
+  void _showLinkSelectorEdit(BuildContext context, int index, Function(String)? onSelected) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black26,
+      builder: (context) {
+        final screenHeight = MediaQuery.of(context).size.height;
+        final screenWidth = MediaQuery.of(context).size.width;
+
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(5),
+              width: screenWidth * 0.35,
+              height: screenHeight * 0.45,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 6,
+                      mainAxisSpacing: 6,
+                      childAspectRatio: 1.2,
+                      children: _supportedLinks.entries.map((entry) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                            setState(() {
+                              _linkTypes[index] = entry.key;
+                            });
+                            if (onSelected != null) onSelected(entry.key);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: Image.asset(
+                              entry.value['icon'],
+                              width: 28,
+                              height: 28,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _linkTypes[index] = 'custom';
+                      });
+                      if (onSelected != null) onSelected('custom');
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.language, color: Colors.white, size: 30),
+                          SizedBox(width: 6),
+                          Text(
+                            "Custom",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
+
 
   Widget _buildPlatformImage(String platform, bool isActive) {
     return Image.asset(
@@ -397,7 +633,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                               // Show only icon in selected item
                                               selectedItemBuilder:
                                                   (BuildContext context) {
-                                                return _supportedLinks.entries
+                                                return _supportedLinksReadOnly.entries
                                                     .map((entry) {
                                                   return SizedBox(
                                                     width: 40,
@@ -409,7 +645,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                   );
                                                 }).toList();
                                               },
-                                              items: _supportedLinks.entries
+                                              items: _supportedLinksReadOnly.entries
                                                   .map((entry) {
                                                 return DropdownMenuItem<String>(
                                                   value: entry.key,
@@ -437,7 +673,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                           ),
                                           const SizedBox(width: 10),
                                           Expanded(
-                                            flex: 8,
+                                            flex: 7,
                                             child: GestureDetector(
                                               onTap: () => _launchUrl(
                                                   controller.links[index].url),
@@ -554,11 +790,15 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                 .clamp(0, _linkCount),
                             (i) {
                               final index = controller.links.length + i;
+                              final linkType = _linkTypes[index];
+
+                              final linkName = linkType == 'custom' ? 'Website' : _supportedLinks[linkType]!['name'];
+                              final linkIcon = linkType == 'custom' ? MyImages.website : _supportedLinks[linkType]!['icon'];
                               return Column(
                                 children: [
                                   Row(
                                     children: [
-                                      Expanded(
+                                    /*  Expanded(
                                         flex: 2,
                                         child: DropdownButtonFormField<String>(
                                           iconEnabledColor: Colors.black,
@@ -614,17 +854,35 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                             }
                                           },
                                         ),
-                                      ),
-                                      const SizedBox(width: 10),
+                                      ),*/
                                       Expanded(
-                                        flex: 7,
+                                        flex: 2,
+                                        child: GestureDetector(
+                                          onTap: () => _showLinkSelector(context, index),
+                                          child: Row(
+                                            children: [
+                                              Image.asset(
+                                                linkIcon,
+                                                width: 40,
+                                                height: 40,
+                                              ),
+                                              const SizedBox(width: 6),
+
+                                              const Icon(Icons.arrow_drop_down, size: 20),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        flex: 6,
                                         child: myFieldAdvance(
+
                                           context: context,
                                           controller: _linkControllers[index],
-                                          hintText:
-                                              'Enter ${_supportedLinks[_linkTypes[index]]!['name']} ${_supportedLinks[_linkTypes[index]]!['name'] == "Phone" ? 'Number' : _supportedLinks[_linkTypes[index]]!['name'] == "Email" ? "Id" : _supportedLinks[_linkTypes[index]]!['name'] == "Website" ? "URL" : "URL or ID"}',
-                                          inputType:  _supportedLinks[_linkTypes[index]]!['name'] == "Phone"?TextInputType.phone:_supportedLinks[_linkTypes[index]]!['name'] == "Email" ?TextInputType.emailAddress:TextInputType.text,
-                                          textInputAction: index <
+                                          hintText: 'Enter $linkName ${linkName == "Phone" ? "Number" : linkName == "Email" ? "Id" : "URL"}',
+                                          inputType:  TextInputType.text,     textInputAction: index <
                                                   _linkControllers.length - 1
                                               ? TextInputAction.next
                                               : TextInputAction.done,
@@ -696,6 +954,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                               _linkCount--;
                                               hasEmpty = true;
                                             } else {
+                                              log("body---->");
+
                                               // Create the link if not empty
                                               await controller.createLink(
                                                 name: _linkTypes[i],
@@ -720,4 +980,103 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
       ),
     );
   }
+
+  void _showLinkSelector(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black26,
+      builder: (context) {
+        final screenHeight = MediaQuery.of(context).size.height;
+        final screenWidth = MediaQuery.of(context).size.width;
+
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(5),
+              width: screenWidth * 0.35,
+              height: screenHeight * 0.45,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 6,
+                      mainAxisSpacing: 6,
+                      childAspectRatio: 1.2,
+                      children: _supportedLinks.entries.map((entry) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                            setState(() {
+                              _linkTypes[index] = entry.key;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: Image.asset(
+                              entry.value['icon'],
+                              width: 28,
+                              height: 28,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        _linkTypes[index] = 'custom';
+                      });
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.language, color: Colors.white, size: 30),
+                          SizedBox(width: 6),
+                          Text(
+                            "Custom",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 }

@@ -299,14 +299,24 @@ class UserController extends GetxController {
       return;
     }
 
-    final url = "${ApiUrls.baseUrl}/users/check_username/$username";
+    final url = "${ApiUrls.checkUsername}$username";
 
+    print("checkUsernameAvailability URL: $url");
     final response = await ApiService.get(url);
+    print("checkUsernameAvailability Response: ${response?.statusCode}");
+    print("checkUsernameAvailability Response Body: ${response?.body}");
+
     if (response != null && response.statusCode == 200) {
+      print("checkUsernameAvailability Success: $response");
+
       final body = jsonDecode(response.body);
       isUsernameAvailable.value = body['status'] == true;
       usernameMessage.value = body['message'] ?? '';
+      print("usernameMessage: ${body['message']}");
+      print("isUsernameAvailable: ${body['status']}");
     } else {
+      print("checkUsernameAvailability Error: ${response?.statusCode}");
+      print("checkUsernameAvailability Error Body: ${response?.body}");
       isUsernameAvailable.value = false;
       usernameMessage.value = 'Something went wrong';
     }
@@ -442,7 +452,6 @@ class UserController extends GetxController {
             // Remove the + symbol if present, as IntlPhoneField expects just the country code
             AppConst.countryCode = countryCode.replaceFirst('+', '');
             log("Exist countryCode Data---------------$countryCode");
-
           }
 
           log("Exist User Data---------------$user");
