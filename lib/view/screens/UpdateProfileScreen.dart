@@ -371,7 +371,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         email: emailController.text,
         bio: bioController.text,
         profileFile: null,
-        profileUrl: '', // Empty string to remove image from server
+        profileUrl: '',
         onSuccess: () {
           log('✅ Profile image removed successfully from server');
         },

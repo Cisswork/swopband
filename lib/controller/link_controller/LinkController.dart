@@ -199,25 +199,69 @@ class LinkController extends GetxController {
       return;
     }
 
-    final response =
-        await ApiService.get("https://profile.swopband.com/links/");
-    print("Response Fetch Link--->${response?.body}");
+    try {
+      final respLinks =
+          await ApiService.get("https://profile.swopband.com/links/");
+      final respPhones =
+          await ApiService.get("https://profile.swopband.com/phone_numbers");
+      final respEmails =
+          await ApiService.get("https://profile.swopband.com/emails");
 
-    fetchLinkLoader.value = false;
+      final List<Link> combined = [];
 
-    if (response != null && response.statusCode == 200) {
-      try {
-        final data = jsonDecode(response.body);
-        final List linksJson = data['links'] ?? [];
-
-        // Safely assign after frame
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-          links.value = linksJson.map((e) => Link.fromJson(e)).toList();
-        });
-      } catch (e) {
-        Get.snackbar("Error", "Failed to parse links");
-        print("❌ JSON decode error: $e");
+      if (respLinks != null && respLinks.statusCode == 200) {
+        try {
+          final data = jsonDecode(respLinks.body);
+          final List linksJson = data['links'] ?? [];
+          combined
+              .addAll(linksJson.map<Link>((e) => Link.fromJson(e)).toList());
+        } catch (e) {
+          print("❌ JSON decode error (links): $e");
+        }
       }
+
+      if (respPhones != null && respPhones.statusCode == 200) {
+        try {
+          final data = jsonDecode(respPhones.body);
+          final List phonesJson = data['phone_numbers'] ?? [];
+          combined.addAll(phonesJson.map<Link>((e) {
+            final cc = (e['country_code'] ?? '').toString();
+            final num = (e['number'] ?? '').toString();
+            return Link(
+              id: (e['id'] ?? '').toString(),
+              userId: (e['user_id'] ?? '').toString(),
+              type: 'phone',
+              url: "$cc$num",
+            );
+          }).toList());
+        } catch (e) {
+          print("❌ JSON decode error (phone_numbers): $e");
+        }
+      }
+
+      if (respEmails != null && respEmails.statusCode == 200) {
+        try {
+          final data = jsonDecode(respEmails.body);
+          final List emailsJson = data['emails'] ?? [];
+          combined.addAll(emailsJson.map<Link>((e) {
+            return Link(
+              id: (e['id'] ?? '').toString(),
+              userId: (e['user_id'] ?? '').toString(),
+              type: 'email',
+              url: (e['email'] ?? '').toString(),
+            );
+          }).toList());
+        } catch (e) {
+          print("❌ JSON decode error (emails): $e");
+        }
+      }
+
+      // Safely assign after frame
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        links.value = combined;
+      });
+    } finally {
+      fetchLinkLoader.value = false;
     }
   }
 
