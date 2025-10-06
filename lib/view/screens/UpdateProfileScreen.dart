@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:swopband/controller/user_controller/UserController.dart';
 import 'package:swopband/view/utils/shared_pref/SharedPrefHelper.dart';
+import 'package:swopband/view/network/ApiService.dart';
 import 'package:swopband/view/widgets/custom_button.dart';
 import 'package:swopband/view/widgets/custom_textfield.dart';
 import '../utils/app_constants.dart';
@@ -362,20 +363,25 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
   Future<void> _removeImageFromAPI() async {
     try {
-      log('🗑️ Removing profile image from server...');
+      log('🗑️ Removing profile image via users/<userId> PUT with profile_url: null ...');
 
-      // Call update user API with empty profileUrl to remove image
-      await controller.updateUser(
-        username: swopUserNameController.text,
-        name: nameController.text,
-        email: emailController.text,
-        bio: bioController.text,
-        profileFile: null,
-        profileUrl: '',
-        onSuccess: () {
-          log('✅ Profile image removed successfully from server');
-        },
-      );
+      final userId = await SharedPrefService.getString('backend_user_id');
+      if (userId == null || userId.isEmpty) {
+        SnackbarUtil.showError('User ID not found');
+        return;
+      }
+
+      final url = 'https://profile.swopband.com/users/$userId';
+      final body = {"profile_url": null};
+
+      final response = await ApiService.put(url, body);
+      if (response != null &&
+          (response.statusCode == 200 || response.statusCode == 201)) {
+        log('✅ Profile image removed successfully on server');
+      } else {
+        log('❌ Failed to remove image. Status: ${response?.statusCode}, Body: ${response?.body}');
+        SnackbarUtil.showError('Failed to remove image on server');
+      }
     } catch (e) {
       log('❌ Error removing image from server: $e');
       SnackbarUtil.showError('Failed to remove image from server: $e');
@@ -616,8 +622,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                     ),
                     const SizedBox(height: 15),
 
-
-
                     TextFormField(
                       maxLength: 100,
                       controller: bioController,
@@ -735,8 +739,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
         imageQuality: 90, // high quality (90%)
-        maxWidth: 1920,   // Full HD width
-        maxHeight: 1920,  // Full HD height
+        maxWidth: 1920, // Full HD width
+        maxHeight: 1920, // Full HD height
       );
 
       if (pickedFile != null) {
@@ -761,13 +765,13 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         setState(() {
           _selectedImageFile = processedFile;
           _selectedImageUrl = null; // Clear URL since we have a file
-          _isImageRemoved = false;  // Reset remove flag when new image is selected
+          _isImageRemoved =
+              false; // Reset remove flag when new image is selected
         });
 
         // ✅ Upload image to API
         await _uploadImageToAPI(processedFile);
 
-        _showSuccessSnackbar('Profile photo updated successfully');
         log('✅ Image selected and stored: ${processedFile.path}');
       } else {
         log('No image selected.');
@@ -908,14 +912,29 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         log('💬 Message: $message');
 
         if (imageUrl != null && imageUrl.isNotEmpty) {
-          // Update the selected image URL with the uploaded image URL
+          // First update local state, then call API to update profile with the new URL
           setState(() {
             _selectedImageUrl = imageUrl;
             _isImageRemoved = false; // Reset remove flag when image is uploaded
           });
-
           log('✅ Image URL set in state: $_selectedImageUrl');
-          _showSuccessSnackbar('Image uploaded successfully!');
+
+          // Call update user immediately with the fresh imageUrl
+          await controller.updateUser(
+            username: swopUserNameController.text,
+            name: nameController.text,
+            email: emailController.text,
+            bio: bioController.text,
+            phone: _phoneNumber.isNotEmpty ? _phoneNumber : null,
+            countryCode: _selectedCountry.phoneCode.isNotEmpty
+                ? '+${_selectedCountry.phoneCode}'
+                : null,
+            profileFile: null,
+            profileUrl: imageUrl,
+            onSuccess: () {
+              // Optional success feedback
+            },
+          );
         } else {
           log('❌ No imageUrl in response');
           _showErrorSnackbar('Upload successful but no image URL received');
@@ -947,7 +966,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       }
     } catch (e) {
       log('❌ Error uploading image: $e');
-      _showErrorSnackbar('Error uploading image: $e');
+      // _showErrorSnackbar('Error uploading image: $e');
     } finally {
       setState(() {
         _isLoadingImage = false;
