@@ -431,7 +431,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(5),
               width: screenWidth * 0.35, // smaller width
-              height: screenHeight * 0.45, // half screen height
+              height: screenHeight * 0.51, // half screen height
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -477,7 +477,6 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                       }).toList(),
                     ),
                   ),
-                  const SizedBox(height: 12),
                   GestureDetector(
                     onTap: () {
                       Navigator.pop(context);

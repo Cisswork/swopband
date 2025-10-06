@@ -1000,7 +1000,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(5),
               width: screenWidth * 0.35,
-              height: screenHeight * 0.53,
+              height: screenHeight * 0.51,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -1041,7 +1041,6 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                       }).toList(),
                     ),
                   ),
-                  const SizedBox(height: 12),
                   Padding(
                     padding: const EdgeInsets.only(left: 5.0, right: 5.0),
                     child: GestureDetector(
