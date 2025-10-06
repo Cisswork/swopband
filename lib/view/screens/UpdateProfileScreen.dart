@@ -700,28 +700,22 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     try {
       // Check permissions based on source
       if (source == ImageSource.camera) {
-        // Check camera permission first
         var cameraStatus = await Permission.camera.status;
         log('📷 Camera permission status: $cameraStatus');
-
+        // Uncomment if you want to enforce camera permission check
         // if (cameraStatus != PermissionStatus.granted) {
         //   cameraStatus = await Permission.camera.request();
-        //   log('📷 Camera permission after request: $cameraStatus');
-        //
         //   if (cameraStatus != PermissionStatus.granted) {
         //     _showPermissionDialog('Camera permission is required to take photos. Please enable it in settings.');
         //     return;
         //   }
         // }
       } else {
-        // For gallery, check photos permission
         var photosStatus = await Permission.photos.status;
         log('📸 Photos permission status: $photosStatus');
-
+        // Uncomment if you want to enforce gallery permission check
         // if (photosStatus != PermissionStatus.granted) {
         //   photosStatus = await Permission.photos.request();
-        //   log('📸 Photos permission after request: $photosStatus');
-        //
         //   if (photosStatus != PermissionStatus.granted) {
         //     _showPermissionDialog('Photos permission is required to access gallery. Please enable it in settings.');
         //     return;
@@ -733,30 +727,31 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         _isLoadingImage = true;
       });
 
-      // Add a small delay to ensure permission is fully granted
       await Future.delayed(const Duration(milliseconds: 200));
 
       log('📱 Opening ${source == ImageSource.camera ? 'camera' : 'gallery'}...');
 
+      // ✅ Increased quality & resolution (no more 200x200 tiny image)
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
-        imageQuality: 30, // Very low quality for minimal file size
-        maxWidth: 200, // Very small max width
-        maxHeight: 200, // Very small max height
+        imageQuality: 90, // high quality (90%)
+        maxWidth: 1920,   // Full HD width
+        maxHeight: 1920,  // Full HD height
       );
 
       if (pickedFile != null) {
         File file = File(pickedFile.path);
 
-        // Validate file size (allow up to 5MB)
+        // ✅ Validate file size (allow up to 15MB)
         int fileSize = await file.length();
-        log('Selected image size: $fileSize bytes (${(fileSize / 1024).toStringAsFixed(2)} KB)');
-        if (fileSize > 5 * 1024 * 1024) {
-          _showErrorSnackbar('Image too large. Maximum allowed size is 5MB.');
+        double sizeMB = fileSize / (1024 * 1024);
+        log('Selected image size: $fileSize bytes (${sizeMB.toStringAsFixed(2)} MB)');
+        if (fileSize > 15 * 1024 * 1024) {
+          _showErrorSnackbar('Image too large. Maximum allowed size is 15MB.');
           return;
         }
 
-        // Validate and convert file type if needed
+        // ✅ Validate and convert file type if needed
         File? processedFile = await _processImageFile(file);
         if (processedFile == null) {
           _showErrorSnackbar('Failed to process image. Please try again.');
@@ -766,11 +761,10 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
         setState(() {
           _selectedImageFile = processedFile;
           _selectedImageUrl = null; // Clear URL since we have a file
-          _isImageRemoved =
-              false; // Reset remove flag when new image is selected
+          _isImageRemoved = false;  // Reset remove flag when new image is selected
         });
 
-        // Upload image to API
+        // ✅ Upload image to API
         await _uploadImageToAPI(processedFile);
 
         _showSuccessSnackbar('Profile photo updated successfully');
@@ -782,7 +776,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     } catch (e) {
       log('❌ Error picking image: $e');
 
-      // Check if it's a permission error
       if (e.toString().contains('permission') ||
           e.toString().contains('Permission')) {
         _showPermissionDialog(

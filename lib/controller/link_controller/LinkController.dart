@@ -9,9 +9,9 @@ import '../../view/network/ApiUrls.dart';
 import '../../view/utils/shared_pref/SharedPrefHelper.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class LinkController extends GetxController {
-
   var isLoading = false.obs;
   var links = <Link>[].obs;
   var fetchLinkLoader = false.obs;
@@ -33,7 +33,11 @@ class LinkController extends GetxController {
     }
   }
 
-  Future<void> createLink({required String name, required String type, required String url,required VoidCallback call}) async {
+  Future<void> createLink(
+      {required String name,
+      required String type,
+      required String url,
+      required VoidCallback call}) async {
     log("api start");
     isLoading.value = true;
     try {
@@ -43,16 +47,37 @@ class LinkController extends GetxController {
         return;
       }
 
-      final body = {
-        "user_id": userId,
-        "name": name,
-        "type": type,
-        "url": url,
-      };
+      http.Response? response;
 
-      log("body---->$body");
-
-      final response = await ApiService.post(ApiUrls.createLink, body);
+      // Route to dedicated endpoints for email and phone/whatsapp
+      if (type.toLowerCase() == 'email') {
+        final body = {
+          "type": "primary",
+          "email": url.trim(),
+        };
+        log("email body---->$body");
+        response = await ApiService.post('${ApiUrls.baseUrl}/emails', body);
+      } else if (type.toLowerCase() == 'phone' ||
+          type.toLowerCase() == 'whatsapp') {
+        final parsed = _parsePhone(url);
+        final body = {
+          "type": "primary",
+          "country_code": parsed["country_code"] ?? "+1",
+          "number": parsed["number"] ?? "",
+        };
+        log("phone body---->$body");
+        response =
+            await ApiService.post('${ApiUrls.baseUrl}/phone_numbers', body);
+      } else {
+        final body = {
+          "user_id": userId,
+          "name": name,
+          "type": type,
+          "url": url,
+        };
+        log("link body---->$body");
+        response = await ApiService.post(ApiUrls.createLink, body);
+      }
       log("create link response---->${response?.body}");
       if (response == null) {
         SnackbarUtil.showError("No response from server");
@@ -71,16 +96,19 @@ class LinkController extends GetxController {
       } else {
         // Check for field-specific errors first
         if (data['errors'] != null && data['errors']['fieldErrors'] != null) {
-          final fieldErrors = data['errors']['fieldErrors'] as Map<String, dynamic>;
-          
+          final fieldErrors =
+              data['errors']['fieldErrors'] as Map<String, dynamic>;
+
           // Check for URL field error
-          if (fieldErrors['url'] != null && fieldErrors['url'] is List && fieldErrors['url'].isNotEmpty) {
+          if (fieldErrors['url'] != null &&
+              fieldErrors['url'] is List &&
+              fieldErrors['url'].isNotEmpty) {
             final urlError = fieldErrors['url'][0];
             log("URL field error: $urlError");
             SnackbarUtil.showError(urlError);
             return;
           }
-          
+
           // Check for other field errors
           for (String field in fieldErrors.keys) {
             if (fieldErrors[field] is List && fieldErrors[field].isNotEmpty) {
@@ -91,21 +119,27 @@ class LinkController extends GetxController {
             }
           }
         }
-        
+
         // Check for specific error messages and provide better user feedback
-        final error = data['error'] ?? data['message'] ?? "Something went wrong";
+        final error =
+            data['error'] ?? data['message'] ?? "Something went wrong";
         log("error-->$error");
-        
+
         // Handle specific error cases with better user guidance
         final errorString = error.toString().toLowerCase();
         if (errorString.contains('duplicate')) {
-          SnackbarUtil.showError("This link already exists. Please try a different URL or check your existing links.");
-        } else if (errorString.contains('invalid') || errorString.contains('url')) {
-          SnackbarUtil.showError("Please enter a valid URL for this link type.");
-        } else if (errorString.contains('required') || errorString.contains('missing')) {
+          SnackbarUtil.showError(
+              "This link already exists. Please try a different URL or check your existing links.");
+        } else if (errorString.contains('invalid') ||
+            errorString.contains('url')) {
+          SnackbarUtil.showError(
+              "Please enter a valid URL for this link type.");
+        } else if (errorString.contains('required') ||
+            errorString.contains('missing')) {
           SnackbarUtil.showError("Please fill in all required fields.");
         } else if (response.statusCode == 409) {
-          SnackbarUtil.showError("This link already exists in your profile. Please use a different URL.");
+          SnackbarUtil.showError(
+              "This link already exists in your profile. Please use a different URL.");
         } else {
           SnackbarUtil.showError(error);
         }
@@ -114,9 +148,6 @@ class LinkController extends GetxController {
       isLoading.value = false;
     }
   }
-
-
-
 
   Future<void> writeNfcTagAndSaveLink({
     required BuildContext context,
@@ -147,7 +178,7 @@ class LinkController extends GetxController {
           nfcWriteInProgress.value = false;
           SnackbarUtil.showSuccess('NFC write successful!');
           // Call backend API to save link
-          await createLink(name: name, type: type, url: url, call: () {  });
+          await createLink(name: name, type: type, url: url, call: () {});
         } catch (e) {
           NfcManager.instance.stopSession(errorMessage: e.toString());
           nfcWriteStatus.value = 'Write failed: $e';
@@ -157,7 +188,6 @@ class LinkController extends GetxController {
       },
     );
   }
-
 
   Future<void> fetchLinks() async {
     fetchLinkLoader.value = true;
@@ -169,7 +199,8 @@ class LinkController extends GetxController {
       return;
     }
 
-    final response = await ApiService.get("https://profile.swopband.com/links/");
+    final response =
+        await ApiService.get("https://profile.swopband.com/links/");
     print("Response Fetch Link--->${response?.body}");
 
     fetchLinkLoader.value = false;
@@ -188,14 +219,22 @@ class LinkController extends GetxController {
         print("❌ JSON decode error: $e");
       }
     }
-
-
   }
 
-  Future<void> deleteLink(String id) async {
+  Future<void> deleteLink(String id, String type) async {
     isLoading.value = true;
     try {
-      final response = await ApiService.delete('https://profile.swopband.com/links/$id');
+      final String endpoint;
+      if (type.toLowerCase() == 'email') {
+        endpoint = '${ApiUrls.baseUrl}/emails/$id';
+      } else if (type.toLowerCase() == 'phone' ||
+          type.toLowerCase() == 'whatsapp') {
+        endpoint = '${ApiUrls.baseUrl}/phone_numbers/$id';
+      } else {
+        endpoint = 'https://profile.swopband.com/links/$id';
+      }
+
+      final response = await ApiService.delete(endpoint);
       if (response != null && response.statusCode == 200) {
         SnackbarUtil.showSuccess('Link deleted successfully');
         await fetchLinks();
@@ -209,7 +248,8 @@ class LinkController extends GetxController {
     }
   }
 
-  Future<void> updateLink({required String id, required String type, required String url}) async {
+  Future<void> updateLink(
+      {required String id, required String type, required String url}) async {
     isLoading.value = true;
     try {
       final userId = await SharedPrefService.getString('backend_user_id');
@@ -217,12 +257,33 @@ class LinkController extends GetxController {
         SnackbarUtil.showError('User ID not found');
         return;
       }
-      final body = {
-        'user_id': userId,
-        'type': type,
-        'url': url,
-      };
-      final response = await ApiService.put('https://profile.swopband.com/links/$id', body);
+      http.Response? response;
+
+      if (type.toLowerCase() == 'email') {
+        final body = {
+          'type': 'primary',
+          'email': url.trim(),
+        };
+        response = await ApiService.put('${ApiUrls.baseUrl}/emails/$id', body);
+      } else if (type.toLowerCase() == 'phone' ||
+          type.toLowerCase() == 'whatsapp') {
+        final parsed = _parsePhone(url);
+        final body = {
+          'type': 'primary',
+          'country_code': parsed['country_code'] ?? '+1',
+          'number': parsed['number'] ?? '',
+        };
+        response =
+            await ApiService.put('${ApiUrls.baseUrl}/phone_numbers/$id', body);
+      } else {
+        final body = {
+          'user_id': userId,
+          'type': type,
+          'url': url,
+        };
+        response = await ApiService.put(
+            'https://profile.swopband.com/links/$id', body);
+      }
       if (response != null && response.statusCode == 200) {
         SnackbarUtil.showSuccess('Link updated successfully');
         await fetchLinks();
@@ -236,5 +297,16 @@ class LinkController extends GetxController {
     }
   }
 
-
+  Map<String, String> _parsePhone(String input) {
+    final trimmed = input.trim();
+    final reg = RegExp(r"^(\+\d{1,4})?\s*([0-9\-\s]{4,})$");
+    final match = reg.firstMatch(trimmed);
+    if (match != null) {
+      final code = (match.group(1) ?? "+1").replaceAll(" ", "");
+      final number = (match.group(2) ?? "").replaceAll(RegExp(r"[^0-9]"), "");
+      return {"country_code": code, "number": number};
+    }
+    final onlyDigits = trimmed.replaceAll(RegExp(r"[^0-9]"), "");
+    return {"country_code": "+1", "number": onlyDigits};
+  }
 }

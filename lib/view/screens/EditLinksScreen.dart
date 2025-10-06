@@ -1,11 +1,11 @@
-import 'dart:convert';
+// import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:swopband/controller/user_controller/UserController.dart';
-import 'package:swopband/view/network/ApiService.dart';
+// import 'package:swopband/view/network/ApiService.dart';
 import 'package:swopband/view/utils/app_constants.dart';
 import 'package:swopband/view/utils/shared_pref/SharedPrefHelper.dart';
 import 'package:swopband/view/widgets/custom_button.dart';
@@ -79,12 +79,13 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     'youtube': {'name': 'YouTube', 'icon': MyImages.youtube},
     'tiktok': {'name': 'TikTok', 'icon': MyImages.tiktok},
     'discord': {'name': 'Discord', 'icon': MyImages.discord},
-     // 'custom': {'name': 'Website', 'icon': MyImages.website},
+    // 'custom': {'name': 'Website', 'icon': MyImages.website},
     'phone': {'name': 'Phone', 'icon': MyImages.phone},
     // Added Website
     'email': {'name': 'Email', 'icon': MyImages.email},
     // A
-  };  final Map<String, Map<String, dynamic>> _supportedLinksReadOnly = {
+  };
+  final Map<String, Map<String, dynamic>> _supportedLinksReadOnly = {
     'instagram': {'name': 'Instagram', 'icon': MyImages.insta},
     'snapchat': {'name': 'Snapchat', 'icon': MyImages.snapchat},
     'linkedin': {'name': 'LinkedIn', 'icon': MyImages.linkedId},
@@ -145,7 +146,6 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
 
   Future<void> _checkAuth() async {
     final firebaseId = await SharedPrefService.getString('firebase_id');
-    final backendUserId = await SharedPrefService.getString('backend_user_id');
     log("firebaseId  : $firebaseId");
 
     if (firebaseId != null && firebaseId.isNotEmpty) {
@@ -279,12 +279,14 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
 
   void _showEditDialog(int index) {
     final link = controller.links[index];
-    final TextEditingController urlController = TextEditingController(text: link.url);
+    final TextEditingController urlController =
+        TextEditingController(text: link.url);
 
     // use the same list _linkTypes
     String selectedType = _linkTypes[index];
 
-    if (!_supportedLinks.containsKey(selectedType) && selectedType != 'custom') {
+    if (!_supportedLinks.containsKey(selectedType) &&
+        selectedType != 'custom') {
       selectedType = 'instagram'; // fallback
       _linkTypes[index] = selectedType;
     }
@@ -302,9 +304,9 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                 : _supportedLinks[selectedType]!['icon'];
 
             return AlertDialog(
-                  backgroundColor: MyColors.backgroundColor,
-
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              backgroundColor: MyColors.backgroundColor,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               title: const Text('Edit Link'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -315,8 +317,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                         onTap: () {
                           _showLinkSelectorEdit(context, index, (newType) {
                             setStateDialog(() {
-                              selectedType = newType;       // <- yaha local update
-                              _linkTypes[index] = newType;  // <- list bhi update
+                              selectedType = newType; // <- yaha local update
+                              _linkTypes[index] = newType; // <- list bhi update
                             });
                           });
                         },
@@ -334,11 +336,11 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                           controller: urlController,
                           decoration: InputDecoration(
                             labelText:
-                            'Enter $linkName ${linkName == "Phone" ? "Number" : linkName == "Email" ? "Id" : "URL"}',
+                                'Enter $linkName ${linkName == "Phone" ? "Number" : linkName == "Email" ? "Id" : "URL"}',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8)),
                           ),
-                          keyboardType:TextInputType.text,
+                          keyboardType: TextInputType.text,
                         ),
                       ),
                     ],
@@ -353,16 +355,16 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                 Obx(() => controller.isLoading.value
                     ? const CircularProgressIndicator()
                     : TextButton(
-                  onPressed: () async {
-                    await controller.updateLink(
-                      id: link.id,
-                      type: _linkTypes[index], // <-- abhi ka updated type
-                      url: urlController.text.trim(),
-                    );
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Save'),
-                )),
+                        onPressed: () async {
+                          await controller.updateLink(
+                            id: link.id,
+                            type: _linkTypes[index], // <-- abhi ka updated type
+                            url: urlController.text.trim(),
+                          );
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Save'),
+                      )),
               ],
             );
           },
@@ -372,7 +374,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
   }
 
   /// update showLinkSelector to accept callback
-  void _showLinkSelectorEdit(BuildContext context, int index, Function(String)? onSelected) {
+  void _showLinkSelectorEdit(
+      BuildContext context, int index, Function(String)? onSelected) {
     showDialog(
       context: context,
       barrierColor: Colors.black26,
@@ -471,9 +474,6 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
       },
     );
   }
-
-
-
 
   Widget _buildPlatformImage(String platform, bool isActive) {
     return Image.asset(
@@ -611,9 +611,9 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                             flex: 2,
                                             child:
                                                 DropdownButtonFormField<String>(
-                                                  isExpanded: true,
-                                                  isDense: false,
-                                                  itemHeight: null,
+                                              isExpanded: true,
+                                              isDense: false,
+                                              itemHeight: null,
                                               iconEnabledColor: Colors.black,
                                               iconDisabledColor: Colors.black,
                                               value:
@@ -633,19 +633,20 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                               // Show only icon in selected item
                                               selectedItemBuilder:
                                                   (BuildContext context) {
-                                                return _supportedLinksReadOnly.entries
+                                                return _supportedLinksReadOnly
+                                                    .entries
                                                     .map((entry) {
                                                   return SizedBox(
                                                     width: 40,
                                                     height: 40,
                                                     child: Image.asset(
                                                       entry.value['icon'],
-
                                                     ),
                                                   );
                                                 }).toList();
                                               },
-                                              items: _supportedLinksReadOnly.entries
+                                              items: _supportedLinksReadOnly
+                                                  .entries
                                                   .map((entry) {
                                                 return DropdownMenuItem<String>(
                                                   value: entry.key,
@@ -725,7 +726,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                               'delete') {
                                                             await controller
                                                                 .deleteLink(
-                                                                    link.id);
+                                                                    link.id,
+                                                                    link.type);
                                                           }
                                                         },
                                                         itemBuilder:
@@ -792,13 +794,17 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                               final index = controller.links.length + i;
                               final linkType = _linkTypes[index];
 
-                              final linkName = linkType == 'custom' ? 'Website' : _supportedLinks[linkType]!['name'];
-                              final linkIcon = linkType == 'custom' ? MyImages.website : _supportedLinks[linkType]!['icon'];
+                              final linkName = linkType == 'custom'
+                                  ? 'Website'
+                                  : _supportedLinks[linkType]!['name'];
+                              final linkIcon = linkType == 'custom'
+                                  ? MyImages.website
+                                  : _supportedLinks[linkType]!['icon'];
                               return Column(
                                 children: [
                                   Row(
                                     children: [
-                                    /*  Expanded(
+                                      /*  Expanded(
                                         flex: 2,
                                         child: DropdownButtonFormField<String>(
                                           iconEnabledColor: Colors.black,
@@ -858,7 +864,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                       Expanded(
                                         flex: 2,
                                         child: GestureDetector(
-                                          onTap: () => _showLinkSelector(context, index),
+                                          onTap: () =>
+                                              _showLinkSelector(context, index),
                                           child: Row(
                                             children: [
                                               Image.asset(
@@ -867,22 +874,22 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                 height: 40,
                                               ),
                                               const SizedBox(width: 6),
-
-                                              const Icon(Icons.arrow_drop_down, size: 20),
+                                              const Icon(Icons.arrow_drop_down,
+                                                  size: 20),
                                             ],
                                           ),
                                         ),
                                       ),
-
                                       const SizedBox(width: 6),
                                       Expanded(
                                         flex: 6,
                                         child: myFieldAdvance(
-
                                           context: context,
                                           controller: _linkControllers[index],
-                                          hintText: 'Enter $linkName ${linkName == "Phone" ? "Number" : linkName == "Email" ? "Id" : "URL"}',
-                                          inputType:  TextInputType.text,     textInputAction: index <
+                                          hintText:
+                                              'Enter $linkName ${linkName == "Phone" ? "Number" : linkName == "Email" ? "Id" : "URL"}',
+                                          inputType: TextInputType.text,
+                                          textInputAction: index <
                                                   _linkControllers.length - 1
                                               ? TextInputAction.next
                                               : TextInputAction.done,
@@ -892,8 +899,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.delete,
-                                            size: 20,
-                                            color: Colors.grey),
+                                            size: 20, color: Colors.grey),
                                         onPressed: () {
                                           setState(() {
                                             if (_linkCount >
@@ -939,8 +945,6 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                         textColor: MyColors.textWhite,
                                         text: AppStrings.apply.tr,
                                         onPressed: () async {
-                                          bool hasEmpty = false;
-
                                           // Loop backwards to safely remove empty links while iterating
                                           for (int i = _linkCount - 1;
                                               i >= controller.links.length;
@@ -952,7 +956,6 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                               _linkControllers.removeAt(i);
                                               _linkTypes.removeAt(i);
                                               _linkCount--;
-                                              hasEmpty = true;
                                             } else {
                                               log("body---->");
 
@@ -997,7 +1000,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(5),
               width: screenWidth * 0.35,
-              height: screenHeight * 0.45,
+              height: screenHeight * 0.53,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
@@ -1039,37 +1042,41 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                      setState(() {
-                        _linkTypes[index] = 'custom';
-                      });
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.language, color: Colors.white, size: 30),
-                          SizedBox(width: 6),
-                          Text(
-                            "Custom",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          _linkTypes[index] = 'custom';
+                        });
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 9),
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.language, color: Colors.white, size: 27),
+                            SizedBox(width: 6),
+                            Text(
+                              "Custom",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 5),
                 ],
               ),
             ),
@@ -1078,5 +1085,4 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
       },
     );
   }
-
 }

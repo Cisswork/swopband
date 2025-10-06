@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swopband/controller/link_controller/LinkController.dart';
@@ -152,22 +151,32 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Image.asset(MyImages.insta, width: 50, height: 50),
-                              Image.asset(MyImages.tiktok, width: 50, height: 50),
-                              Image.asset(MyImages.snapchat, width: 50, height: 50),
-                              Image.asset(MyImages.linkedId, width: 50, height: 50),
-                              Image.asset(MyImages.xmaster, width: 50, height: 50),
+                              Image.asset(MyImages.insta,
+                                  width: 50, height: 50),
+                              Image.asset(MyImages.tiktok,
+                                  width: 50, height: 50),
+                              Image.asset(MyImages.snapchat,
+                                  width: 50, height: 50),
+                              Image.asset(MyImages.linkedId,
+                                  width: 50, height: 50),
+                              Image.asset(MyImages.xmaster,
+                                  width: 50, height: 50),
                             ],
                           ),
                           const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Image.asset(MyImages.spotify, width: 50, height: 50),
-                              Image.asset(MyImages.facebook, width: 50, height: 50),
-                              Image.asset(MyImages.strava, width: 50, height: 50),
-                              Image.asset(MyImages.youtube, width: 50, height: 50),
-                              Image.asset(MyImages.discord, width: 50, height: 50),
+                              Image.asset(MyImages.spotify,
+                                  width: 50, height: 50),
+                              Image.asset(MyImages.facebook,
+                                  width: 50, height: 50),
+                              Image.asset(MyImages.strava,
+                                  width: 50, height: 50),
+                              Image.asset(MyImages.youtube,
+                                  width: 50, height: 50),
+                              Image.asset(MyImages.discord,
+                                  width: 50, height: 50),
                             ],
                           ),
                           const SizedBox(height: 20),
@@ -192,14 +201,16 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                          border:
+                              Border.all(color: Colors.grey.withOpacity(0.3)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.link, color: Colors.green, size: 20),
+                                const Icon(Icons.link,
+                                    color: Colors.green, size: 20),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Your Existing Links',
@@ -227,12 +238,17 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
 
                     // Editable rows for new links
                     ...List.generate(
-                      (_linkCount - controller.links.length).clamp(0, _linkCount),
-                          (i) {
+                      (_linkCount - controller.links.length)
+                          .clamp(0, _linkCount),
+                      (i) {
                         final index = controller.links.length + i;
                         final linkType = _linkTypes[index];
-                        final linkName = linkType == 'custom' ? 'Website' : _supportedLinks[linkType]!['name'];
-                        final linkIcon = linkType == 'custom' ? MyImages.website : _supportedLinks[linkType]!['icon'];
+                        final linkName = linkType == 'custom'
+                            ? 'Website'
+                            : _supportedLinks[linkType]!['name'];
+                        final linkIcon = linkType == 'custom'
+                            ? MyImages.website
+                            : _supportedLinks[linkType]!['icon'];
 
                         return Column(
                           children: [
@@ -242,7 +258,8 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                   flex: 2,
                                   child: GestureDetector(
                                     onTap: () {
-                                      FocusManager.instance.primaryFocus?.unfocus();
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
                                       _showLinkSelector(context, index);
                                     },
                                     child: Container(
@@ -252,35 +269,39 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                                       child: Center(
                                         child: Row(
                                           children: [
-                                            Image.asset(linkIcon, width: 38, height: 38), // <-- updated
-                                            const Icon(Icons.arrow_drop_down, size: 19),
+                                            Image.asset(linkIcon,
+                                                width: 38,
+                                                height: 38), // <-- updated
+                                            const Icon(Icons.arrow_drop_down,
+                                                size: 19),
                                           ],
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-
                                 Expanded(
                                   flex: 7,
                                   child: myFieldAdvance(
                                     focusNode: _linkFocusNodes[index],
                                     context: context,
                                     controller: _linkControllers[index],
-                                    hintText: 'Enter $linkName ${linkName == "Phone" ? "Number" : linkName == "Email" ? "Id" : "URL"}',
-                                    inputType:  TextInputType.text,
+                                    hintText:
+                                        'Enter $linkName ${linkName == "Phone" ? "Number" : linkName == "Email" ? "Id" : "URL"}',
+                                    inputType: TextInputType.text,
                                     textInputAction: TextInputAction.done,
                                     fillColor: Colors.transparent,
                                     textBack: Colors.transparent,
                                   ),
                                 ),
-
                                 IconButton(
                                   padding: EdgeInsets.zero,
-                                  icon: const Icon(Icons.delete, size: 20, color: Colors.grey),
+                                  icon: const Icon(Icons.delete,
+                                      size: 20, color: Colors.grey),
                                   onPressed: () {
                                     setState(() {
-                                      if (_linkCount > controller.links.length) {
+                                      if (_linkCount >
+                                          controller.links.length) {
                                         _linkControllers.removeAt(index);
                                         _linkFocusNodes.removeAt(index);
                                         _linkTypes.removeAt(index);
@@ -318,59 +339,71 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                     // Bottom submit button
                     if (_linkCount > controller.links.length)
                       Obx(
-                            () => controller.isLoading.value
+                        () => controller.isLoading.value
                             ? const Center(
-                            child: CircularProgressIndicator(color: Colors.black))
+                                child: CircularProgressIndicator(
+                                    color: Colors.black))
                             : Padding(
-                          padding: const EdgeInsets.only(left: 60.0, right: 60.0, top: 10),
-                          child: CustomButton(
-                            buttonColor: MyColors.textBlack,
-                            textColor: MyColors.textWhite,
-                            text: "Go to your hub",
-                            onPressed: () async {
-                              bool hasEmpty = false;
-                              bool hasDuplicate = false;
+                                padding: const EdgeInsets.only(
+                                    left: 60.0, right: 60.0, top: 10),
+                                child: CustomButton(
+                                  buttonColor: MyColors.textBlack,
+                                  textColor: MyColors.textWhite,
+                                  text: "Go to your hub",
+                                  onPressed: () async {
+                                    bool hasEmpty = false;
+                                    bool hasDuplicate = false;
 
-                              for (int i = controller.links.length; i < _linkCount; i++) {
-                                final url = _linkControllers[i].text.trim();
-                                if (url.isNotEmpty) {
-                                  final existingLink = controller.links.any((link) =>
-                                  link.url.toLowerCase() == url.toLowerCase() ||
-                                      link.url.toLowerCase().contains(url.toLowerCase()) ||
-                                      url.toLowerCase().contains(link.url.toLowerCase()));
+                                    for (int i = controller.links.length;
+                                        i < _linkCount;
+                                        i++) {
+                                      final url =
+                                          _linkControllers[i].text.trim();
+                                      if (url.isNotEmpty) {
+                                        final existingLink = controller.links
+                                            .any((link) =>
+                                                link.url.toLowerCase() ==
+                                                    url.toLowerCase() ||
+                                                link.url.toLowerCase().contains(
+                                                    url.toLowerCase()) ||
+                                                url.toLowerCase().contains(
+                                                    link.url.toLowerCase()));
 
-                                  if (existingLink) {
-                                    hasDuplicate = true;
-                                    SnackbarUtil.showError(
-                                        "Link '${_linkTypes[i]}' with URL '$url' already exists in your profile.");
-                                    break;
-                                  }
-                                }
-                              }
+                                        if (existingLink) {
+                                          hasDuplicate = true;
+                                          SnackbarUtil.showError(
+                                              "Link '${_linkTypes[i]}' with URL '$url' already exists in your profile.");
+                                          break;
+                                        }
+                                      }
+                                    }
 
-                              if (hasDuplicate) return;
+                                    if (hasDuplicate) return;
 
-                              for (int i = _linkCount - 1; i >= controller.links.length; i--) {
-                                final url = _linkControllers[i].text.trim();
-                                if (url.isEmpty) {
-                                  _linkControllers.removeAt(i);
-                                  _linkTypes.removeAt(i);
-                                  _linkCount--;
-                                  hasEmpty = true;
-                                } else {
-                                  await controller.createLink(
-                                    name: _linkTypes[i],
-                                    type: _linkTypes[i],
-                                    url: url,
-                                    call: () {
-                                      Get.offAll(() => BottomNavScreen());
-                                    },
-                                  );
-                                }
-                              }
-                            },
-                          ),
-                        ),
+                                    for (int i = _linkCount - 1;
+                                        i >= controller.links.length;
+                                        i--) {
+                                      final url =
+                                          _linkControllers[i].text.trim();
+                                      if (url.isEmpty) {
+                                        _linkControllers.removeAt(i);
+                                        _linkTypes.removeAt(i);
+                                        _linkCount--;
+                                        hasEmpty = true;
+                                      } else {
+                                        await controller.createLink(
+                                          name: _linkTypes[i],
+                                          type: _linkTypes[i],
+                                          url: url,
+                                          call: () {
+                                            Get.offAll(() => BottomNavScreen());
+                                          },
+                                        );
+                                      }
+                                    }
+                                  },
+                                ),
+                              ),
                       ),
                   ],
                 ),
@@ -427,13 +460,14 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                             });
                           },
                           child: Container(
-                            width: 30,               // slightly smaller than before
-                            height: 30,              // slightly smaller than before
+                            width: 30, // slightly smaller than before
+                            height: 30, // slightly smaller than before
                             child: Padding(
-                              padding: const EdgeInsets.all(6.0), // medium padding
+                              padding:
+                                  const EdgeInsets.all(6.0), // medium padding
                               child: Image.asset(
                                 entry.value['icon'],
-                                width: 26,             // medium icon size
+                                width: 26, // medium icon size
                                 height: 26,
                                 fit: BoxFit.contain,
                               ),
@@ -443,8 +477,6 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                       }).toList(),
                     ),
                   ),
-
-
                   const SizedBox(height: 12),
                   GestureDetector(
                     onTap: () {
@@ -484,5 +516,4 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
       },
     );
   }
-
 }

@@ -132,8 +132,8 @@ class BottomNavScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                height: isSelected?30:27,
-                width: isSelected?30:27,
+                height: isSelected?28:25,
+                width: isSelected?28:25,
                 image,
 
                 color: isSelected ? Colors.white : Colors.grey,

@@ -559,7 +559,6 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     ),
 
                   // Username availability status
-/*
                   Obx(() {
                     if (controller.swopUsername.value.isNotEmpty) {
                       return Container(
@@ -605,7 +604,6 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                     }
                     return const SizedBox.shrink();
                   }),
-*/
                   _nfcInProgress
                       ? const Center(
                           child: CircularProgressIndicator(color: Colors.black))
@@ -866,39 +864,40 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
     });
 
     try {
-      // Check permissions based on source
+      // 🔹 Check permissions based on source
       if (source == ImageSource.camera) {
         var cameraStatus = await Permission.camera.request();
         if (cameraStatus != PermissionStatus.granted) {
-          _showPermissionDialog(
-              'Camera permission is required to take photos.');
+          _showPermissionDialog('Camera permission is required to take photos.');
           return;
         }
       } else {
+        // On Android 13+, use Permission.photos instead of storage if needed
         var storageStatus = await Permission.storage.request();
         if (storageStatus != PermissionStatus.granted) {
-          _showPermissionDialog(
-              'Storage permission is required to access photos.');
+          _showPermissionDialog('Storage permission is required to access photos.');
           return;
         }
       }
 
+      // 🔹 Pick image (optimized settings)
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
-        imageQuality: 30, // Very low quality for minimal file size
-        maxWidth: 200, // Very small max width
-        maxHeight: 200, // Very small max height
+        imageQuality: 90, // High-quality compression
+        maxWidth: 1920,   // Full HD width
+        maxHeight: 1920,  // Full HD height
       );
 
       if (pickedFile != null) {
         File file = File(pickedFile.path);
 
-        // Validate file size (allow up to 5MB for multipart upload)
+        // 🔹 Validate file size (allow up to 15MB)
         int fileSize = await file.length();
-        print(
-            'Selected image size: $fileSize bytes (${(fileSize / 1024).toStringAsFixed(2)} KB)');
-        if (fileSize > 5 * 1024 * 1024) {
-          _showErrorSnackbar('Image too large. Maximum allowed size is 5MB.');
+        double sizeInMB = fileSize / (1024 * 1024);
+        print('Selected image size: $fileSize bytes (${sizeInMB.toStringAsFixed(2)} MB)');
+
+        if (fileSize > 15 * 1024 * 1024) {
+          _showErrorSnackbar('Image too large. Maximum allowed size is 15MB.');
           return;
         }
 
@@ -913,7 +912,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
         print('No image selected.');
       }
     } catch (e) {
-      print('Error picking image: $e');
+      print('❌ Error picking image: $e');
       _showErrorSnackbar('Failed to pick image: $e');
     } finally {
       setState(() {
