@@ -112,6 +112,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+                      SizedBox(height: 50,),
 
                       Image.asset(
                         height: 40,
