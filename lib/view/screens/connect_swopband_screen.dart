@@ -126,28 +126,27 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
   }
 
   Future<void> _startNfcSessionAndWrite() async {
-
-    // log("[NFC] Calling controller.createUser()");
-    // File? selectedFile = (widget.imagePickerKey.currentState as dynamic)
-    //     ?.getSelectedImageFile();
-    // String profileImage = await _getCurrentProfileImage(
-    // await controller.createUser(
-    //   username: widget.username,
-    //   name: widget.name,
-    //   email: widget.email,
-    //   bio: widget.bio,
-    //   age: widget.age,
-    //   phone: widget.phone,
-    //   countryCode: widget.countryCode,
-    //   profileFile: selectedFile,
-    //   profileUrl: selectedFile == null ? profileImage : null,
-    //   onSuccess: () {
-    //     log("[NFC] User created successfully, navigating to AddLinkScreen.");
-    //     // Resume background operations after successful operation
-    //     _nfcBackgroundService.resumeBackgroundOperations();
-    //     Get.offAll(() => const AddLinkScreen());
-    //   },
-    // );
+    log("[NFC] Calling controller.createUser()");
+    File? selectedFile =
+        (widget.imagePickerKey.currentState as dynamic)?.getSelectedImageFile();
+    String profileImage = await _getCurrentProfileImage();
+    await controller.createUser(
+      username: widget.username,
+      name: widget.name,
+      email: widget.email,
+      bio: widget.bio,
+      age: widget.age,
+      phone: widget.phone,
+      countryCode: widget.countryCode,
+      profileFile: selectedFile,
+      profileUrl: selectedFile == null ? profileImage : null,
+      onSuccess: () {
+        log("[NFC] User created successfully, navigating to AddLinkScreen.");
+        // Resume background operations after successful operation
+        _nfcBackgroundService.resumeBackgroundOperations();
+        Get.offAll(() => const AddLinkScreen());
+      },
+    );
     log("[NFC] Starting NFC session and write process...");
     setState(() {
       _nfcStatus = "Hold your iPhone near the Swopband ring...";
@@ -228,6 +227,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
+                          fontFamily: "PTSerif",
                           color: Colors.black87,
                         ),
                       ),
@@ -241,6 +241,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.black54,
+                          fontFamily: "PTSerif",
                         ),
                       ),
 
@@ -288,6 +289,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                           style: TextStyle(
                             color: Colors.black54,
                             fontSize: 16,
+                            fontFamily: "PTSerif",
                           ),
                         ),
                       ),
@@ -472,7 +474,6 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
     return Scaffold(
       backgroundColor: MyColors.backgroundColor,
       body: SafeArea(
-
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
@@ -481,7 +482,6 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-
                   Image.asset(
                     MyImages.nameLogo,
                     height: 40,
@@ -501,7 +501,8 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(30)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(30)),
                           border: Border.all(
                             color: MyColors.textBlack,
                             width: 2,
@@ -579,11 +580,14 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                         style: const TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
+                          fontFamily: "PTSerif",
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ),
-const SizedBox(height: 10,),
+                  const SizedBox(
+                    height: 10,
+                  ),
                   CustomButton(
                     buttonColor: MyColors.textBlack,
                     textColor: MyColors.textWhite,
@@ -627,7 +631,6 @@ const SizedBox(height: 10,),
       ),
     );
   }
-
 }
 
 // ImagePickerExample class for ConnectSwopbandScreen
@@ -675,7 +678,6 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
                   )
                 : null,
           ),
-
           if (!_isLoadingImage)
             Positioned(
               bottom: 0,
@@ -762,6 +764,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                fontFamily: "PTSerif",
               ),
             ),
             const SizedBox(height: 16),
@@ -807,6 +810,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.red,
+                  fontFamily: "PTSerif",
                 ),
               ),
             ),
@@ -849,14 +853,16 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
       if (source == ImageSource.camera) {
         var cameraStatus = await Permission.camera.request();
         if (cameraStatus != PermissionStatus.granted) {
-          _showPermissionDialog('Camera permission is required to take photos.');
+          _showPermissionDialog(
+              'Camera permission is required to take photos.');
           return;
         }
       } else {
         // On Android 13+, you may want to use Permission.photos instead of storage
         var storageStatus = await Permission.storage.request();
         if (storageStatus != PermissionStatus.granted) {
-          _showPermissionDialog('Storage permission is required to access photos.');
+          _showPermissionDialog(
+              'Storage permission is required to access photos.');
           return;
         }
       }
@@ -865,8 +871,8 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
         imageQuality: 90, // High quality
-        maxWidth: 1920,   // Full HD width
-        maxHeight: 1920,  // Full HD height
+        maxWidth: 1920, // Full HD width
+        maxHeight: 1920, // Full HD height
       );
 
       if (pickedFile != null) {
@@ -875,7 +881,8 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
         // 🔹 Validate file size (allow up to 15MB)
         int fileSize = await file.length();
         double sizeInMB = fileSize / (1024 * 1024);
-        print('Selected image size: $fileSize bytes (${sizeInMB.toStringAsFixed(2)} MB)');
+        print(
+            'Selected image size: $fileSize bytes (${sizeInMB.toStringAsFixed(2)} MB)');
 
         if (fileSize > 15 * 1024 * 1024) {
           _showErrorSnackbar('Image too large. Maximum allowed size is 15MB.');

@@ -127,7 +127,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                 children: [
                                   Text(
                                     _selectedCountry.flagEmoji,
-                                    style: const TextStyle(fontSize: 20),
+                                    style: const TextStyle(
+                                        fontSize: 20, fontFamily: "PTSerif"),
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
@@ -135,7 +136,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      fontFamily: "Chromatica",
+                                      fontFamily: "PTSerif",
                                       color: MyColors.textBlack,
                                     ),
                                   ),
@@ -161,7 +162,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             hintStyle: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              fontFamily: "Chromatica",
+                              fontFamily: "PTSerif",
                               color: MyColors.textBlack,
                               decoration: TextDecoration.none,
                               wordSpacing: 1.2,
@@ -277,6 +278,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 style: TextStyle(
                   backgroundColor: Colors.white,
                   color: MyColors.textBlack.withOpacity(0.8),
+                  fontFamily: "PTSerif",
                   fontSize: 14,
                 ),
               ),
@@ -304,6 +306,7 @@ class _SignupScreenState extends State<SignupScreen> {
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
+                fontFamily: "PTSerif",
               ),
             ),
           ),
@@ -323,6 +326,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 style: TextStyle(
                   backgroundColor: Colors.white,
                   color: MyColors.textBlack.withOpacity(0.8),
+                  fontFamily: "PTSerif",
                   fontSize: 14,
                 ),
               ),
@@ -351,6 +355,7 @@ class _SignupScreenState extends State<SignupScreen> {
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
+                fontFamily: "PTSerif",
               ),
             ),
           ),

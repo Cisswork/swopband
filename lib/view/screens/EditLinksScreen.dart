@@ -171,111 +171,6 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     super.dispose();
   }
 
-/*
-  void _showEditDialog(int index) {
-    final link = controller.links[index];
-    final TextEditingController urlController = TextEditingController(text: link.url);
-    String selectedType = link.type;
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Link'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Expanded(
-                flex: 2,
-                child: GestureDetector(
-                  onTap: () => _showLinkSelector(context, index),
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        _linkTypes[index] == 'custom'
-                            ? MyImages.website
-                            : _supportedLinks[_linkTypes[index]]!['icon'],
-                        width: 40,
-                        height: 40,
-                      ),
-                      const SizedBox(width: 6),
-
-                      const Icon(Icons.arrow_drop_down, size: 20),
-                    ],
-                  ),
-                ),
-              ),
-
-              // DropdownButtonFormField<String>(
-              //   value: selectedType,
-              //   isExpanded: true,
-              //   decoration: const InputDecoration(
-              //     border: OutlineInputBorder(),
-              //   ),
-              //   // Show only icon in selected item
-              //   selectedItemBuilder: (BuildContext context) {
-              //     return _supportedLinksReadOnly.entries.map((entry) {
-              //       return Container(
-              //         alignment: Alignment.center,
-              //         child: Image.asset(
-              //           entry.value['icon'],
-              //           width: 24,
-              //           height: 24,
-              //         ),
-              //       );
-              //     }).toList();
-              //   },
-              //   items: _supportedLinks.entries.map((entry) {
-              //     return DropdownMenuItem<String>(
-              //       value: entry.key,
-              //       child: Row(
-              //         children: [
-              //           Image.asset(entry.value['icon'], width: 24, height: 24),
-              //           const SizedBox(width: 8),
-              //           Text(entry.value['name']),
-              //         ],
-              //       ),
-              //     );
-              //   }).toList(),
-              //   onChanged: (String? newValue) {
-              //     if (newValue != null) {
-              //       selectedType = newValue;
-              //     }
-              //   },
-              // ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: urlController,
-                decoration: const InputDecoration(
-                  labelText: 'URL',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            Obx(() => controller.isLoading.value
-                ? const CircularProgressIndicator()
-                : TextButton(
-                    onPressed: () async {
-                      await controller.updateLink(
-                        id: link.id,
-                        type: selectedType,
-                        url: urlController.text.trim(),
-                      );
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Save'),
-                  )),
-          ],
-        );
-      },
-    );
-  }
-*/
 
   void _showEditDialog(int index) {
     final link = controller.links[index];
@@ -307,7 +202,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
               backgroundColor: MyColors.backgroundColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
-              title: const Text('Edit Link'),
+              title: const Text('Edit Link',style: TextStyle(                    fontFamily: "PTSerif",
+              ),),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -335,6 +231,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                         child: TextField(
                           controller: urlController,
                           decoration: InputDecoration(
+                            labelStyle: TextStyle(                    fontFamily: "PTSerif",
+                            ),
                             labelText:
                                 'Enter $linkName ${linkName == "Phone" ? "Number" : linkName == "Email" ? "Id" : "URL"}',
                             border: OutlineInputBorder(
@@ -350,7 +248,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel'),
+                  child: const Text('Cancel',style: TextStyle(                    fontFamily: "PTSerif",
+                  ),),
                 ),
                 Obx(() => controller.isLoading.value
                     ? const CircularProgressIndicator()
@@ -363,7 +262,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                           );
                           Navigator.of(context).pop();
                         },
-                        child: const Text('Save'),
+                        child: const Text('Save',style: TextStyle(                    fontFamily: "PTSerif",
+                        ),),
                       )),
               ],
             );
@@ -459,6 +359,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
+                              fontFamily: "PTSerif",
                               fontSize: 15,
                             ),
                           ),
@@ -515,6 +416,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                 Text(
                                   AppStrings.editLinks.tr,
                                   style: AppTextStyles.extraLarge.copyWith(
+
+
                                     color: Colors.white,
                                     fontSize: 30,
                                     fontWeight: FontWeight.bold,
@@ -660,6 +563,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                       const SizedBox(width: 8),
                                                       Flexible(
                                                         child: Text(
+                                                          style: TextStyle(                    fontFamily: "PTSerif",
+                                                          ),
                                                           entry.value['name'],
                                                           overflow: TextOverflow
                                                               .ellipsis,
@@ -698,6 +603,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                             .links[index].url,
                                                         style: const TextStyle(
                                                           color: Colors.black,
+                                                          fontFamily: "PTSerif",
                                                           decoration:
                                                               TextDecoration
                                                                   .underline,
@@ -752,6 +658,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                                             width:
                                                                                 8),
                                                                         Text(
+                                                                          style: TextStyle(                    fontFamily: "PTSerif",
+                                                                          ),
                                                                             'Edit'),
                                                                       ],
                                                                     ),
@@ -771,6 +679,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                                             width:
                                                                                 8),
                                                                         Text(
+                                                                          style: TextStyle(                    fontFamily: "PTSerif",
+                                                                          ),
                                                                             'Delete'),
                                                                       ],
                                                                     ),
@@ -1067,6 +977,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: "PTSerif",
                                 fontSize: 14,
                               ),
                             ),

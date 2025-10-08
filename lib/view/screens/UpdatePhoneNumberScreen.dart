@@ -64,7 +64,8 @@ class _UpdatePhoneNumberScreenState extends State<UpdatePhoneNumberScreen> {
                   children: [
                     Text(
                       selectedCountry.flagEmoji,
-                      style: const TextStyle(fontSize: 20),
+                      style:
+                          const TextStyle(fontSize: 20, fontFamily: "PTSerif"),
                     ),
                     const SizedBox(width: 8),
                     Text(
@@ -72,7 +73,7 @@ class _UpdatePhoneNumberScreenState extends State<UpdatePhoneNumberScreen> {
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: "Chromatica",
+                        fontFamily: "PTSerif",
                         color: MyColors.textBlack,
                       ),
                     ),
@@ -98,7 +99,7 @@ class _UpdatePhoneNumberScreenState extends State<UpdatePhoneNumberScreen> {
               hintStyle: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                fontFamily: "Chromatica",
+                fontFamily: "PTSerif",
                 color: MyColors.textBlack,
                 decoration: TextDecoration.none,
                 wordSpacing: 1.2,

@@ -156,7 +156,7 @@ class _SwopbandWebViewScreenState extends State<SwopbandWebViewScreen> {
               icon: const Icon(Icons.person_add, color: Colors.white),
               label: const Text(
                 'View Connections',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: "PTSerif"),
               ),
             )
           : null,*/

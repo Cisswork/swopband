@@ -397,7 +397,8 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                 children: [
                                   Text(
                                     _selectedCountry.flagEmoji,
-                                    style: const TextStyle(fontSize: 20),
+                                    style: const TextStyle(
+                                        fontSize: 20, fontFamily: "PTSerif"),
                                   ),
                                   const SizedBox(width: 5),
                                   Text(
@@ -405,7 +406,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      fontFamily: "Chromatica",
+                                      fontFamily: "PTSerif",
                                       color: MyColors.textBlack,
                                     ),
                                   ),
@@ -434,7 +435,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                             hintStyle: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              fontFamily: "Chromatica",
+                              fontFamily: "PTSerif",
                               color: MyColors.textBlack,
                               decoration: TextDecoration.none,
                               wordSpacing: 1.2,
@@ -495,7 +496,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       hintStyle: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: "Chromatica",
+                        fontFamily: "PTSerif",
                         color: MyColors.textBlack,
                         decoration: TextDecoration.none,
                         wordSpacing: 1.2,
@@ -513,7 +514,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey,
-                                  fontFamily: "Chromatica",
+                                  fontFamily: "PTSerif",
                                 ),
                               ),
                             ),
@@ -553,6 +554,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         style: const TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
+                          fontFamily: "PTSerif",
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -594,6 +596,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                   color: controller.isUsernameAvailable.value
                                       ? Colors.green
                                       : Colors.red,
+                                  fontFamily: "PTSerif",
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -781,6 +784,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                fontFamily: "PTSerif",
               ),
             ),
             const SizedBox(height: 16),
@@ -827,6 +831,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.red,
+                  fontFamily: "PTSerif",
                 ),
               ),
             ),
@@ -868,14 +873,16 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
       if (source == ImageSource.camera) {
         var cameraStatus = await Permission.camera.request();
         if (cameraStatus != PermissionStatus.granted) {
-          _showPermissionDialog('Camera permission is required to take photos.');
+          _showPermissionDialog(
+              'Camera permission is required to take photos.');
           return;
         }
       } else {
         // On Android 13+, use Permission.photos instead of storage if needed
         var storageStatus = await Permission.storage.request();
         if (storageStatus != PermissionStatus.granted) {
-          _showPermissionDialog('Storage permission is required to access photos.');
+          _showPermissionDialog(
+              'Storage permission is required to access photos.');
           return;
         }
       }
@@ -884,8 +891,8 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
       final XFile? pickedFile = await _picker.pickImage(
         source: source,
         imageQuality: 90, // High-quality compression
-        maxWidth: 1920,   // Full HD width
-        maxHeight: 1920,  // Full HD height
+        maxWidth: 1920, // Full HD width
+        maxHeight: 1920, // Full HD height
       );
 
       if (pickedFile != null) {
@@ -894,7 +901,8 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
         // 🔹 Validate file size (allow up to 15MB)
         int fileSize = await file.length();
         double sizeInMB = fileSize / (1024 * 1024);
-        print('Selected image size: $fileSize bytes (${sizeInMB.toStringAsFixed(2)} MB)');
+        print(
+            'Selected image size: $fileSize bytes (${sizeInMB.toStringAsFixed(2)} MB)');
 
         if (fileSize > 15 * 1024 * 1024) {
           _showErrorSnackbar('Image too large. Maximum allowed size is 15MB.');
@@ -925,19 +933,22 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Permission Required'),
+        title: const Text('Permission Required',
+            style: TextStyle(fontFamily: "PTSerif")),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child:
+                const Text('Cancel', style: TextStyle(fontFamily: "PTSerif")),
           ),
           TextButton(
             onPressed: () {
               openAppSettings();
               Navigator.pop(context);
             },
-            child: const Text('Open Settings'),
+            child: const Text('Open Settings',
+                style: TextStyle(fontFamily: "PTSerif")),
           ),
         ],
       ),

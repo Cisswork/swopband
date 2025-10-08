@@ -44,24 +44,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 50),
+              const SizedBox(height: 30),
               Text(
                 "Settings",
                 style: AppTextStyles.large.copyWith(
-                  fontSize: 27,
+                  fontSize: 30,
                   fontWeight: FontWeight.bold,
                   color: MyColors.textBlack,
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
 
               CustomButton(
                 border: Colors.black,
                 buttonColor: MyColors.textWhite,
                 textColor: MyColors.textBlack,
                 text: "Enter the SWOPSTORE",
-                onPressed: ()async{
-                  Get.to(()=>const PurchaseScreen());
+                onPressed: () async {
+                  Get.to(() => const PurchaseScreen());
                 },
               ),
               const SizedBox(height: 10),
@@ -73,7 +73,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   textColor: MyColors.textWhite,
                   text: "FAQ and Troubleshooting",
                   onPressed: () {
-                    Get.to(()=>const FAQScreen());
+                    Get.to(() => const FAQScreen());
                   },
                 ),
               ),
@@ -95,23 +95,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildTappableAccountOption(
                       title: 'Edit Profile',
                       icon: Icons.person,
-                      onTap: () => Get.to(()=>const UpdateProfileScreen()),
+                      onTap: () => Get.to(() => const UpdateProfileScreen()),
                     ),
 
                     _buildTappableAccountOption(
                       title: 'FAQ',
                       icon: Icons.help_outline,
-                      onTap: () => Get.to(()=>const FAQScreen()),
+                      onTap: () => Get.to(() => const FAQScreen()),
                     ),
 
                     // Feedback option
                     _buildTappableAccountOption(
                       title: 'Send Feedback',
                       icon: Icons.feedback,
-                      onTap: () => FeedbackModalHelper.showFeedbackModal(context),
+                      onTap: () =>
+                          FeedbackModalHelper.showFeedbackModal(context),
                     ),
 
-                   /* // NFC Test option (for development/testing)
+                    /* // NFC Test option (for development/testing)
                     _buildTappableAccountOption(
                       title: 'NFC Test',
                       icon: Icons.nfc,
@@ -123,20 +124,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildTappableAccountOption(
                       title: 'Privacy Policy',
                       icon: Icons.privacy_tip_outlined,
-                      onTap: () => Get.to(()=>PrivacyPolicyScreen(url: "https://profile.swopband.com/privacy_policy.html",
-                        type: 'Privacy Policy',)),
+                      onTap: () => Get.to(() => PrivacyPolicyScreen(
+                            url:
+                                "https://profile.swopband.com/privacy_policy.html",
+                            type: 'Privacy Policy',
+                          )),
                     ),
 
                     // Terms & Conditions option
                     _buildTappableAccountOption(
                       title: 'Term & Condition',
                       icon: Icons.description_outlined,
-                      onTap: () => Get.to(()=>PrivacyPolicyScreen(url: "https://profile.swopband.com/terms_and_conditions.html",
-                        type: 'Term & Condition',)),
+                      onTap: () => Get.to(() => PrivacyPolicyScreen(
+                            url:
+                                "https://profile.swopband.com/terms_and_conditions.html",
+                            type: 'Term & Condition',
+                          )),
                     ),
-
-
-
                   ],
                 ),
               ),
@@ -146,7 +150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 buttonColor: MyColors.textBlack,
                 textColor: MyColors.textWhite,
                 text: "Sign Out of your Account",
-                onPressed: (){
+                onPressed: () {
                   _showSignOutDialog();
                 },
               ),
@@ -161,7 +165,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
-
                   children: [
                     _buildSectionTitle('Reset SWOPBAND'),
                     Padding(
@@ -171,12 +174,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         style: AppTextStyles.medium.copyWith(
                             color: MyColors.textWhite,
                             fontWeight: FontWeight.w500,
-                            fontSize: 15
-                        ),
+                            fontSize: 15),
                       ),
                     ),
                     const SizedBox(height: 20),
-
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: CustomButton(
@@ -188,7 +189,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -205,20 +205,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Align(
       alignment: AlignmentDirectional.topStart,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 5.0,left: 5),
+        padding: const EdgeInsets.only(bottom: 5.0, left: 5),
         child: Text(
           title,
           style: AppTextStyles.medium.copyWith(
               color: MyColors.textWhite,
               fontWeight: FontWeight.w600,
-              fontSize: 20
-          ),
+              fontSize: 20),
         ),
       ),
     );
   }
 
-  Widget _buildTappableAccountOption({required String title, required IconData icon, required VoidCallback onTap, Color iconColor = Colors.white,}) {
+  Widget _buildTappableAccountOption({
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+    Color iconColor = Colors.white,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -250,16 +254,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         title: const Text(
           'Sign Out',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "PTSerif"),
         ),
-        content: const Text('Are you sure you want to sign out?'),
+        content: const Text('Are you sure you want to sign out?',
+            style: TextStyle(fontFamily: "PTSerif")),
         actions: [
           TextButton(
             style: TextButton.styleFrom(
               foregroundColor: Colors.grey[600],
             ),
             onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL'),
+            child:
+                const Text('CANCEL', style: TextStyle(fontFamily: "PTSerif")),
           ),
           TextButton(
             style: TextButton.styleFrom(
@@ -269,7 +275,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Navigator.pop(context);
               _signOutUser();
             },
-            child: const Text('SIGN OUT'),
+            child:
+                const Text('SIGN OUT', style: TextStyle(fontFamily: "PTSerif")),
           ),
         ],
       ),
@@ -285,26 +292,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         title: const Text(
           'Delete Account',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "PTSerif"),
         ),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('This will permanently:'),
+            Text('This will permanently:',
+                style: TextStyle(fontFamily: "PTSerif")),
             SizedBox(height: 8),
             Padding(
               padding: EdgeInsets.only(left: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('• Delete all your data'),
-                  Text('• Remove your profile'),
+                  Text('• Delete all your data',
+                      style: TextStyle(fontFamily: "PTSerif")),
+                  Text('• Remove your profile',
+                      style: TextStyle(fontFamily: "PTSerif")),
                 ],
               ),
             ),
             SizedBox(height: 16),
-            Text('This action cannot be undone.'),
+            Text('This action cannot be undone.',
+                style: TextStyle(fontFamily: "PTSerif")),
           ],
         ),
         actions: [
@@ -313,7 +324,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               foregroundColor: Colors.grey[600],
             ),
             onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL'),
+            child:
+                const Text('CANCEL', style: TextStyle(fontFamily: "PTSerif")),
           ),
           TextButton(
             style: TextButton.styleFrom(
@@ -323,7 +335,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Navigator.pop(context);
               await _deleteAndSignOutUser1();
             },
-            child: const Text('DELETE ACCOUNT'),
+            child: const Text('DELETE ACCOUNT',
+                style: TextStyle(fontFamily: "PTSerif")),
           ),
         ],
       ),
@@ -333,7 +346,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _deleteAndSignOutUser() async {
     try {
       // Step 0: Get backend user ID
-      final backendUserId = await SharedPrefService.getString('backend_user_id');
+      final backendUserId =
+          await SharedPrefService.getString('backend_user_id');
 
       // Step 1: Delete account from backend
       if (backendUserId != null && backendUserId.isNotEmpty) {
@@ -341,7 +355,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           'https://profile.swopband.com/users/$backendUserId',
         );
 
-        if (response == null || (response.statusCode != 200 && response.statusCode != 204)) {
+        if (response == null ||
+            (response.statusCode != 200 && response.statusCode != 204)) {
           SnackbarUtil.showError('Failed to delete account on server.');
           return;
         }
@@ -363,7 +378,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           try {
             if (Platform.isIOS) {
               // Fresh Apple sign-in
-              final appleCredential = await SignInWithApple.getAppleIDCredential(
+              final appleCredential =
+                  await SignInWithApple.getAppleIDCredential(
                 scopes: [
                   AppleIDAuthorizationScopes.email,
                   AppleIDAuthorizationScopes.fullName
@@ -404,7 +420,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             if (FirebaseAuth.instance.currentUser == null) {
               deleted = true;
             } else {
-              SnackbarUtil.showError("Account deletion failed after re-authentication.");
+              SnackbarUtil.showError(
+                  "Account deletion failed after re-authentication.");
               return;
             }
           }
@@ -423,7 +440,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       // Navigate to WelcomeScreen
       Get.offAll(() => const WelcomeScreen());
-      SnackbarUtil.showSuccess('Account Deleted: Your account has been deleted.');
+      SnackbarUtil.showSuccess(
+          'Account Deleted: Your account has been deleted.');
     } catch (e) {
       log('❌ Error deleting/signing out: $e');
       SnackbarUtil.showError('Failed to delete account.');
@@ -471,12 +489,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       await FirebaseAuth.instance.signOut();
       await GoogleSignIn().signOut();
       print("✅ Signed out");
-
     } catch (e) {
       print("❌ Error: $e");
     }
   }
-
 
   Future<void> _deleteAndSignOutUser1() async {
     try {
@@ -487,13 +503,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       );
 
       // Step 1: Delete account from backend
-      final backendUserId = await SharedPrefService.getString('backend_user_id');
+      final backendUserId =
+          await SharedPrefService.getString('backend_user_id');
       if (backendUserId != null && backendUserId.isNotEmpty) {
         final response = await ApiService.delete(
           'https://profile.swopband.com/users/$backendUserId',
         );
 
-        if (response == null || (response.statusCode != 200 && response.statusCode != 204)) {
+        if (response == null ||
+            (response.statusCode != 200 && response.statusCode != 204)) {
           Get.back(); // Close loading dialog
           SnackbarUtil.showError('Failed to delete account on server.');
           return;
@@ -548,4 +566,5 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       log('❌ Error during signout: $e');
     }
-  }}
+  }
+}

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppTextStyles {
-  static const String fontFamily = 'Chromatica';
+  static const String fontFamily = 'PTSerif';
 
   static const TextStyle small = TextStyle(
     fontSize: 12,

@@ -43,10 +43,10 @@ class CustomButton extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-              fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w600,
                 fontSize: 15,
                 color: effectiveTextColor,
-                fontFamily: "Chromatica"),
+                fontFamily: "PTSerif"),
             textAlign: TextAlign.center,
             maxLines: 3,
           ),

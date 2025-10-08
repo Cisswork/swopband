@@ -34,6 +34,7 @@ class RingNotConnectedScreen extends StatelessWidget {
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
+                  fontFamily: "PTSerif",
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -46,7 +47,7 @@ class RingNotConnectedScreen extends StatelessWidget {
                   textColor: MyColors.textWhite,
                   text: "Retry",
                   onPressed: () {
-                    Get.to(()=>IntroducingBubbleScreen());
+                    Get.to(() => IntroducingBubbleScreen());
                   },
                 ),
               ),
@@ -58,8 +59,8 @@ class RingNotConnectedScreen extends StatelessWidget {
                   textColor: MyColors.textBlack,
                   text: "FAQ and Troubleshooting",
                   onPressed: () {
-                    Get.to(()=>FAQScreen());
-                    },
+                    Get.to(() => FAQScreen());
+                  },
                 ),
               ),
             ],

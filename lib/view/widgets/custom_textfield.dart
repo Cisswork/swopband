@@ -68,7 +68,7 @@ Widget myFieldAdvance({
                 hintStyle: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  fontFamily: "Chromatica",
+                  fontFamily: "PTSerif",
                   color: Colors.grey,
                   decoration: TextDecoration.none,
                   wordSpacing: 1.2,

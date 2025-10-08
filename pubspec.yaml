@@ -94,14 +94,14 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Chromatica
+    - family: PTSerif
       fonts:
-        - asset: assets/fonts/Chromatica-Black.ttf
-        - asset: assets/fonts/Chromatica-Bold.ttf
-        - asset: assets/fonts/Chromatica-Light.ttf
-        - asset: assets/fonts/Chromatica-Medium.ttf
-        - asset: assets/fonts/Chromatica-Regular.ttf
-        - asset: assets/fonts/Chromatica-Thin.ttf
+        - asset: assets/fonts/PTSerif-Bold.ttf
+        - asset: assets/fonts/PTSerif-BoldItalic.ttf
+        - asset: assets/fonts/PTSerif-Italic.ttf
+        - asset: assets/fonts/PTSerif-Regular.ttf
+        - asset: assets/fonts/Urbanist-Italic-VariableFont_wght.ttf
+        - asset: assets/fonts/Urbanist-VariableFont_wght.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:

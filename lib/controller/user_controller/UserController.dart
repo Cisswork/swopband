@@ -218,10 +218,10 @@ class UserController extends GetxController {
     }
 
     // Add profile_url if provided (imageUrl from /uploads/ API)
-     if (profileUrl != null && profileUrl.isNotEmpty) {
+    if (profileUrl != null && profileUrl.isNotEmpty) {
       fields["profile_url"] = profileUrl.toString();
       log("🔗 Using profile URL from /uploads/ API : $profileUrl");
-     }
+    }
 
     log("🔗 UPDATE USER PARAMETERS: $fields");
     log("🔗 BACKEND USER ID: $backendUserId");
@@ -520,6 +520,7 @@ class UserController extends GetxController {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
+                    fontFamily: "PTSerif",
                     color: Colors.green,
                   ),
                 ),
@@ -532,6 +533,7 @@ class UserController extends GetxController {
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey.shade700,
+                    fontFamily: "PTSerif",
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -554,6 +556,7 @@ class UserController extends GetxController {
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
+                      fontFamily: "PTSerif",
                     ),
                   ),
                 ),

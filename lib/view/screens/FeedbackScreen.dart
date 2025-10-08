@@ -36,8 +36,10 @@ class _FeedbackPopupState extends State<FeedbackPopup> {
               children: [
                 const Expanded(
                   child: Text(
+
                     "With your feedback, we can\nmake SwopBand even better!",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: Colors.white, fontSize: 16,                    fontFamily: "PTSerif",
+                    ),
                   ),
                 ),
                 GestureDetector(
@@ -78,8 +80,10 @@ class _FeedbackPopupState extends State<FeedbackPopup> {
                 style: const TextStyle(color: Colors.white),
                 maxLines: 3,
                 decoration: const InputDecoration(
+
                   hintText: "Type feedback here...",
-                  hintStyle: TextStyle(color: Colors.grey),
+                  hintStyle: TextStyle(color: Colors.grey,                    fontFamily: "PTSerif",
+                  ),
                   contentPadding: EdgeInsets.all(12),
                   border: InputBorder.none,
                 ),
@@ -107,7 +111,8 @@ class _FeedbackPopupState extends State<FeedbackPopup> {
                 controller.submitReviewRating(
                     rating, _controller.text, context);
               },
-              child: const Text("Submit"),
+              child: const Text("Submit",style: TextStyle(                    fontFamily: "PTSerif",
+              ),),
             )),
           ],
         ),

@@ -280,6 +280,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                fontFamily: "PTSerif",
               ),
             ),
             const SizedBox(height: 16),
@@ -325,6 +326,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.red,
+                  fontFamily: "PTSerif",
                 ),
               ),
             ),
@@ -372,19 +374,24 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       }
 
       final url = 'https://profile.swopband.com/users/$userId';
-      final body = {"profile_url": profileUrl.isEmpty? null:profileUrl};
+      final body = {"profile_url": profileUrl.isEmpty ? null : profileUrl};
 
       final response = await ApiService.put(url, body);
       if (response != null &&
           (response.statusCode == 200 || response.statusCode == 201)) {
-        log('✅ Profile image  ${profileUrl.isEmpty?"Removed":"Add"} successfully');
+        _showSuccessSnackbar(
+            'Profile photo ${profileUrl.isEmpty ? "removed" : "update"}');
+
+        log('✅ Profile image  ${profileUrl.isEmpty ? "Removed" : "Add"} successfully');
       } else {
-        log('❌ Failed to remove  ${profileUrl.isEmpty?"Removed":"Add"}. Status: ${response?.statusCode}, Body: ${response?.body}');
-        SnackbarUtil.showError('Failed to  ${profileUrl.isEmpty?"Removed":"Add"} image on server');
+        log('❌ Failed to remove  ${profileUrl.isEmpty ? "Removed" : "Add"}. Status: ${response?.statusCode}, Body: ${response?.body}');
+        SnackbarUtil.showError(
+            'Failed to  ${profileUrl.isEmpty ? "Removed" : "Add"} image on server');
       }
     } catch (e) {
-      log('❌ Error removing  ${profileUrl.isEmpty?"Removed":"Add"} from server: $e');
-      SnackbarUtil.showError('Failed to  ${profileUrl.isEmpty?"Removed":"Add"} image from server: $e');
+      log('❌ Error removing  ${profileUrl.isEmpty ? "Removed" : "Add"} from server: $e');
+      SnackbarUtil.showError(
+          'Failed to  ${profileUrl.isEmpty ? "Removed" : "Add"} image from server: $e');
     }
   }
 
@@ -537,7 +544,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                   children: [
                                     Text(
                                       _selectedCountry.flagEmoji,
-                                      style: const TextStyle(fontSize: 20),
+                                      style: const TextStyle(
+                                          fontSize: 20, fontFamily: "PTSerif"),
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
@@ -545,7 +553,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        fontFamily: "Chromatica",
+                                        fontFamily: "PTSerif",
                                         color: MyColors.textBlack,
                                       ),
                                     ),
@@ -571,7 +579,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                               hintStyle: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: "Chromatica",
+                                fontFamily: "PTSerif",
                                 color: MyColors.textBlack,
                                 decoration: TextDecoration.none,
                                 wordSpacing: 1.2,
@@ -642,7 +650,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
-                                    fontFamily: "Chromatica",
+                                    fontFamily: "PTSerif",
                                   ),
                                 ),
                               ),
@@ -659,7 +667,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
                         hintStyle: const TextStyle(
                           fontSize: 14,
-                          fontFamily: "Chromatica",
+                          fontFamily: "PTSerif",
                           color: MyColors.textBlack,
                           decoration: TextDecoration.none,
                           wordSpacing: 1.2,

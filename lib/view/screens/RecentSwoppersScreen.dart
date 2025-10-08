@@ -139,7 +139,10 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                   },
                   decoration: InputDecoration(
                     hintText: 'Search Connections',
-                    hintStyle: const TextStyle(color: Colors.grey),
+                    hintStyle: const TextStyle(
+                      color: Colors.grey,
+                      fontFamily: "PTSerif",
+                    ),
                     suffixIcon: Transform(
                       alignment: Alignment.center,
                       transform: Matrix4.rotationY(3.1416),
@@ -191,53 +194,55 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
 
                 if (controller.recentSwoppers.isEmpty) {
                   return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.nfc,
-                          size: 64,
-                          color: MyColors.textDisabledColor,
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'No NFC connections yet',
-                          style: AppTextStyles.medium.copyWith(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.nfc,
+                            size: 64,
                             color: MyColors.textDisabledColor,
                           ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'When someone touches their NFC ring to your device,\n they will appear here automatically',
-                          style: AppTextStyles.small.copyWith(
-                            color: MyColors.textDisabledColor,
+                          SizedBox(height: 16),
+                          Text(
+                            'No NFC connections yet',
+                            style: AppTextStyles.medium.copyWith(
+                              color: MyColors.textDisabledColor,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 20),
-                        // Container(
-                        //   padding: EdgeInsets.all(16),
-                        //   decoration: BoxDecoration(
-                        //     color: Colors.blue.withOpacity(0.1),
-                        //     borderRadius: BorderRadius.circular(12),
-                        //     border: Border.all(color: Colors.blue.withOpacity(0.3)),
-                        //   ),
-                        //   child: Row(
-                        //     mainAxisSize: MainAxisSize.min,
-                        //     children: [
-                        //       Icon(Icons.info_outline, color: Colors.blue, size: 20),
-                        //       SizedBox(width: 8),
-                        //       Text(
-                        //         'NFC is active and listening',
-                        //         style: TextStyle(
-                        //           color: Colors.blue,
-                        //           fontWeight: FontWeight.w600,
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                      ],
+                          SizedBox(height: 8),
+                          Text(
+                            'When someone touches their NFC ring to your device,\n they will appear here automatically',
+                            style: AppTextStyles.small.copyWith(
+                              color: MyColors.textDisabledColor,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 20),
+                          // Container(
+                          //   padding: EdgeInsets.all(16),
+                          //   decoration: BoxDecoration(
+                          //     color: Colors.blue.withOpacity(0.1),
+                          //     borderRadius: BorderRadius.circular(12),
+                          //     border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                          //   ),
+                          //   child: Row(
+                          //     mainAxisSize: MainAxisSize.min,
+                          //     children: [
+                          //       Icon(Icons.info_outline, color: Colors.blue, size: 20),
+                          //       SizedBox(width: 8),
+                          //       Text(
+                          //         'NFC is active and listening',
+                          //         style: TextStyle(
+                          //           color: Colors.blue,
+                          //           fontWeight: FontWeight.w600,
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                        ],
+                      ),
                     ),
                   );
                 }
@@ -359,15 +364,28 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Quick Connect'),
+        title: Text(
+          'Quick Connect',
+          style: TextStyle(
+            fontFamily: "PTSerif",
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Enter username to connect instantly:'),
+            Text(
+              'Enter username to connect instantly:',
+              style: TextStyle(
+                fontFamily: "PTSerif",
+              ),
+            ),
             SizedBox(height: 16),
             TextField(
               controller: _usernameController,
               decoration: InputDecoration(
+                hintStyle: TextStyle(
+                  fontFamily: "PTSerif",
+                ),
                 hintText: 'e.g., ranga013',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.person),
@@ -385,7 +403,8 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
+            child: Text('Cancel',style: TextStyle(                    fontFamily: "PTSerif",
+            ),),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -395,7 +414,8 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                 await _connectWithUsername(username);
               }
             },
-            child: Text('Connect'),
+            child: Text('Connect',style: TextStyle(                    fontFamily: "PTSerif",
+            ),),
           ),
         ],
       ),
@@ -411,7 +431,8 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
             children: [
               CircularProgressIndicator(),
               SizedBox(width: 16),
-              Text('Creating connection...'),
+              Text('Creating connection...',style: TextStyle(                    fontFamily: "PTSerif",
+              ),),
             ],
           ),
         ),
@@ -426,6 +447,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
 
       if (success) {
         Get.snackbar(
+
           'Success',
           'Connected with @$username',
           backgroundColor: Colors.green,
@@ -509,11 +531,14 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
       builder: (context) => AlertDialog(
         title: Text('Remove Connection'),
         content: Text(
+            style: TextStyle(                    fontFamily: "PTSerif",
+            ),
             'Are you sure you want to remove @${user.username} from your connections?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel'),
+            child: Text('Cancel',style: TextStyle(                    fontFamily: "PTSerif",
+            ),),
           ),
           ElevatedButton(
             onPressed: () {
@@ -536,7 +561,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Remove', style: TextStyle(color: Colors.white)),
+            child: Text('Remove', style: TextStyle(color: Colors.white,      fontFamily: "PTSerif",)),
           ),
         ],
       ),

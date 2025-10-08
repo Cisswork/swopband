@@ -144,6 +144,7 @@ class BottomNavScreen extends StatelessWidget {
                   child: Text(
                     label,
                     style: TextStyle(
+                      fontFamily: "PTSerif",
                       color: Colors.white,
                       fontSize: screenWidth * 0.025, // 2.5% of screen width
                       fontWeight: FontWeight.w500,
