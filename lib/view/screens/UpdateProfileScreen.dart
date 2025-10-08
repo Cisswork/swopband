@@ -168,7 +168,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
           : null,
       profileFile:
           null, // No file upload needed as image is already uploaded to API
-      profileUrl: profileUrl,
+      profileUrl: "",
       onSuccess: () {
         SnackbarUtil.showSuccess("Profile updated successfully!");
         Get.back(); // Go back to previous screen
