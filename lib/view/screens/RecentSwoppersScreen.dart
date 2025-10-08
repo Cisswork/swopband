@@ -75,6 +75,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                 Text(
                   "Connections",
                   style: AppTextStyles.large.copyWith(
+                    fontFamily: "PTSerif",
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: MyColors.textBlack,
