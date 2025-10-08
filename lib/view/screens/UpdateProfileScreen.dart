@@ -356,12 +356,12 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
     });
 
     // Call API to remove image from server
-    _removeImageFromAPI();
+    _removeImageFromAPI('');
 
     _showSuccessSnackbar('Profile photo removed');
   }
 
-  Future<void> _removeImageFromAPI() async {
+  Future<void> _removeImageFromAPI(String profileUrl) async {
     try {
       log('🗑️ Removing profile image via users/<userId> PUT with profile_url: null ...');
 
@@ -372,19 +372,19 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
       }
 
       final url = 'https://profile.swopband.com/users/$userId';
-      final body = {"profile_url": null};
+      final body = {"profile_url": profileUrl.isEmpty? null:profileUrl};
 
       final response = await ApiService.put(url, body);
       if (response != null &&
           (response.statusCode == 200 || response.statusCode == 201)) {
-        log('✅ Profile image removed successfully on server');
+        log('✅ Profile image  ${profileUrl.isEmpty?"Removed":"Add"} successfully');
       } else {
-        log('❌ Failed to remove image. Status: ${response?.statusCode}, Body: ${response?.body}');
-        SnackbarUtil.showError('Failed to remove image on server');
+        log('❌ Failed to remove  ${profileUrl.isEmpty?"Removed":"Add"}. Status: ${response?.statusCode}, Body: ${response?.body}');
+        SnackbarUtil.showError('Failed to  ${profileUrl.isEmpty?"Removed":"Add"} image on server');
       }
     } catch (e) {
-      log('❌ Error removing image from server: $e');
-      SnackbarUtil.showError('Failed to remove image from server: $e');
+      log('❌ Error removing  ${profileUrl.isEmpty?"Removed":"Add"} from server: $e');
+      SnackbarUtil.showError('Failed to  ${profileUrl.isEmpty?"Removed":"Add"} image from server: $e');
     }
   }
 
@@ -920,21 +920,8 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
           log('✅ Image URL set in state: $_selectedImageUrl');
 
           // Call update user immediately with the fresh imageUrl
-          await controller.updateUser(
-            username: swopUserNameController.text,
-            name: nameController.text,
-            email: emailController.text,
-            bio: bioController.text,
-            phone: _phoneNumber.isNotEmpty ? _phoneNumber : null,
-            countryCode: _selectedCountry.phoneCode.isNotEmpty
-                ? '+${_selectedCountry.phoneCode}'
-                : null,
-            profileFile: null,
-            profileUrl: imageUrl,
-            onSuccess: () {
-              // Optional success feedback
-            },
-          );
+          _removeImageFromAPI(imageUrl);
+          //
         } else {
           log('❌ No imageUrl in response');
           _showErrorSnackbar('Upload successful but no image URL received');

@@ -130,7 +130,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
     // log("[NFC] Calling controller.createUser()");
     // File? selectedFile = (widget.imagePickerKey.currentState as dynamic)
     //     ?.getSelectedImageFile();
-    // String profileImage = await _getCurrentProfileImage();
+    // String profileImage = await _getCurrentProfileImage(
     // await controller.createUser(
     //   username: widget.username,
     //   name: widget.name,
