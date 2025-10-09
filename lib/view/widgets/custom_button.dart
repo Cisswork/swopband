@@ -46,7 +46,7 @@ class CustomButton extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
                 color: effectiveTextColor,
-                fontFamily: "PTSerif"),
+                fontFamily: "Outfit"),
             textAlign: TextAlign.center,
             maxLines: 3,
           ),

@@ -227,7 +227,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 6.0),
+        padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 6.0),
         child: Row(
           children: [
             Text(
@@ -254,10 +254,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         title: const Text(
           'Sign Out',
-          style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "PTSerif"),
+          style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Outfit"),
         ),
         content: const Text('Are you sure you want to sign out?',
-            style: TextStyle(fontFamily: "PTSerif")),
+            style: TextStyle(fontFamily: "Outfit")),
         actions: [
           TextButton(
             style: TextButton.styleFrom(
@@ -265,7 +265,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             onPressed: () => Navigator.pop(context),
             child:
-                const Text('CANCEL', style: TextStyle(fontFamily: "PTSerif")),
+                const Text('CANCEL', style: TextStyle(fontFamily: "Outfit")),
           ),
           TextButton(
             style: TextButton.styleFrom(
@@ -276,7 +276,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _signOutUser();
             },
             child:
-                const Text('SIGN OUT', style: TextStyle(fontFamily: "PTSerif")),
+                const Text('SIGN OUT', style: TextStyle(fontFamily: "Outfit")),
           ),
         ],
       ),
@@ -292,14 +292,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         title: const Text(
           'Delete Account',
-          style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "PTSerif"),
+          style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Outfit"),
         ),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('This will permanently:',
-                style: TextStyle(fontFamily: "PTSerif")),
+                style: TextStyle(fontFamily: "Outfit")),
             SizedBox(height: 8),
             Padding(
               padding: EdgeInsets.only(left: 8.0),
@@ -307,15 +307,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('• Delete all your data',
-                      style: TextStyle(fontFamily: "PTSerif")),
+                      style: TextStyle(fontFamily: "Outfit")),
                   Text('• Remove your profile',
-                      style: TextStyle(fontFamily: "PTSerif")),
+                      style: TextStyle(fontFamily: "Outfit")),
                 ],
               ),
             ),
             SizedBox(height: 16),
             Text('This action cannot be undone.',
-                style: TextStyle(fontFamily: "PTSerif")),
+                style: TextStyle(fontFamily: "Outfit")),
           ],
         ),
         actions: [
@@ -325,7 +325,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             onPressed: () => Navigator.pop(context),
             child:
-                const Text('CANCEL', style: TextStyle(fontFamily: "PTSerif")),
+                const Text('CANCEL', style: TextStyle(fontFamily: "Outfit")),
           ),
           TextButton(
             style: TextButton.styleFrom(
@@ -336,7 +336,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               await _deleteAndSignOutUser1();
             },
             child: const Text('DELETE ACCOUNT',
-                style: TextStyle(fontFamily: "PTSerif")),
+                style: TextStyle(fontFamily: "Outfit")),
           ),
         ],
       ),

@@ -520,7 +520,7 @@ class UserController extends GetxController {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    fontFamily: "PTSerif",
+                    fontFamily: "Outfit",
                     color: Colors.green,
                   ),
                 ),
@@ -533,7 +533,7 @@ class UserController extends GetxController {
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey.shade700,
-                    fontFamily: "PTSerif",
+                    fontFamily: "Outfit",
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -556,7 +556,7 @@ class UserController extends GetxController {
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
-                      fontFamily: "PTSerif",
+                      fontFamily: "Outfit",
                     ),
                   ),
                 ),

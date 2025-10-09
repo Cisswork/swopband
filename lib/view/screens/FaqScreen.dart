@@ -29,7 +29,7 @@ class _FAQScreenState extends State<FAQScreen> {
         title: const Text(
           'FAQs',
           style: TextStyle(
-            fontFamily: "PTSerif",
+            fontFamily: "Outfit",
 
             color: Colors.white,
             fontSize: 24,
@@ -50,7 +50,7 @@ class _FAQScreenState extends State<FAQScreen> {
           return const Center(
             child: Text(
               'No FAQs available',
-              style: TextStyle(color: Colors.white, fontSize: 16,            fontFamily: "PTSerif",
+              style: TextStyle(color: Colors.white, fontSize: 16,            fontFamily: "Outfit",
               ),
             ),
           );
@@ -111,7 +111,7 @@ class _FAQItemState extends State<FAQItem> {
         title: Text(
           widget.question,
           style: const TextStyle(
-            fontFamily: "PTSerif",
+            fontFamily: "Outfit",
 
             color: Colors.white,
             fontSize: 18,
@@ -132,7 +132,7 @@ class _FAQItemState extends State<FAQItem> {
           Text(
             widget.answer,
             style: const TextStyle(
-              fontFamily: "PTSerif",
+              fontFamily: "Outfit",
 
               color: Colors.white70,
               fontSize: 16,

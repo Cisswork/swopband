@@ -38,7 +38,7 @@ class _FeedbackPopupState extends State<FeedbackPopup> {
                   child: Text(
 
                     "With your feedback, we can\nmake SwopBand even better!",
-                    style: TextStyle(color: Colors.white, fontSize: 16,                    fontFamily: "PTSerif",
+                    style: TextStyle(color: Colors.white, fontSize: 16,                    fontFamily: "Outfit",
                     ),
                   ),
                 ),
@@ -82,7 +82,7 @@ class _FeedbackPopupState extends State<FeedbackPopup> {
                 decoration: const InputDecoration(
 
                   hintText: "Type feedback here...",
-                  hintStyle: TextStyle(color: Colors.grey,                    fontFamily: "PTSerif",
+                  hintStyle: TextStyle(color: Colors.grey,                    fontFamily: "Outfit",
                   ),
                   contentPadding: EdgeInsets.all(12),
                   border: InputBorder.none,
@@ -111,7 +111,7 @@ class _FeedbackPopupState extends State<FeedbackPopup> {
                 controller.submitReviewRating(
                     rating, _controller.text, context);
               },
-              child: const Text("Submit",style: TextStyle(                    fontFamily: "PTSerif",
+              child: const Text("Submit",style: TextStyle(                    fontFamily: "Outfit",
               ),),
             )),
           ],

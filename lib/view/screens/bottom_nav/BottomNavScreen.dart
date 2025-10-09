@@ -70,7 +70,7 @@ class BottomNavScreen extends StatelessWidget {
                 margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02), // 2% of screen width
                 decoration: BoxDecoration(
                   color: Colors.black.withOpacity(0.95),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(30),
                   border: Border.all(
                     color: Colors.white.withOpacity(0.2),
                     width: 1,
@@ -144,7 +144,7 @@ class BottomNavScreen extends StatelessWidget {
                   child: Text(
                     label,
                     style: TextStyle(
-                      fontFamily: "PTSerif",
+                      fontFamily: "Outfit",
                       color: Colors.white,
                       fontSize: screenWidth * 0.025, // 2.5% of screen width
                       fontWeight: FontWeight.w500,

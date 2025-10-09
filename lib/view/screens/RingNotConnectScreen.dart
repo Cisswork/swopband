@@ -34,7 +34,7 @@ class RingNotConnectedScreen extends StatelessWidget {
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
-                  fontFamily: "PTSerif",
+                  fontFamily: "Outfit",
                 ),
                 textAlign: TextAlign.center,
               ),

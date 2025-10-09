@@ -501,7 +501,7 @@ class _AddLinkScreenState extends State<AddLinkScreen> {
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: "PTSerif",
+                                fontFamily: "Outfit",
                                 fontSize: 15),
                           ),
                         ],

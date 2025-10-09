@@ -202,7 +202,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
               backgroundColor: MyColors.backgroundColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
-              title: const Text('Edit Link',style: TextStyle(                    fontFamily: "PTSerif",
+              title: const Text('Edit Link',style: TextStyle(                    fontFamily: "Outfit",
               ),),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -231,7 +231,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                         child: TextField(
                           controller: urlController,
                           decoration: InputDecoration(
-                            labelStyle: TextStyle(                    fontFamily: "PTSerif",
+                            labelStyle: TextStyle(                    fontFamily: "Outfit",
                             ),
                             labelText:
                                 'Enter $linkName ${linkName == "Phone" ? "Number" : linkName == "Email" ? "Id" : "URL"}',
@@ -248,7 +248,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel',style: TextStyle(                    fontFamily: "PTSerif",
+                  child: const Text('Cancel',style: TextStyle(                    fontFamily: "Outfit",
                   ),),
                 ),
                 Obx(() => controller.isLoading.value
@@ -262,7 +262,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                           );
                           Navigator.of(context).pop();
                         },
-                        child: const Text('Save',style: TextStyle(                    fontFamily: "PTSerif",
+                        child: const Text('Save',style: TextStyle(                    fontFamily: "Outfit",
                         ),),
                       )),
               ],
@@ -359,7 +359,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontFamily: "PTSerif",
+                              fontFamily: "Outfit",
                               fontSize: 15,
                             ),
                           ),
@@ -563,7 +563,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                       const SizedBox(width: 8),
                                                       Flexible(
                                                         child: Text(
-                                                          style: TextStyle(                    fontFamily: "PTSerif",
+                                                          style: TextStyle(                    fontFamily: "Outfit",
                                                           ),
                                                           entry.value['name'],
                                                           overflow: TextOverflow
@@ -603,7 +603,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                             .links[index].url,
                                                         style: const TextStyle(
                                                           color: Colors.black,
-                                                          fontFamily: "PTSerif",
+                                                          fontFamily: "Outfit",
                                                           decoration:
                                                               TextDecoration
                                                                   .underline,
@@ -658,7 +658,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                                             width:
                                                                                 8),
                                                                         Text(
-                                                                          style: TextStyle(                    fontFamily: "PTSerif",
+                                                                          style: TextStyle(                    fontFamily: "Outfit",
                                                                           ),
                                                                             'Edit'),
                                                                       ],
@@ -679,7 +679,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                                             width:
                                                                                 8),
                                                                         Text(
-                                                                          style: TextStyle(                    fontFamily: "PTSerif",
+                                                                          style: TextStyle(                    fontFamily: "Outfit",
                                                                           ),
                                                                             'Delete'),
                                                                       ],
@@ -977,7 +977,7 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: "PTSerif",
+                                fontFamily: "Outfit",
                                 fontSize: 14,
                               ),
                             ),

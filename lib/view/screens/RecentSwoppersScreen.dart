@@ -75,7 +75,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                 Text(
                   "Connections",
                   style: AppTextStyles.large.copyWith(
-                    fontFamily: "PTSerif",
+                    fontFamily: "Outfit",
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: MyColors.textBlack,
@@ -142,7 +142,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                     hintText: 'Search Connections',
                     hintStyle: const TextStyle(
                       color: Colors.grey,
-                      fontFamily: "PTSerif",
+                      fontFamily: "Outfit",
                     ),
                     suffixIcon: Transform(
                       alignment: Alignment.center,
@@ -368,7 +368,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
         title: Text(
           'Quick Connect',
           style: TextStyle(
-            fontFamily: "PTSerif",
+            fontFamily: "Outfit",
           ),
         ),
         content: Column(
@@ -377,7 +377,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
             Text(
               'Enter username to connect instantly:',
               style: TextStyle(
-                fontFamily: "PTSerif",
+                fontFamily: "Outfit",
               ),
             ),
             SizedBox(height: 16),
@@ -385,7 +385,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
               controller: _usernameController,
               decoration: InputDecoration(
                 hintStyle: TextStyle(
-                  fontFamily: "PTSerif",
+                  fontFamily: "Outfit",
                 ),
                 hintText: 'e.g., ranga013',
                 border: OutlineInputBorder(),
@@ -404,7 +404,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel',style: TextStyle(                    fontFamily: "PTSerif",
+            child: Text('Cancel',style: TextStyle(                    fontFamily: "Outfit",
             ),),
           ),
           ElevatedButton(
@@ -415,7 +415,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
                 await _connectWithUsername(username);
               }
             },
-            child: Text('Connect',style: TextStyle(                    fontFamily: "PTSerif",
+            child: Text('Connect',style: TextStyle(                    fontFamily: "Outfit",
             ),),
           ),
         ],
@@ -432,7 +432,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
             children: [
               CircularProgressIndicator(),
               SizedBox(width: 16),
-              Text('Creating connection...',style: TextStyle(                    fontFamily: "PTSerif",
+              Text('Creating connection...',style: TextStyle(                    fontFamily: "Outfit",
               ),),
             ],
           ),
@@ -532,13 +532,13 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
       builder: (context) => AlertDialog(
         title: Text('Remove Connection'),
         content: Text(
-            style: TextStyle(                    fontFamily: "PTSerif",
+            style: TextStyle(                    fontFamily: "Outfit",
             ),
             'Are you sure you want to remove @${user.username} from your connections?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: Text('Cancel',style: TextStyle(                    fontFamily: "PTSerif",
+            child: Text('Cancel',style: TextStyle(                    fontFamily: "Outfit",
             ),),
           ),
           ElevatedButton(
@@ -562,7 +562,7 @@ class _RecentSwoppersScreenState extends State<RecentSwoppersScreen> {
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Remove', style: TextStyle(color: Colors.white,      fontFamily: "PTSerif",)),
+            child: Text('Remove', style: TextStyle(color: Colors.white,      fontFamily: "Outfit",)),
           ),
         ],
       ),

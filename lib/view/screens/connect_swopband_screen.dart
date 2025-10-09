@@ -227,7 +227,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          fontFamily: "PTSerif",
+                          fontFamily: "Outfit",
                           color: Colors.black87,
                         ),
                       ),
@@ -241,7 +241,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.black54,
-                          fontFamily: "PTSerif",
+                          fontFamily: "Outfit",
                         ),
                       ),
 
@@ -289,7 +289,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                           style: TextStyle(
                             color: Colors.black54,
                             fontSize: 16,
-                            fontFamily: "PTSerif",
+                            fontFamily: "Outfit",
                           ),
                         ),
                       ),
@@ -580,7 +580,7 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
                         style: const TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
-                          fontFamily: "PTSerif",
+                          fontFamily: "Outfit",
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -764,7 +764,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                fontFamily: "PTSerif",
+                fontFamily: "Outfit",
               ),
             ),
             const SizedBox(height: 16),
@@ -810,7 +810,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.red,
-                  fontFamily: "PTSerif",
+                  fontFamily: "Outfit",
                 ),
               ),
             ),

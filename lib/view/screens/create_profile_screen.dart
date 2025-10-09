@@ -237,7 +237,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                   const SizedBox(height: 10),
                   Text(
                     AppStrings.createProfile.tr,
-                    style: AppTextStyles.large.copyWith(fontSize: 18),
+                    style: AppTextStyles.large.copyWith(fontSize: 20),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 10),
@@ -398,7 +398,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                   Text(
                                     _selectedCountry.flagEmoji,
                                     style: const TextStyle(
-                                        fontSize: 20, fontFamily: "PTSerif"),
+                                        fontSize: 20, fontFamily: "Outfit"),
                                   ),
                                   const SizedBox(width: 5),
                                   Text(
@@ -406,7 +406,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      fontFamily: "PTSerif",
+                                      fontFamily: "Outfit",
                                       color: MyColors.textBlack,
                                     ),
                                   ),
@@ -435,7 +435,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                             hintStyle: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              fontFamily: "PTSerif",
+                              fontFamily: "Outfit",
                               color: MyColors.textBlack,
                               decoration: TextDecoration.none,
                               wordSpacing: 1.2,
@@ -496,7 +496,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                       hintStyle: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: "PTSerif",
+                        fontFamily: "Outfit",
                         color: MyColors.textBlack,
                         decoration: TextDecoration.none,
                         wordSpacing: 1.2,
@@ -514,7 +514,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey,
-                                  fontFamily: "PTSerif",
+                                  fontFamily: "Outfit",
                                 ),
                               ),
                             ),
@@ -554,7 +554,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                         style: const TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.bold,
-                          fontFamily: "PTSerif",
+                          fontFamily: "Outfit",
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -596,7 +596,7 @@ class _CreateProfileScreenState extends State<CreateProfileScreen> {
                                   color: controller.isUsernameAvailable.value
                                       ? Colors.green
                                       : Colors.red,
-                                  fontFamily: "PTSerif",
+                                  fontFamily: "Outfit",
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -784,7 +784,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                fontFamily: "PTSerif",
+                fontFamily: "Outfit",
               ),
             ),
             const SizedBox(height: 16),
@@ -831,7 +831,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.red,
-                  fontFamily: "PTSerif",
+                  fontFamily: "Outfit",
                 ),
               ),
             ),
@@ -934,13 +934,13 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Permission Required',
-            style: TextStyle(fontFamily: "PTSerif")),
+            style: TextStyle(fontFamily: "Outfit")),
         content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child:
-                const Text('Cancel', style: TextStyle(fontFamily: "PTSerif")),
+                const Text('Cancel', style: TextStyle(fontFamily: "Outfit")),
           ),
           TextButton(
             onPressed: () {
@@ -948,7 +948,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
               Navigator.pop(context);
             },
             child: const Text('Open Settings',
-                style: TextStyle(fontFamily: "PTSerif")),
+                style: TextStyle(fontFamily: "Outfit")),
           ),
         ],
       ),

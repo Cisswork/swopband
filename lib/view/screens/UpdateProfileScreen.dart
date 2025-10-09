@@ -280,7 +280,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                fontFamily: "PTSerif",
+                fontFamily: "Outfit",
               ),
             ),
             const SizedBox(height: 16),
@@ -326,7 +326,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.red,
-                  fontFamily: "PTSerif",
+                  fontFamily: "Outfit",
                 ),
               ),
             ),
@@ -545,7 +545,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                     Text(
                                       _selectedCountry.flagEmoji,
                                       style: const TextStyle(
-                                          fontSize: 20, fontFamily: "PTSerif"),
+                                          fontSize: 20, fontFamily: "Outfit"),
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
@@ -553,7 +553,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        fontFamily: "PTSerif",
+                                        fontFamily: "Outfit",
                                         color: MyColors.textBlack,
                                       ),
                                     ),
@@ -579,7 +579,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                               hintStyle: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: "PTSerif",
+                                fontFamily: "Outfit",
                                 color: MyColors.textBlack,
                                 decoration: TextDecoration.none,
                                 wordSpacing: 1.2,
@@ -650,7 +650,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
-                                    fontFamily: "PTSerif",
+                                    fontFamily: "Outfit",
                                   ),
                                 ),
                               ),
@@ -667,7 +667,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
                         hintStyle: const TextStyle(
                           fontSize: 14,
-                          fontFamily: "PTSerif",
+                          fontFamily: "Outfit",
                           color: MyColors.textBlack,
                           decoration: TextDecoration.none,
                           wordSpacing: 1.2,

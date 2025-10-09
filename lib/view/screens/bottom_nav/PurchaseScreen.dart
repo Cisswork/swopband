@@ -92,7 +92,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
         title: const Text(
           "Purchase Swopband",
           style: TextStyle(
-            fontFamily: "PTSerif",
+            fontFamily: "Outfit",
           ),
         ),
       ),
