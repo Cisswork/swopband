@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:swopband/controller/user_controller/UserController.dart';
+
 // import 'package:swopband/view/network/ApiService.dart';
 import 'package:swopband/view/utils/app_constants.dart';
 import 'package:swopband/view/utils/shared_pref/SharedPrefHelper.dart';
@@ -171,7 +172,6 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
     super.dispose();
   }
 
-
   void _showEditDialog(int index) {
     final link = controller.links[index];
     final TextEditingController urlController =
@@ -202,8 +202,12 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
               backgroundColor: MyColors.backgroundColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
-              title: const Text('Edit Link',style: TextStyle(                    fontFamily: "Outfit",
-              ),),
+              title: const Text(
+                'Edit Link',
+                style: TextStyle(
+                  fontFamily: "Outfit",
+                ),
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -231,7 +235,8 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                         child: TextField(
                           controller: urlController,
                           decoration: InputDecoration(
-                            labelStyle: TextStyle(                    fontFamily: "Outfit",
+                            labelStyle: TextStyle(
+                              fontFamily: "Outfit",
                             ),
                             labelText:
                                 'Enter $linkName ${linkName == "Phone" ? "Number" : linkName == "Email" ? "Id" : "URL"}',
@@ -248,8 +253,12 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel',style: TextStyle(                    fontFamily: "Outfit",
-                  ),),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      fontFamily: "Outfit",
+                    ),
+                  ),
                 ),
                 Obx(() => controller.isLoading.value
                     ? const CircularProgressIndicator()
@@ -262,8 +271,12 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                           );
                           Navigator.of(context).pop();
                         },
-                        child: const Text('Save',style: TextStyle(                    fontFamily: "Outfit",
-                        ),),
+                        child: const Text(
+                          'Save',
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                          ),
+                        ),
                       )),
               ],
             );
@@ -416,8 +429,6 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                 Text(
                                   AppStrings.editLinks.tr,
                                   style: AppTextStyles.extraLarge.copyWith(
-
-
                                     color: Colors.white,
                                     fontSize: 30,
                                     fontWeight: FontWeight.bold,
@@ -563,7 +574,9 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                       const SizedBox(width: 8),
                                                       Flexible(
                                                         child: Text(
-                                                          style: TextStyle(                    fontFamily: "Outfit",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                "Outfit",
                                                           ),
                                                           entry.value['name'],
                                                           overflow: TextOverflow
@@ -658,8 +671,10 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                                             width:
                                                                                 8),
                                                                         Text(
-                                                                          style: TextStyle(                    fontFamily: "Outfit",
-                                                                          ),
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontFamily: "Outfit",
+                                                                            ),
                                                                             'Edit'),
                                                                       ],
                                                                     ),
@@ -679,8 +694,10 @@ class _EditLinksScreenState extends State<EditLinksScreen> {
                                                                             width:
                                                                                 8),
                                                                         Text(
-                                                                          style: TextStyle(                    fontFamily: "Outfit",
-                                                                          ),
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontFamily: "Outfit",
+                                                                            ),
                                                                             'Delete'),
                                                                       ],
                                                                     ),

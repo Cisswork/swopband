@@ -26,7 +26,7 @@ class AppTextStyles {
 
   static const TextStyle extraLarge = TextStyle(
     fontSize: 36,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w400,
     fontFamily: fontFamily,
     letterSpacing: -0.2, // 2% tighter spacing
   );

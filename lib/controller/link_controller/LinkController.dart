@@ -62,7 +62,7 @@ class LinkController extends GetxController {
         final parsed = _parsePhone(url);
         final body = {
           "type": "primary",
-          "country_code": parsed["country_code"] ?? "+1",
+          "country_code": parsed["country_code"] ??"",
           "number": parsed["number"] ?? "",
         };
         log("phone body---->$body");
@@ -314,7 +314,7 @@ class LinkController extends GetxController {
         final parsed = _parsePhone(url);
         final body = {
           'type': 'primary',
-          'country_code': parsed['country_code'] ?? '+1',
+          'country_code': parsed['country_code'] ?? '',
           'number': parsed['number'] ?? '',
         };
         response =
