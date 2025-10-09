@@ -12,7 +12,7 @@ class AppTextStyles {
 
   static const TextStyle medium = TextStyle(
     fontSize: 16,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w400,
     fontFamily: fontFamily,
     letterSpacing: -0.2, // 2% tighter spacing
   );
