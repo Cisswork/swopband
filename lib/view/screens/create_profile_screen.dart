@@ -870,14 +870,14 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
 
     try {
       // 🔹 Check permissions based on source
-      if (source == ImageSource.camera) {
+      /*if (source == ImageSource.camera) {
         var cameraStatus = await Permission.camera.request();
         if (cameraStatus != PermissionStatus.granted) {
           _showPermissionDialog(
               'Camera permission is required to take photos.');
           return;
         }
-      } else {
+      }*/
         // On Android 13+, use Permission.photos instead of storage if needed
         var storageStatus = await Permission.storage.request();
         if (storageStatus != PermissionStatus.granted) {
@@ -885,7 +885,7 @@ class _ImagePickerExampleState extends State<ImagePickerExample> {
               'Storage permission is required to access photos.');
           return;
         }
-      }
+
 
       // 🔹 Pick image (optimized settings)
       final XFile? pickedFile = await _picker.pickImage(

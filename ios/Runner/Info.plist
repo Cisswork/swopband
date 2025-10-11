@@ -66,8 +66,7 @@
           </array>
         </dict>
       </array>
-<key>NSUserTrackingUsageDescription</key>
-<string>Used for Apple Sign-In authentication.</string>
+
 
       <key>NSFaceIDUsageDescription</key>
       <string>Sign in with Apple requires Face ID permission.</string>

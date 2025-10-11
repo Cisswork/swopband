@@ -14,6 +14,7 @@ import 'package:swopband/view/widgets/feedback_modal.dart';
 import '../translations/app_strings.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_text_styles.dart';
+import '../../controller/recent_swoppers_controller/RecentSwoppersController.dart';
 import 'ChangeEmailAddressScreen.dart';
 import 'FaqScreen.dart';
 import 'UpdatePasswordScreen.dart';
@@ -450,10 +451,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _signOutUser() async {
     try {
+      // Clear controller data first
+      try {
+        final recentSwoppersController = Get.find<RecentSwoppersController>();
+        recentSwoppersController.clearAllDataOnLogout();
+      } catch (e) {
+        log("⚠️ RecentSwoppersController not found during logout: $e");
+      }
+      
       await FirebaseAuth.instance.signOut();
       if (Platform.isAndroid) await GoogleSignIn().signOut();
       await SharedPrefService.clear();
       Get.offAll(() => const WelcomeScreen());
+      
+      log("✅ Complete logout successful - all data cleared");
     } catch (e) {
       print('❌ Error signing out: $e');
       SnackbarUtil.showError('Failed to sign out.');

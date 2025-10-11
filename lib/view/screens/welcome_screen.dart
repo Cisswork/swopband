@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:swopband/view/screens/bottom_nav/BottomNavScreen.dart';
 import 'package:swopband/view/widgets/custom_button.dart';
 import '../../controller/user_controller/UserController.dart';
+import '../../controller/recent_swoppers_controller/RecentSwoppersController.dart';
 import '../utils/app_colors.dart';
 import '../utils/images/iamges.dart';
 import '../utils/shared_pref/SharedPrefHelper.dart';
@@ -232,9 +235,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
   }
   Future<void> signOut() async {
+    // Clear controller data first
+    try {
+      final recentSwoppersController = Get.find<RecentSwoppersController>();
+      recentSwoppersController.clearAllDataOnLogout();
+    } catch (e) {
+      log("⚠️ RecentSwoppersController not found during logout: $e");
+    }
+    
     await GoogleSignIn().signOut();
     await FirebaseAuth.instance.signOut();
     await SharedPrefService.clear(); // ya at least remove 'firebase_id'
+    
+    log("✅ Complete logout successful - all data cleared");
   }
 
   @override

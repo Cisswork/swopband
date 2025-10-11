@@ -127,26 +127,26 @@ class _ConnectSwopbandScreenState extends State<ConnectSwopbandScreen> {
 
   Future<void> _startNfcSessionAndWrite() async {
     log("[NFC] Calling controller.createUser()");
-    File? selectedFile =
-        (widget.imagePickerKey.currentState as dynamic)?.getSelectedImageFile();
-    String profileImage = await _getCurrentProfileImage();
-    await controller.createUser(
-      username: widget.username,
-      name: widget.name,
-      email: widget.email,
-      bio: widget.bio,
-      age: widget.age,
-      phone: widget.phone,
-      countryCode: widget.countryCode,
-      profileFile: selectedFile,
-      profileUrl: selectedFile == null ? profileImage : null,
-      onSuccess: () {
-        log("[NFC] User created successfully, navigating to AddLinkScreen.");
-        // Resume background operations after successful operation
-        _nfcBackgroundService.resumeBackgroundOperations();
-        Get.offAll(() => const AddLinkScreen());
-      },
-    );
+    // File? selectedFile =
+    //     (widget.imagePickerKey.currentState as dynamic)?.getSelectedImageFile();
+    // String profileImage = await _getCurrentProfileImage();
+    // await controller.createUser(
+    //   username: widget.username,
+    //   name: widget.name,
+    //   email: widget.email,
+    //   bio: widget.bio,
+    //   age: widget.age,
+    //   phone: widget.phone,
+    //   countryCode: widget.countryCode,
+    //   profileFile: selectedFile,
+    //   profileUrl: selectedFile == null ? profileImage : null,
+    //   onSuccess: () {
+    //     log("[NFC] User created successfully, navigating to AddLinkScreen.");
+    //     // Resume background operations after successful operation
+    //     _nfcBackgroundService.resumeBackgroundOperations();
+    //     Get.offAll(() => const AddLinkScreen());
+    //   },
+    // );
     log("[NFC] Starting NFC session and write process...");
     setState(() {
       _nfcStatus = "Hold your iPhone near the Swopband ring...";

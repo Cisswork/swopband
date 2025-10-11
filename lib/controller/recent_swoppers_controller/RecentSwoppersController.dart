@@ -48,11 +48,12 @@ class RecentSwoppersController extends GetxController {
       }
 
       final firebaseId = await SharedPrefService.getString('firebase_id');
-      if (firebaseId == null) {
+      if (firebaseId == null || firebaseId.isEmpty) {
         SnackbarUtil.showError("Firebase ID not found");
-        // Load mock data if no firebase ID (for testing)
+        // Clear existing data if no firebase ID
+        recentSwoppers.clear();
         fetchRecentSwoppersLoader.value = false;
-        log("❌ No Firebase ID found, cannot fetch connections");
+        log("❌ No Firebase ID found, cleared connections data");
         return;
       }
 
@@ -269,6 +270,17 @@ class RecentSwoppersController extends GetxController {
 
   void clearAllConnections() {
     recentSwoppers.clear();
+  }
+
+  // Method to clear all data on logout
+  void clearAllDataOnLogout() {
+    log("🧹 Clearing all connection data on logout...");
+    recentSwoppers.clear();
+    isLoading.value = false;
+    fetchRecentSwoppersLoader.value = false;
+    isCreatingConnection.value = false;
+    useMockData.value = false;
+    log("✅ All connection data cleared");
   }
 
   // Method to toggle mock data for testing
